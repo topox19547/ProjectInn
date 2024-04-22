@@ -7,10 +7,12 @@
 class TextStatType{
     private defaultValue:string;
     private name:string;
+    private readonly maxLength:number;
 
     constructor(name:string, defaultValue:string){
         this.name = name;
         this.defaultValue = defaultValue;
+        this.maxLength = 140;
     }
 
     /**
@@ -39,5 +41,14 @@ class TextStatType{
      */
     public setDefaultValue(defaultValue:string):void{
         this.defaultValue = defaultValue;
+    }
+
+    /**
+     * checks if the given value is less than the maximum length
+     * @param value the string to check
+     * @returns whether it is shorter than the maximum length
+     */
+    public isValueValid(value:string):boolean{
+        return value.length < this.maxLength;
     }
 }
