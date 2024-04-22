@@ -1,8 +1,8 @@
 import { ProviderNode } from "./ProviderNode";
 import { Game } from "./Game";
-import { PermissionProvider } from "../permissions/PermissionsProvider";
+import { PermissionProvider } from "../deprecated/PermissionsProvider";
 import { PermissionStorage } from "../permissions/PermissionsStorage";
-import { Player } from "../Player/Player"
+import { Player } from "../player/Player"
 import { Provider } from "../deprecated/Provider";
 import { StatTypesProvider } from "../deprecated/StatTypesProvider";
 import { StatTypesStorage } from "../stats/StatTypesStorage";
@@ -15,20 +15,24 @@ import { StatTypesStorage } from "../stats/StatTypesStorage";
 export class TokenType extends ProviderNode{
     private name:string;
     private assetPath:string;
-    private localPermissions:PermissionStorage;
-    private localStatTypes:StatTypesStorage;
     private game:Game;
 
     constructor(name:string, assetPath:string, game:Game){
         super();
         this.name = name;
         this.assetPath = assetPath;
-        this.localPermissions = new PermissionStorage();
-        this.localStatTypes= new StatTypesStorage();
         this.game = game;
     }
 
     public getHigherScope(): ProviderNode {
         return this.game;
+    }
+
+    public setName(name:string){
+        this.name = name;
+    }
+
+    public getName():string{
+        return this.name;
     }
 }

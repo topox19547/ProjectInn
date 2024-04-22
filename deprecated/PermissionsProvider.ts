@@ -1,6 +1,6 @@
-import { PermissionStorage } from "./PermissionsStorage";
-import { Player } from "../Player/Player";
-import { Provider } from "../deprecated/Provider";
+import { PermissionStorage } from "../permissions/PermissionsStorage";
+import { Player } from "../player/Player";
+import { Provider } from "./Provider";
 
 /**
  * interface for classes that are part of the permission tree.

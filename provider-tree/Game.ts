@@ -1,6 +1,6 @@
 import { ProviderNode } from "./ProviderNode";
-import { PermissionProvider } from "../permissions/PermissionsProvider";
-import { Player } from "../Player/Player";
+import { PermissionProvider } from "../deprecated/PermissionsProvider";
+import { Player } from "../player/Player";
 import { StatTypesProvider } from "../deprecated/StatTypesProvider";
 
 export class Game extends ProviderNode{
