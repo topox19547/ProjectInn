@@ -39,7 +39,7 @@ export class Vector2Map<T>{
         if(index == -1){
             return undefined;
         }
-        return this.values[index];
+        return this.values[index]; 
     }
 
     public set(key:Vector2, t:T):void{

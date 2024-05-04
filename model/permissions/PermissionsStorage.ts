@@ -2,7 +2,7 @@
  * class that stores permissions for other classes, such as Token and TokenType
  */
 
-import { Player } from "../player/Player";
+import { Player } from "../actors/Player";
 
 export class PermissionStorage{
     private localPermissions:Map<Permission,Array<Player>>;
