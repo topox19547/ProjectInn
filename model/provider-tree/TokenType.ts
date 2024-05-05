@@ -2,7 +2,6 @@ import { ProviderNode } from "./ProviderNode";
 import { Game } from "./Game";
 import { PermissionProvider } from "../deprecated/PermissionsProvider";
 import { PermissionStorage } from "../permissions/PermissionsStorage";
-import { Player } from "../actors/Player"
 import { Provider } from "../deprecated/Provider";
 import { StatTypesProvider } from "../deprecated/StatTypesProvider";
 import { StatTypesStorage } from "../stats/StatTypesStorage";

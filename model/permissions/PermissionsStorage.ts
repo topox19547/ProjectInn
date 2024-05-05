@@ -1,14 +1,17 @@
+
 /**
  * class that stores permissions for other classes, such as Token and TokenType
  */
 
-import { Player } from "../actors/Player";
+import { GameActor as String } from "../actors/GameActor";
+import { Permission } from "./Permission";
+
 
 export class PermissionStorage{
-    private localPermissions:Map<Permission,Array<Player>>;
+    private localPermissions:Map<Permission,Array<String>>;
 
     constructor(){
-        this.localPermissions = new Map<Permission,Array<Player>>();
+        this.localPermissions = new Map<Permission,Array<String>>();
     }
 
     /**
@@ -17,8 +20,8 @@ export class PermissionStorage{
      * @param permission the permission to check for
      * @returns whether the player has the given permission
      */
-    public hasPermission(player:Player, permission:Permission):boolean{
-        let players : Array<Player> | undefined = this.localPermissions.get(permission);
+    public hasPermission(player:String, permission:Permission):boolean{
+        let players : Array<String> | undefined = this.localPermissions.get(permission);
         if(players == undefined){
             return false;
         }
@@ -30,10 +33,10 @@ export class PermissionStorage{
      * @param player the player to receive the permission
      * @param permission the permission to give
      */
-    public addPermission(player:Player, permission:Permission):void{
-        let players : Array<Player> | undefined = this.localPermissions.get(permission)
+    public addPermission(player:String, permission:Permission):void{
+        let players : Array<String> | undefined = this.localPermissions.get(permission)
         if(players == undefined){
-            players = new Array<Player>;
+            players = new Array<String>;
             this.localPermissions.set(permission,players);
         }
         players.push(player);
@@ -44,8 +47,8 @@ export class PermissionStorage{
      * @param player the player to lose the permission
      * @param permission the permission to remove
      */
-    public removePermission(player:Player, permission:Permission):void{
-        const players : Array<Player> | undefined = this.localPermissions.get(permission);
+    public removePermission(player:String, permission:Permission):void{
+        const players : Array<String> | undefined = this.localPermissions.get(permission);
         if(players == undefined){
             return;
         }
@@ -61,7 +64,7 @@ export class PermissionStorage{
      */
     public clone():PermissionStorage{
         const newPermStorage = new PermissionStorage();
-        newPermStorage.localPermissions = new Map<Permission,Array<Player>>();
+        newPermStorage.localPermissions = new Map<Permission,Array<String>>();
         for(const [key, value] of this.localPermissions.entries()){
             newPermStorage.localPermissions.set(key, [...value]);
         }

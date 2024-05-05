@@ -66,4 +66,6 @@ export class Vector2Map<T>{
         const index:number = this.keys.findIndex((vec:Vector2) => vec.equals(key));
         return index != -1;
     }
+
+    public deserialize()
 }

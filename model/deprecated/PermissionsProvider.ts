@@ -1,5 +1,4 @@
 import { PermissionStorage } from "../permissions/PermissionsStorage";
-import { Player } from "../actors/Player";
 import { Provider } from "./Provider";
 
 /**

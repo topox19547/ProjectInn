@@ -3,7 +3,7 @@
  * every permission has a specific list of scopes where it can be applied, specified at the end of each line here
  */
 
-enum Permission{
+export enum Permission{
     KICK, //Permission that lets the user kick other users (excluding the game master) (GLOBAL)
     MAP_MOD, //Permission that lets the user change to another map (GLOBAL)
     TOKEN_TYPE_CREATE, //Permission that lets a user create or delete token types (GLOBAL)
