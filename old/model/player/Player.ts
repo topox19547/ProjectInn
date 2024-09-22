@@ -1,4 +1,4 @@
-import { Color } from "../../Color";
+import { Color } from "./Color";
 
 /**
  * a class used for every entity that takes part in a game

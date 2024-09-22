@@ -1,0 +1,4 @@
+enum GridType{
+    SQUARE,
+    HEXAGONAL
+}

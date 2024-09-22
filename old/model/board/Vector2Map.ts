@@ -6,7 +6,7 @@
  * comparison by reference.
  */
 
-import { Vector2 } from "./Vector2";
+import { Vector2 } from "../../../model/Vector2";
 
 export class Vector2Map<T>{
     private keys:Array<Vector2>;

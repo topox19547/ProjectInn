@@ -1,5 +1,5 @@
 import { Provider } from "./Provider";
-import { StatTypesStorage } from "../stats/StatTypesStorage";
+import { StatTypesStorage } from "./stats/StatTypesStorage";
 
 export interface StatTypesProvider extends Provider{
     /**

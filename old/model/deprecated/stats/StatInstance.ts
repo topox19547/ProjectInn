@@ -6,10 +6,9 @@
  * T is the type of the value held by the statInstance, V is the StatType class to utilize.
  */
 
-export class StatInstance<T,V>{
+class StatInstance<T,V extends StatType<T>>{
     private value:T;
     private statType:V;
-    private valueChecker:(t:T) => boolean;
 
     /**
      * constructor for StatInstance
@@ -18,10 +17,9 @@ export class StatInstance<T,V>{
      * @param valueChecker the method that checks for the validity of a given value
      *                      usually provided by the StatType class itself
      */
-    constructor(value:T,statType:V,valueChecker:(t:T) => boolean){
+    constructor(value:T,statType:V){
         this.value = value;
         this.statType = statType;
-        this.valueChecker = valueChecker;
     }
     
     /**
@@ -37,7 +35,7 @@ export class StatInstance<T,V>{
      * @returns whether it has been set or not
      */
     public setValue(value:T):boolean{
-        if (this.valueChecker(value)){
+        if (this.statType.isValueValid(value)){
             this.value = value;
             return true;
         }

@@ -2,7 +2,7 @@
  * class representing a vector with two components
  * a few useful methods added for convenience
  */
-export class Vector2{
+class Vector2{
     private x:number;
     private y:number;
 
@@ -25,6 +25,11 @@ export class Vector2{
 
     public setX(x:number){
         this.x = x;
+    }
+
+    public setTo(position : Vector2){
+        this.x = position.getX();
+        this.y = position.getY();
     }
 
     public translateX(increment:number){

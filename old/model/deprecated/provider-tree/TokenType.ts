@@ -1,10 +1,8 @@
 import { ProviderNode } from "./ProviderNode";
 import { Game } from "./Game";
-import { PermissionProvider } from "../deprecated/PermissionsProvider";
-import { PermissionStorage } from "../permissions/PermissionsStorage";
-import { Provider } from "../deprecated/Provider";
-import { StatTypesProvider } from "../deprecated/StatTypesProvider";
-import { StatTypesStorage } from "../stats/StatTypesStorage";
+import { PermissionProvider } from "../PermissionsProvider";
+import { Provider } from "../Provider";
+import { StatTypesProvider } from "../StatTypesProvider";
 
 /**
  * class that synchronizes the the default name, the attribute types,

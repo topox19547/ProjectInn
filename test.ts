@@ -1,12 +1,12 @@
-import { Color } from "./Color";
-import { GameActor } from "./model/actors/GameActor";
+import { Color } from "./model/player/Color";
+import { GameActor } from "./model/player/Player";
 import { PermissionStorage } from "./model/permissions/PermissionsStorage";
-import { Permission } from "./model/permissions/Permission";
+import { Permission } from "./model/player/Permission";
 import { Vector2Map } from "./model/board/Vector2Map";
 import { Vector2 } from "./model/board/Vector2";
-import { Token } from "./model/provider-tree/Token";
-import { TokenType } from "./model/provider-tree/TokenType";
-import { Game } from "./model/provider-tree/Game";
+import { Token } from "./model/deprecated/provider-tree/Token";
+import { TokenType } from "./model/deprecated/provider-tree/TokenType";
+import { Game } from "./model/deprecated/provider-tree/Game";
 let perms:PermissionStorage = new PermissionStorage();
 let gamer:GameActor = new GameActor(new Color("#FFFFFF"),"P")
 perms.addPermission(gamer,Permission.DICE_ROLL);
