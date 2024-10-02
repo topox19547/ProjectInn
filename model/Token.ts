@@ -1,11 +1,11 @@
 class Token{
+    private name : string;
     private readonly asset : Asset;
     private readonly id : number;
     private readonly owners : Array<string>;
     private readonly notes : Map<string,string>;
     private readonly stats : Map<string, Stat>;
     private readonly position : Vector2;
-    private name : string;
     private readonly maxNameLength: number;
     private readonly maxNoteLength : number;
 

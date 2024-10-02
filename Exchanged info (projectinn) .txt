@@ -1,0 +1,81 @@
+Exchanged info
+
+Game creation:
+Client : gameName, starting map object
+Server : game ID
+
+Game join:
+Client : name, gameID, password?
+Server : gameName, playerList, playerIdentity, Map, Token (maybe game file?)
+
+Token moved:
+Client : tokenID?, new position
+Server : tokenID, new position (broadcast to all) / ERROR
+
+Token moving:
+Client : tokenID?, new position
+Server : tokenID, new position (broadcast to all) / ERROR
+
+New token:
+Client : tokenType, spawn position
+Server : replicate, broadcasting to everyone / ERROR
+
+Deleted token
+Client : TokenID
+Server : TokenID / ERROR
+
+Token ownership update:
+Client : tokenID, user, state
+Server : replicate to everyone / ERROR
+
+Token attribute added/removed:
+Client : tokenAttribute, tokenID, status (added/removed)
+Server : replicate, broadcasting to everyone / ERROR
+
+Token attribute value changed:
+Client : new tokenAttribute, tokenID
+Server : replicate, broadcasting to everyone / ERROR
+
+New token type:
+Client : asset URL, name
+Server : replicate to people who have token management permissions, TokenTypeID / ERROR
+
+Deleted token type:
+Client : TokenTypeName
+Server : TokenTypeName (to people with management permissions) / ERROR
+
+Global permission update:
+Client : User, permission, state
+Server : replicate to the user + to all masters / ERROR
+
+Map changed:
+Client : asset, offset, various map fuckery
+Server : replicate to everyone / ERROR
+
+Chat message:
+Client : message
+Server : replicate to everyone
+
+Map ping:
+Client : coordinates
+Server : replicate to everyone
+
+Ping (obvious)
+
+message structure:
+{
+	STATUS: one of the statuses above
+	CONTENT: an object with a certain amount of given parameters
+}
+
+
+Things that will require serialization/deserialization
+TokenAttributes
+
+
+
+
+Possible ways to handle save
+- JSON + file URLs (chosen, for now)
+- JSON + base64 images
+- IndexedDB (kinda weird)
