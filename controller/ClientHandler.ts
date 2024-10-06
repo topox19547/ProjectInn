@@ -3,4 +3,5 @@ interface ClientHandler{
     close():void
     receive():void
     send():void
+    changeState(state : ClientState):void
 }

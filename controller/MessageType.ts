@@ -1,0 +1,18 @@
+enum MessageType{
+    REQUEST_GAMES,
+    CREATE_GAME,
+    JOIN_GAME,
+    TOKEN_MOVING,
+    TOKEN_MOVED,
+    TOKEN,
+    TOKEN_OWNERSHIP,
+    TOKEN_ATTRIBUTE,
+    TOKEN_NOTE,
+    TOKEN_ASSET,
+    PERMISSIONS,
+    MAP_ASSET,
+    MAP_CHANGED,
+    MAP_PING,
+    CHAT,
+    PING
+}

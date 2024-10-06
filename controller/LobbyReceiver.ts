@@ -1,4 +1,4 @@
-class DefaultState implements ClientState{
+class LobbyController implements ClientState{
     private readonly server : Server;
 
     constructor(server : Server){

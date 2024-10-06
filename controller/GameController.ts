@@ -1,3 +1,3 @@
-class GameController{
+class GameContr{
     
 }
