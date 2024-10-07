@@ -5,13 +5,11 @@ class Game{
     private readonly tokenAssets : Array<Asset>;
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
-    private readonly gameID : number;
     private readonly maxPasswordLength;
     private currentScene : Scene;
     private password : string | undefined;
     
-    constructor(gameID:number, name : string, owner : Player, password : string | undefined, startingScene : Scene){
-        this.gameID = gameID;
+    constructor(name : string, owner : Player, password : string | undefined, startingScene : Scene){
         this.name = name;
         this.ownerName = owner.getName();
         this.players = new Array().concat(owner);
@@ -109,6 +107,9 @@ class Game{
         if(sceneIndex == -1){
             return false;
         }
+        if(this.scenes.length <= 1){
+            return false;
+        }
         this.scenes.splice(sceneIndex, 1);
         return true;
     }
@@ -117,7 +118,13 @@ class Game{
         return [... this.scenes];
     }
 
-    public changeScene(scene : Scene) :  
+    public getCurrentScene() : Scene{
+        return this.currentScene;
+    }
+
+    public changeScene(scene : Scene) : void{
+        this.currentScene = scene;
+    }
 
     public checkPassword(attempt : string) : boolean{
         return this.password == undefined || attempt == this.password;

@@ -48,6 +48,8 @@ Global permission update:
 Client : User, permission, BOOL
 Server : replicate to the user + to all masters / ERROR
 
+Asset URL changed:
+
 Map changed:
 Client : asset, offset, various map fuckery
 Server : replicate to everyone / ERROR

@@ -2,21 +2,19 @@
 class Scene{
     private readonly asset : Asset;
     private gridType : GridType;
-    private offset : number;
+    private offset : Vector2;
     private tileSize : number;
-    private readonly mapSize : Vector2;
     private readonly maxTileSize : number;
     private readonly minTileSize : number;
 
-    //Remember to always check if the asset's image can be loaded before using in in the constructor
-    constructor(asset : Asset, grid : GridType, offset : number, tilesize : number, mapSize : Vector2){
+    //Remember to always check if the asset's image can be loaded before using it in the constructor
+    constructor(asset : Asset, grid : GridType, offset : Vector2, tileSize : number, mapSize : Vector2){
         this.asset = asset;
         this.gridType = grid;
-        this.offset = offset;
-        this.tileSize = tilesize;
+        this.offset = new Vector2(tileSize % offset.getX(), tileSize % offset.getY());
+        this.tileSize = tileSize;
         this.maxTileSize = 1000;
         this.minTileSize = 30;
-        this.mapSize = mapSize; //TODO: find a way to update this when the asset URL changes
     }
 
     public getAsset() : Asset{
@@ -31,12 +29,12 @@ class Scene{
         this.gridType = gridType; 
     }
 
-    public getOffset() : number{
+    public getOffset() :Vector2{
         return this.offset;
     }
 
-    public setOffset(offset : number) : void{
-        this.offset = offset;
+    public setOffset(offset : Vector2) : void{
+        this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
     }
 
     public getTileSize() : number{
@@ -51,7 +49,10 @@ class Scene{
         return true;
     }
 
-    public isValidPosition(position : Vector2){
-
+    public isValidPosition(position : Vector2) : boolean{
+        const mapSize : Vector2 | undefined = this.asset.getSize();
+        return mapSize != undefined &&
+            Math.ceil(mapSize.getX() + this.offset.getX() / this.tileSize) >= position.getX() &&
+            Math.ceil(mapSize.getY() + this.offset.getY() / this.tileSize) >= position.getY();
     }
 }
