@@ -11,7 +11,7 @@ class Lobby{
         let id = 1;
         while(this.games.has(id)){
             id++;
-            if (i == this.maxConcurrentGames){
+            if (id == this.maxConcurrentGames){
                 throw new Error("all the game slots are full")
             }
         }
@@ -19,8 +19,15 @@ class Lobby{
         return id;
     }
 
-    public removeGame(game : Game) : boolean{
-        
+    public removeGame(game : Game) : void{
+        for(let [id, g] of this.games){
+            if(g == game){
+                this.games.delete(id);
+            }
+        }
     }
 
+    public getGameById(id : number) : Game | undefined{
+        return this.games.get(id);
+    }
 }
