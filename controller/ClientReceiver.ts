@@ -1,3 +1,0 @@
-interface ClientState{
-    handleMessage() : void
-}

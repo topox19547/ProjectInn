@@ -1,11 +1,11 @@
 class LobbyController implements ClientState{
-    private readonly server : Server;
+    private readonly lobby : Lobby;
 
-    constructor(server : Server){
-        this.server = server;
+    constructor(lobby : Lobby){
+        this.lobby = lobby;
     }
 
-    handleMessage(): void {
+    handleMessage(message : string): void {
         throw new Error("Method not implemented.");
     }
 }

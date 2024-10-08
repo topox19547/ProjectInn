@@ -12,7 +12,7 @@ class GameController implements ClientState{
         this.endProcedure = endProcedure;
     }
 
-    handleMessage(): void {
+    handleMessage(message : string): void {
         throw new Error("Method not implemented.");
     }
 
