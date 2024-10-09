@@ -24,6 +24,6 @@ class ClientNotifier{
             if(p != undefined && check(p)){
                 c.send(message);
             }
-        })
+        });
     }
 }

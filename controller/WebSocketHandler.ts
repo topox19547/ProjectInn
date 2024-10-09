@@ -4,6 +4,10 @@ class WebSocketHandler implements ClientHandler{
     constructor(webSocket : WebSocket){
         this.webSocket = webSocket;
     }
+    
+    changeState(state: ClientState): void {
+        throw new Error("Method not implemented.");
+    }
 
     open(): void {
         throw new Error("Method not implemented.");

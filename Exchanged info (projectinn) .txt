@@ -11,10 +11,30 @@ Server : gameName, playerList, playerIdentity, Map, Token (maybe game file?)
 Token moved:
 Client : tokenID?, new position
 Server : tokenID, new position (broadcast to all) / ERROR
+Client : {
+	Status : "TOKEN_MOVED"
+	ID : number
+	position : Vector2
+}
+Server : {
+	Status : "TOKEN_MOVED"
+	ID : number
+	position : Vector2
+} (always broadcasted to everyone)
 
 Token moving:
 Client : tokenID?, new position
 Server : tokenID, new position (broadcast to all) / ERROR
+Client : {
+	Status : "TOKEN_MOVING"
+	ID : number
+	position : Vector2
+}
+Server : {
+	Status : "TOKEN_MOVING"
+	ID : number
+	position : Vector2
+} (always broadcasted to everyone)
 
 New token:
 Client : tokenType, spawn position
@@ -49,6 +69,18 @@ Client : User, permission, BOOL
 Server : replicate to the user + to all masters / ERROR
 
 Asset URL changed:
+Client : {
+	Status : "ASSET"
+	Command : "MODIFY"
+	AssetID : number
+	AssetURL : url string
+}
+Server : {
+	Status : "ASSET"
+	Command : "SAFE_MODIFY"
+	AssetID : number
+	AssetURL : url string
+} (broadcast to all if asset is in use, only send to people with "MANAGE_TOKEN" permissions otherwise)
 
 Map changed:
 Client : asset, offset, various map fuckery
@@ -70,8 +102,10 @@ Ping (obvious)
 message structure:
 {
 	STATUS: one of the statuses above
-	CONTENT: an object with a certain amount of given parameters
+	CONTENT...
 }
+
+messages could be built using builder pattern
 
 
 Things that will require serialization/deserialization

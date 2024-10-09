@@ -1,6 +1,6 @@
 
 class Scene{
-    private readonly asset : Asset;
+    private asset : Asset;
     private gridType : GridType;
     private offset : Vector2;
     private tileSize : number;
