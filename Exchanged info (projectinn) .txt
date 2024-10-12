@@ -1,12 +1,35 @@
 Exchanged info
 
 Game creation:
-Client : gameName, password, starting map object
+Client : gameName, playername, password, starting map object
 Server : game ID
+Client : {
+	Status : "CREATE_GAME"
+	gameName : string
+	playername : string
+	password : string
+	asset : {
+		assetID : number
+		assetURL : url string
+		assetName : string
+	}
+}
+
+Server : {
+	same as game join response
+}
 
 Game join:
 Client : name, gameID, password? (if required)
 Server : gameName, playerList, playerIdentity, Map, Token (maybe game file?)
+Client : {
+	Status : "JOIN_GAME"
+	ID : gameID
+	password : string
+}
+Server : {
+	Status : "
+}
 
 Token moved:
 Client : tokenID?, new position
@@ -39,39 +62,95 @@ Server : {
 New token:
 Client : tokenType, spawn position
 Server : replicate, broadcasting to everyone / ERROR
+Client : {
+	Status : "TOKEN"
+	Command : "CREATE"
+	assetID : number
+	position : Vector2
+}
+Server : {
+	Status : "TOKEN"
+	Command : "CREATE"
+	assetID : number
+	tokenID : number
+	position : Vector2
+}
 
 Deleted token
 Client : TokenID
 Server : TokenID / ERROR
+Client : {
+	Status : "TOKEN"
+	Command : "DELETE"
+	ID : number
+}
+Server : {
+	Status : "TOKEN"
+	Command : "DELETE"
+	ID : number
+}
+
 
 Token ownership update:
 Client : tokenID, user, state
 Server : replicate to everyone / ERROR
+Client : {
+	Status : "TOKEN"
+	ID : number
+	Username : string
+	state : bool
+}
+Server : {
+	Status : "TOKEN"
+	ID : number
+	Username : string
+	state : bool
+}
 
-Token attribute added/removed:
+Token attribute added / modified:
 Client : tokenAttribute, tokenID, status (added/removed)
 Server : replicate, broadcasting to everyone / ERROR
+Client : {
+	Status : "TOKEN_ATTRIBUTE"
+	Command : "SAFE_MODIFY"
+	TokenID : number
+	AttributeName : string
+	value : number
+	max : number
+	min : number
+}
+Server : {
+	Status : "TOKEN_ATTRIBUTE"
+	Command : "SAFE_MODIFY"
+	TokenID : number
+	AttributeName : string
+	value : number
+	max : number
+	min : number
+}
 
-Token attribute value changed:
-Client : new tokenAttribute, tokenID
-Server : replicate, broadcasting to everyone / ERROR
+Token attribute removed :
+Client : {
+	Status : "TOKEN_ATTRIBUTE"
+	Command : "DELETE"
+	TokenID : number
+	AttributeName : string
+}
+Server : {
+	Status : "TOKEN_ATTRIBUTE"
+	Command : "DELETE"
+	TokenID : number
+	AttributeName : string
+}
 
-New token type:
+
+
+new asset / modified asset:
 Client : asset URL, name
 Server : replicate to people who have token management permissions, TokenTypeID / ERROR
-
-Deleted token type:
-Client : TokenTypeName
-Server : TokenTypeName (to people with management permissions) / ERROR
-
-Global permission update:
-Client : User, permission, BOOL
-Server : replicate to the user + to all masters / ERROR
-
-Asset URL changed:
 Client : {
 	Status : "ASSET"
-	Command : "MODIFY"
+	Command : "SAFE_MODIFY"
 	AssetID : number
 	AssetURL : url string
 }
@@ -80,19 +159,79 @@ Server : {
 	Command : "SAFE_MODIFY"
 	AssetID : number
 	AssetURL : url string
-} (broadcast to all if asset is in use, only send to people with "MANAGE_TOKEN" permissions otherwise)
+	AssetSize : Vector2 (for placeholder asset when client can't load URL)
+}
+
+deleted asset:
+Client : {
+	Status : "ASSET"
+	Command : "DELETE"
+	AssetID : number
+}
+Server : {
+	Status : "ASSET"
+	Command : "DELETE"
+	AssetID : number
+}
+
+Global permission update:
+Client : User, permission, BOOL
+Server : replicate to the user + to all masters / ERROR
+Client : {
+	Status : "PERMISSIONS"
+	Username : string
+	Permission : permission
+	Status : bool
+}
+Server : {
+	Status : "PERMISSIONS"
+	Username : string
+	Permission : permission
+	Status : bool
+}
 
 Map changed:
 Client : asset, offset, various map fuckery
 Server : replicate to everyone / ERROR
+Client : {
+	AssetID : number
+	gridType : GridType
+	offset : Vector2
+	tileSize : number
+}
 
 Chat message:
 Client : message
 Server : replicate to everyone
+Client : {
+	Status : "CHAT"
+	message : string
+}
+Server : {
+	Status : "CHAT"
+	message : string
+	sender : string
+}
 
 Map ping:
 Client : coordinates
 Server : replicate to everyone
+Client : {
+	Status : "MAP_PING"
+	position : Vector2
+}
+Server : {
+	Status : "MAP_PING"
+	position : Vector2
+	sender : string
+}
+
+Error:
+Server :
+{
+	Status : "ERROR"
+	Type : "ANY STATUS"
+}
 
 Image missing error:
 Sent from the server when an image couldn't be loaded

@@ -21,6 +21,18 @@ class Token{
         this.maxNameLength = 24;
     }
 
+    public static fromObject(object: any): Token | undefined {
+        object.hasId()
+        if(object.hasOwnProperty("id")){
+            const token : Token = new Token(object.asset, object.id)
+        }
+        return undefined
+    }
+
+    public static toObject(): Object {
+        throw new Error("Method not implemented.");
+    }
+
     public getAsset() : Asset{
         return this.asset;
     }

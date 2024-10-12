@@ -1,0 +1,61 @@
+[
+    {
+        "name" : "game name",
+        "owner" : "player name",
+        "players" : {
+            "player name" : {
+                "color" : "red",
+                "permissions" : {
+                    "MASTER" : false,
+                    "MAP_MANAGEMENT" : false,
+                    "TOKEN_MANAGEMENT" : false
+                }
+            }
+        },
+        "maps" : [
+            {
+                "grid type" : "hexagonal",
+                "grid offset" : {
+                    "x" : 0,
+                    "y" : 1
+                },
+                "tile size" : 100,
+                "assetID" : 2,
+                "asset" : "map asset",
+                "name" : "swamp"
+            }
+        ],
+        "token types" : [
+            {
+                "assetID" : 1,
+                "name" : "orc",
+                "asset" : "url"
+            }
+        ],
+        "tokens" : [
+            {
+                "id" : 1,
+                "name" : "orc ranger",
+                "tokenType" : "token type name",
+                "owners" : [
+                    "playername",
+                    "playername2"
+                ],
+                "position" : {
+                    "x" : 0,
+                    "y" : 1
+                },
+                "notes" : {
+                    "statuses" : "burned, poisoned"
+                },
+                "attributes" : {
+                    "hp" : {
+                        "value" : 1,
+                        "min" : 0,
+                        "max" : 100
+                    }
+                }
+            }
+        ]
+    }
+]

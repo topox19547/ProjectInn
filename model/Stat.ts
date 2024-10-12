@@ -30,7 +30,7 @@ class Stat{
         return this.max;
     }
 
-    public setMax(max : number | undefined){
+    public setMax(max : number | undefined) : void{
         this.max = max;
         this.value = max != undefined && this.value > max ? max : this.value;
     }

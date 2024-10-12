@@ -1,5 +1,4 @@
 enum MessageType{
-    REQUEST_GAMES,
     CREATE_GAME,
     JOIN_GAME,
     TOKEN_MOVING,
@@ -13,5 +12,6 @@ enum MessageType{
     MAP_CHANGED,
     MAP_PING,
     CHAT,
-    PING
+    PING,
+    ERROR
 }
