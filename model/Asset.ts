@@ -27,6 +27,10 @@ class Asset{
         return this.name;
     }
 
+    public getID() : number{
+        return this.assetID;
+    }
+
     //TODO: ADD CHECK FOR NAME UNIQUENESS ON THE CONTROLLER'S SIDE
     public setName(name : string) : boolean{
         if(name.length <= this.maxNameLength){

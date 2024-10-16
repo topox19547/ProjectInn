@@ -10,6 +10,10 @@ class Vector2{
         this.x = x;
         this.y = y;
     }
+    
+    public static toObject(vector : Vector2){
+        return {x : vector.x, y : vector.y};
+    }
 
     public getX():number{
         return this.x;

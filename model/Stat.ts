@@ -3,10 +3,14 @@ class Stat{
     private max : number | undefined;
     private value : number;
 
-    constructor(min : number, max : number, value : number){
+    constructor(value : number, min? : number, max? : number){
         this.min = min;
         this.max = max;
         this.value = value;
+    }
+
+    public static toObject(stat : Stat){
+        return { min : stat.min, max : stat.max, value : stat.value};
     }
 
     public getValue() : number{

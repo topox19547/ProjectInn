@@ -36,7 +36,7 @@
             {
                 "id" : 1,
                 "name" : "orc ranger",
-                "tokenType" : "token type name",
+                "assetID" : 1,
                 "owners" : [
                     "playername",
                     "playername2"

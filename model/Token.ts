@@ -3,11 +3,27 @@ class Token{
     private readonly asset : Asset;
     private readonly id : number;
     private readonly owners : Array<string>;
-    private readonly notes : Map<string,string>;
+    private readonly notes : Map<string, string>;
     private readonly stats : Map<string, Stat>;
     private readonly position : Vector2;
     private readonly maxNameLength: number;
     private readonly maxNoteLength : number;
+    private static readonly validate = ensureObject({
+        name : ensureString,
+        id : ensureNumber,
+        assetID : ensureNumber,
+        owners : ensureArrayOf(ensureString),
+        notes : ensureMapObject(ensureString),
+        stats : ensureMapObject(ensureObject({
+            max : ensureNumberWeak,
+            min : ensureNumberWeak,
+            value : ensureNumber
+        })),
+        position : ensureObject({
+            x : ensureNumber,
+            y : ensureNumber
+        })
+    });
 
     constructor(asset : Asset, id : number){
         this.asset = asset;
@@ -21,16 +37,62 @@ class Token{
         this.maxNameLength = 24;
     }
 
-    public static fromObject(object: any): Token | undefined {
-        object.hasId()
-        if(object.hasOwnProperty("id")){
-            const token : Token = new Token(object.asset, object.id)
+    public static fromObject(object: unknown, gameContext : Game): Token | undefined {
+        let tokenObject;
+        try{
+            tokenObject = this.validate(object);
+        } catch (e){
+            console.log(e);
+            return undefined;
         }
-        return undefined
+        const asset : Asset | undefined = gameContext.getTokenAssets().find(a => a.getID() == tokenObject.id);
+        if(asset == undefined){
+            return undefined
+        }
+        const token : Token = new Token(asset, tokenObject.id);
+        if (!token.setName(tokenObject.name)){
+            return undefined
+        }
+        for (const owner in tokenObject.owners){
+            if(!token.addOwner(owner) || gameContext.getPlayers().findIndex(p => p.getName() == owner) == -1){
+                return undefined
+            }
+        }
+        for (const key in tokenObject.notes){
+            const value = tokenObject.notes.key
+            if(!token.setNote(key,value)){
+                return undefined
+            }
+        }
+        for (const key in tokenObject.stats){
+            const value = tokenObject.stats.key
+            if(!token.setStat(key,new Stat(value.value, value.min, value.max))){
+                return undefined
+            }
+        }
+        const position = new Vector2(tokenObject.position.x, tokenObject.position.y);
+        if(!gameContext.getCurrentScene().isValidPosition(position)){
+            position.setX(0);
+            position.setY(0);
+        }
+        token.setPosition(position);
+        return token;
     }
 
-    public static toObject(): Object {
-        throw new Error("Method not implemented.");
+    public static toObject(token : Token) : ReturnType<typeof this.validate>{
+        const statsObject : Record<string,ReturnType<typeof Stat.toObject>> = {};
+        const notesObject : Record<string,string> = {};
+        token.stats.forEach((v,k) => statsObject[k] = Stat.toObject(v));
+        token.notes.forEach((v,k) => notesObject[k] = v);
+        return {
+            name : token.name,
+            id : token.id,
+            assetID : token.asset.getID(),
+            owners : [...token.owners],
+            notes : notesObject,
+            stats : statsObject,
+            position : Vector2.toObject(token.position)
+        }
     }
 
     public getAsset() : Asset{
@@ -45,8 +107,12 @@ class Token{
         return this.name;
     }
 
-    public setName(name : string) : void{
+    public setName(name : string) : boolean{
+        if (name.length > this.maxNameLength){
+            return false
+        }
         this.name = name;
+        return true;
     }
 
     public isOwner(name : string) : boolean{
