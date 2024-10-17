@@ -5,12 +5,13 @@
 class Vector2{
     private x:number;
     private y:number;
+    public static readonly validate = ensureObject({x : ensureNumber, y : ensureNumber});
 
     constructor(x:number, y:number){
         this.x = x;
         this.y = y;
     }
-    
+
     public static toObject(vector : Vector2){
         return {x : vector.x, y : vector.y};
     }

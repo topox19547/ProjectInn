@@ -8,21 +8,14 @@ class Token{
     private readonly position : Vector2;
     private readonly maxNameLength: number;
     private readonly maxNoteLength : number;
-    private static readonly validate = ensureObject({
+    public static readonly validate = ensureObject({
         name : ensureString,
         id : ensureNumber,
         assetID : ensureNumber,
         owners : ensureArrayOf(ensureString),
         notes : ensureMapObject(ensureString),
-        stats : ensureMapObject(ensureObject({
-            max : ensureNumberWeak,
-            min : ensureNumberWeak,
-            value : ensureNumber
-        })),
-        position : ensureObject({
-            x : ensureNumber,
-            y : ensureNumber
-        })
+        stats : ensureMapObject(Stat.validate),
+        position : Vector2.validate
     });
 
     constructor(asset : Asset, id : number){
@@ -37,40 +30,33 @@ class Token{
         this.maxNameLength = 24;
     }
 
-    public static fromObject(object: unknown, gameContext : Game): Token | undefined {
-        let tokenObject;
-        try{
-            tokenObject = this.validate(object);
-        } catch (e){
-            console.log(e);
-            return undefined;
-        }
-        const asset : Asset | undefined = gameContext.getTokenAssets().find(a => a.getID() == tokenObject.id);
+    public static fromObject(object: ReturnType<typeof this.validate>, gameContext : Game): Token | undefined {
+        const asset : Asset | undefined = gameContext.getTokenAssets().find(a => a.getID() == object.id);
         if(asset == undefined){
             return undefined
         }
-        const token : Token = new Token(asset, tokenObject.id);
-        if (!token.setName(tokenObject.name)){
+        const token : Token = new Token(asset, object.id);
+        if (!token.setName(object.name)){
             return undefined
         }
-        for (const owner in tokenObject.owners){
+        for (const owner in object.owners){
             if(!token.addOwner(owner) || gameContext.getPlayers().findIndex(p => p.getName() == owner) == -1){
                 return undefined
             }
         }
-        for (const key in tokenObject.notes){
-            const value = tokenObject.notes.key
+        for (const key in object.notes){
+            const value = object.notes.key
             if(!token.setNote(key,value)){
                 return undefined
             }
         }
-        for (const key in tokenObject.stats){
-            const value = tokenObject.stats.key
+        for (const key in object.stats){
+            const value = object.stats.key
             if(!token.setStat(key,new Stat(value.value, value.min, value.max))){
                 return undefined
             }
         }
-        const position = new Vector2(tokenObject.position.x, tokenObject.position.y);
+        const position = new Vector2(object.position.x, object.position.y);
         if(!gameContext.getCurrentScene().isValidPosition(position)){
             position.setX(0);
             position.setY(0);

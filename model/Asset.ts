@@ -3,8 +3,8 @@ class Asset{
     private assetSize : Vector2 | undefined;
     private name : string;
     private readonly assetID : number;
-    private readonly maxNameLength: number;
     private readonly notifier : ClientNotifier | undefined;
+    private static readonly maxNameLength: number = 24;
 
     constructor(assetID : number, name : string, notifier? : ClientNotifier){
         this.assetID = assetID;
@@ -12,7 +12,10 @@ class Asset{
         this.assetURL = undefined;
         this.assetSize = undefined;
         this.notifier = notifier;
-        this.maxNameLength = 24;
+    }
+
+    public static getMaxNameLength() : number{
+        return this.maxNameLength;
     }
 
     public getURL() : string | undefined{
@@ -33,7 +36,7 @@ class Asset{
 
     //TODO: ADD CHECK FOR NAME UNIQUENESS ON THE CONTROLLER'S SIDE
     public setName(name : string) : boolean{
-        if(name.length <= this.maxNameLength){
+        if(name.length <= Asset.maxNameLength){
             this.name = name;
             return true;
         }

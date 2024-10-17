@@ -4,17 +4,39 @@ class Scene{
     private gridType : GridType;
     private offset : Vector2;
     private tileSize : number;
-    private readonly maxTileSize : number;
-    private readonly minTileSize : number;
+    private static readonly maxTileSize : number = 1000;
+    private static readonly minTileSize : number = 30;
+    public static readonly validate = ensureObject({
+        assetID : ensureNumber,
+        gridType : ensureNumber,
+        offset : Vector2.validate,
+        tileSize : ensureNumber,
+    })
 
     //Remember to always check if the asset's image can be loaded before using it in the constructor
-    constructor(asset : Asset, grid : GridType, offset : Vector2, tileSize : number, mapSize : Vector2){
+    constructor(asset : Asset, grid : GridType, offset : Vector2, tileSize : number){
         this.asset = asset;
         this.gridType = grid;
-        this.offset = new Vector2(tileSize % offset.getX(), tileSize % offset.getY());
+        this.offset = new Vector2(0,0);
+        this.setOffset(offset);
         this.tileSize = tileSize;
-        this.maxTileSize = 1000;
-        this.minTileSize = 30;
+    }
+    
+    public static getMaxTileSize() : number{ return this.maxTileSize; }
+    
+    public static getMinTileSize() : number{ return this.minTileSize; }
+
+    public static fromObject(object : ReturnType<typeof Scene.validate>, asset : Asset) : Scene{
+        return new Scene(asset, object.gridType, new Vector2(object.offset.x, object.offset.y), object.tileSize);
+    }
+
+    public static toObject(scene : Scene) : ReturnType<typeof Scene.validate>{
+        return {
+            assetID : scene.asset.getID(),
+            gridType : scene.gridType,
+            offset : Vector2.toObject(scene.offset),
+            tileSize : scene.tileSize
+        }
     }
 
     public getAsset() : Asset{
@@ -41,12 +63,14 @@ class Scene{
         return this.tileSize;
     }
 
-    public setTileSize(tileSize : number) : boolean{
-        if(tileSize > this.maxTileSize || tileSize < this.minTileSize){
-            return false;
+    public setTileSize(tileSize : number) : void{
+        if(tileSize > Scene.maxTileSize){
+            this.tileSize = Scene.maxTileSize;
+        } else if(tileSize < Scene.minTileSize){
+            this.tileSize = Scene.minTileSize;
+        } else {
+            this.tileSize = tileSize;
         }
-        this.tileSize = tileSize;
-        return true;
     }
 
     public isValidPosition(position : Vector2) : boolean{

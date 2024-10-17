@@ -2,6 +2,11 @@ class Stat{
     private min : number | undefined;
     private max : number | undefined;
     private value : number;
+    public static readonly validate = ensureObject({
+        min : ensureNumberWeak,
+        max : ensureNumberWeak,
+        value : ensureNumber
+    })
 
     constructor(value : number, min? : number, max? : number){
         this.min = min;
@@ -9,7 +14,7 @@ class Stat{
         this.value = value;
     }
 
-    public static toObject(stat : Stat){
+    public static toObject(stat : Stat) : ReturnType<typeof this.validate> {
         return { min : stat.min, max : stat.max, value : stat.value};
     }
 

@@ -9,14 +9,14 @@ class Game{
     private currentScene : Scene;
     private password : string | undefined;
     
-    constructor(name : string, owner : Player, password : string | undefined, startingScene : Scene){
+    constructor(name : string, owner : Player, startingScene : Scene){
         this.name = name;
         this.ownerName = owner.getName();
         this.players = new Array().concat(owner);
         this.tokenAssets = new Array<Asset>;
         this.scenes = new Array<Scene>;
         this.tokens = new Array<Token>;
-        this.password = password;
+        this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
     }

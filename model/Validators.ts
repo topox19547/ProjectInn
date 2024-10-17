@@ -20,10 +20,6 @@ const ensureBoolean : ensureType<boolean> = (object : unknown) => {
     return object;
 }
 
-const ignore : ensureType<any> = (object : unknown) => {
-    return object;
-}
-
 const ensureArrayOf = <T>(ensureInnerType : ensureType<T>) => (object : unknown) : T[] => {
     if (!Array.isArray(object)) throw Error("not an array");
     return object.map(ensureInnerType);
