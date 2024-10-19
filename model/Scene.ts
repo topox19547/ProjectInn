@@ -1,13 +1,13 @@
 
 class Scene{
-    private asset : Asset;
+    private readonly asset : Asset;
     private gridType : GridType;
     private offset : Vector2;
     private tileSize : number;
     private static readonly maxTileSize : number = 1000;
     private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
-        assetID : ensureNumber,
+        asset : Asset.validate,
         gridType : ensureNumber,
         offset : Vector2.validate,
         tileSize : ensureNumber,
@@ -32,11 +32,11 @@ class Scene{
 
     public static toObject(scene : Scene) : ReturnType<typeof Scene.validate>{
         return {
-            assetID : scene.asset.getID(),
+            asset : Asset.toObject(scene.asset),
             gridType : scene.gridType,
             offset : Vector2.toObject(scene.offset),
             tileSize : scene.tileSize
-        }
+        };
     }
 
     public getAsset() : Asset{

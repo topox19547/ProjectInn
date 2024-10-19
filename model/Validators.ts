@@ -10,14 +10,20 @@ const ensureNumber : ensureType<number> = (object : unknown) => {
     return object;
 }
 
-const ensureNumberWeak : ensureType<number | undefined> = (object : unknown) => {
-    if (typeof object !== "number" && typeof object !== "undefined") throw Error("not a number");
-    return object;
-}
-
 const ensureBoolean : ensureType<boolean> = (object : unknown) => {
     if (typeof object !== "boolean") throw Error("not a boolean");
     return object;
+}
+
+const weakEnsureOf = <T>(ensureOtherType : ensureType<T>) => (object : unknown) => {
+    try{
+        return ensureOtherType(object);
+    } catch(e) {
+        if (typeof object !== undefined){
+            throw Error("not undefined or of the desired type");
+        }
+        return undefined;
+    }
 }
 
 const ensureArrayOf = <T>(ensureInnerType : ensureType<T>) => (object : unknown) : T[] => {

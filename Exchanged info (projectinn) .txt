@@ -149,13 +149,13 @@ new asset / modified asset:
 Client : asset URL, name
 Server : replicate to people who have token management permissions, TokenTypeID / ERROR
 Client : {
-	Status : "ASSET"
+	Status : "TOKEN_ASSET / SCENE_ASSET"
 	Command : "SAFE_MODIFY"
 	AssetID : number
 	AssetURL : url string
 }
 Server : {
-	Status : "ASSET"
+	Status : "TOKEN_ASSET / SCENE_ASSET"
 	Command : "SAFE_MODIFY"
 	AssetID : number
 	AssetURL : url string
@@ -164,12 +164,12 @@ Server : {
 
 deleted asset:
 Client : {
-	Status : "ASSET"
+	Status : "(type) ASSET"
 	Command : "DELETE"
 	AssetID : number
 }
 Server : {
-	Status : "ASSET"
+	Status : "(type) ASSET"
 	Command : "DELETE"
 	AssetID : number
 }
@@ -190,10 +190,11 @@ Server : {
 	Status : bool
 }
 
-Map changed:
+Scene changed:
 Client : asset, offset, various map fuckery
 Server : replicate to everyone / ERROR
 Client : {
+	Status : "SCENE_CHANGED"
 	AssetID : number
 	gridType : GridType
 	offset : Vector2

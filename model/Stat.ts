@@ -3,8 +3,8 @@ class Stat{
     private max : number | undefined;
     private value : number;
     public static readonly validate = ensureObject({
-        min : ensureNumberWeak,
-        max : ensureNumberWeak,
+        min : weakEnsureOf(ensureNumber),
+        max : weakEnsureOf(ensureNumber),
         value : ensureNumber
     })
 

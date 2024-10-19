@@ -19,7 +19,8 @@
                     "x" : 0,
                     "y" : 1
                 },
-                "tile size" : 100
+                "tile size" : 100,
+                "assetID" : 2
             }
         ],
         "assets" : [
@@ -30,11 +31,8 @@
             },
             {
                 "assetID" : 2,
-                "asset" : "map asset",
+                "asset" : "url",
                 "name" : "swamp"
-            }
-            {
-
             }
         ],
         "tokens" : [

@@ -5,6 +5,12 @@ class Asset{
     private readonly assetID : number;
     private readonly notifier : ClientNotifier | undefined;
     private static readonly maxNameLength: number = 24;
+    public static readonly validate = ensureObject({
+        assetID : ensureNumber,
+        assetURL : weakEnsureOf(ensureString),
+        assetSize : weakEnsureOf(Vector2.validate),
+        name : ensureString
+    })
 
     constructor(assetID : number, name : string, notifier? : ClientNotifier){
         this.assetID = assetID;
@@ -12,6 +18,27 @@ class Asset{
         this.assetURL = undefined;
         this.assetSize = undefined;
         this.notifier = notifier;
+    }
+
+    public static fromObject(object : ReturnType<typeof this.validate>) : Asset{
+        const asset : Asset = new Asset(object.assetID, object.name);
+        if(object.assetURL === undefined){
+            if(object.assetSize !== undefined){
+                asset.assetSize = new Vector2(object.assetSize.x, object.assetSize.y);
+            }
+            return asset;
+        }
+        asset.setURL(object.assetURL, false); //TODO: change isInUse depending on what we need here
+        return asset;
+    }
+
+    public static toObject(asset : Asset) : ReturnType<typeof this.validate>{
+        return {
+            assetURL : asset.assetURL,
+            assetID : asset.assetID,
+            assetSize : asset.assetSize !== undefined ? Vector2.toObject(asset.assetSize) : undefined,
+            name : asset.name
+        }
     }
 
     public static getMaxNameLength() : number{
