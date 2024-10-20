@@ -26,8 +26,12 @@ class Scene{
     
     public static getMinTileSize() : number{ return this.minTileSize; }
 
-    public static fromObject(object : ReturnType<typeof Scene.validate>, asset : Asset) : Scene{
-        return new Scene(asset, object.gridType, new Vector2(object.offset.x, object.offset.y), object.tileSize);
+    public static fromObject(object : ReturnType<typeof Scene.validate>) : Scene{
+        return new Scene(
+            Asset.fromObject(object.asset),
+            object.gridType,
+            new Vector2(object.offset.x, object.offset.y),
+            object.tileSize);
     }
 
     public static toObject(scene : Scene) : ReturnType<typeof Scene.validate>{

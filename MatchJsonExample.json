@@ -12,7 +12,7 @@
                 }
             }
         },
-        "maps" : [
+        "scenes" : [
             {
                 "grid type" : "hexagonal",
                 "grid offset" : {
@@ -20,19 +20,18 @@
                     "y" : 1
                 },
                 "tile size" : 100,
-                "assetID" : 2
+                "asset" : {
+                    "assetID" : 1, 
+                    "asset" : "url",
+                    "name" : "swamp"
+                }
             }
         ],
-        "assets" : [
+        "tokenAssets" : [
             {
                 "assetID" : 1,
                 "name" : "orc",
                 "asset" : "url"
-            },
-            {
-                "assetID" : 2,
-                "asset" : "url",
-                "name" : "swamp"
             }
         ],
         "tokens" : [

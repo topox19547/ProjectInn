@@ -8,17 +8,73 @@ class Game{
     private readonly maxPasswordLength;
     private currentScene : Scene;
     private password : string | undefined;
+    public static validate = ensureObject({
+        name : ensureString,
+        owner : ensureString,
+        players : ensureArrayOf(Player.validate),
+        scenes : ensureArrayOf(Scene.validate),
+        tokenAssets : ensureArrayOf(Asset.validate),
+        tokens : ensureArrayOf(Token.validate),
+        currentScene : Scene.validate,
+        password : weakEnsureOf(ensureString)
+    });
     
-    constructor(name : string, owner : Player, startingScene : Scene){
+    constructor(name : string, ownerName : string, startingScene : Scene){
         this.name = name;
-        this.ownerName = owner.getName();
-        this.players = new Array().concat(owner);
+        this.ownerName = ownerName;
+        this.players = new Array().concat(ownerName);
         this.tokenAssets = new Array<Asset>;
         this.scenes = new Array<Scene>;
         this.tokens = new Array<Token>;
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
+        this.scenes.concat(this.currentScene)
+    }
+
+    public static fromObject(object : ReturnType<typeof this.validate>){
+        const game : Game = new Game(object.name, object.owner, Scene.fromObject(object.currentScene));
+        for(const player of object.players){
+            if(!game.addPlayer(Player.fromObject(player))){
+                return undefined;
+            }
+        }
+        for(const scene of object.scenes){
+            if(!game.addScene(Scene.fromObject(scene))){
+                return undefined;
+            }
+        }
+        for(const asset of object.tokenAssets){
+            if(!game.addTokenAsset(Asset.fromObject(asset))){
+                return undefined;
+            }
+        }
+        for(const token of object.tokens){
+            const restoredToken : Token | undefined = Token.fromObject(token, game);
+            if(restoredToken === undefined){
+                return undefined;
+            }
+            if(!game.addToken(restoredToken)){
+                return undefined;
+            }
+        }
+        if(object.password !== undefined && !game.setPassword(object.password)){
+            return undefined;
+        }
+        return game;
+    }
+
+    public static toObject(game : Game){
+        return {
+            name : game.name,
+            ownerName : game.ownerName,
+            players : game.players.map(p => Player.toObject(p)),
+            tokenAssets : game.tokenAssets.map(a => Asset.toObject(a)),
+            scenes : game.scenes.map(s => Scene.toObject(s)),
+            tokens : game.tokens.map(t => Token.toObject(t)),
+            password : game.password,
+            currentScene : Scene.toObject(game.currentScene)
+        };
     }
 
     public getName() : string{
