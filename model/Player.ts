@@ -2,7 +2,7 @@ class Player{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;
-    private readonly maxNameLength : number;
+    private static readonly maxNameLength : number = 24;
     public static readonly validate = ensureObject({
         name : ensureString,
         color : ensureString,
@@ -18,11 +18,10 @@ class Player{
             this.permissions.set(i,false);
             i++;
         }
-        this.maxNameLength = 24;
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Player{
-        const player : Player = new Player(object.name, new Color(object.color));
+        const player : Player = new Player(object.name.slice(0,Player.maxNameLength), new Color(object.color));
         let i : number = 0;
         for(const key in Permission){
             player.setPermission(i, object.permissions[key] != undefined ? object.permissions[key] : false);
@@ -43,12 +42,12 @@ class Player{
         }
     }
 
-    public getName() : string{
-        return this.name;
+    public static getMaxNameLength() : number{
+        return this.maxNameLength;
     }
 
-    public getMaxNameLength() : number{
-        return this.maxNameLength;
+    public getName() : string{
+        return this.name;
     }
 
     public getColor() : Color{

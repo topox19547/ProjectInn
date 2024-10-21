@@ -21,7 +21,7 @@ class Asset{
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Asset{
-        const asset : Asset = new Asset(object.assetID, object.name);
+        const asset : Asset = new Asset(object.assetID, object.name.slice(0,Asset.maxNameLength));
         if(object.assetURL === undefined){
             if(object.assetSize !== undefined){
                 asset.assetSize = new Vector2(object.assetSize.x, object.assetSize.y);
@@ -62,7 +62,7 @@ class Asset{
     }
 
     //TODO: ADD CHECK FOR NAME UNIQUENESS ON THE CONTROLLER'S SIDE
-    public setName(name : string) : boolean{
+    public setName(name : string, isInUse : boolean) : boolean{
         if(name.length <= Asset.maxNameLength){
             this.name = name;
             return true;

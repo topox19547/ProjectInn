@@ -6,8 +6,10 @@ class Game{
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
     private readonly maxPasswordLength;
+    private readonly clientNotifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
+    private static maxNameLength : number = 24;
     public static validate = ensureObject({
         name : ensureString,
         owner : ensureString,
@@ -19,7 +21,7 @@ class Game{
         password : weakEnsureOf(ensureString)
     });
     
-    constructor(name : string, ownerName : string, startingScene : Scene){
+    constructor(name : string, ownerName : string, startingScene : Scene, clientNotifier? : ClientNotifier){
         this.name = name;
         this.ownerName = ownerName;
         this.players = new Array().concat(ownerName);
@@ -29,11 +31,15 @@ class Game{
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
+        this.clientNotifier = clientNotifier;
         this.scenes.concat(this.currentScene)
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>){
-        const game : Game = new Game(object.name, object.owner, Scene.fromObject(object.currentScene));
+        const game : Game = new Game(
+            object.name.slice(0,Game.maxNameLength),
+            object.owner,
+            Scene.fromObject(object.currentScene));
         for(const player of object.players){
             if(!game.addPlayer(Player.fromObject(player))){
                 return undefined;
@@ -77,6 +83,10 @@ class Game{
         };
     }
 
+    public static getMaxNameLength(){
+        return this.maxNameLength;
+    }
+
     public getName() : string{
         return this.name;
     }
@@ -90,6 +100,10 @@ class Game{
             return false;
         }
         this.players.push(player);
+        this.clientNotifier?.notify({
+            status : MessageType.PLAYER,
+            command : Command.CREATE,
+            content : Player.toObject(player)})
         return true;
     }
 
@@ -99,6 +113,10 @@ class Game{
             return false;
         }
         this.players.splice(playerIndex, 1);
+        this.clientNotifier?.notify({
+            status : MessageType.PLAYER,
+            command : Command.DELETE,
+            content : Player.toObject(player)})
         return true;
     }
 
@@ -111,6 +129,10 @@ class Game{
             return false;
         }
         this.tokenAssets.push(asset);
+        this.clientNotifier?.notifyIf({
+            status : MessageType.TOKEN_ASSET,
+            command : Command.CREATE,
+            content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS))
         return true;
     }
 
@@ -121,7 +143,14 @@ class Game{
                 this.tokens.splice(i,1);
             }
         }
-        return this.players.splice(assetIndex, 1).length >= 1;
+        if(!(this.tokenAssets.splice(assetIndex, 1).length >= 1)){
+            return false
+        }
+        this.clientNotifier?.notify({
+            status : MessageType.TOKEN_ASSET,
+            command : Command.CREATE,
+            content : Asset.toObject(asset)})
+        return true;
     }
 
     public getTokenAssets() : Array<Asset>{

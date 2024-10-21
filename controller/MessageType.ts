@@ -1,6 +1,7 @@
 enum MessageType{
     CREATE_GAME,
     JOIN_GAME,
+    PLAYER,
     TOKEN_MOVING,
     TOKEN_MOVED,
     TOKEN,
