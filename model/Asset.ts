@@ -2,33 +2,40 @@ class Asset{
     private assetURL : string | undefined;
     private assetSize : Vector2 | undefined;
     private name : string;
+    private readonly assetType : AssetType;
     private readonly assetID : number;
     private readonly notifier : ClientNotifier | undefined;
     private static readonly maxNameLength: number = 24;
     public static readonly validate = ensureObject({
         assetID : ensureNumber,
         assetURL : weakEnsureOf(ensureString),
+        assetType : ensureNumber,
         assetSize : weakEnsureOf(Vector2.validate),
         name : ensureString
     })
 
-    constructor(assetID : number, name : string, notifier? : ClientNotifier){
+    constructor(assetID : number, name : string, assetType : AssetType, notifier? : ClientNotifier){
         this.assetID = assetID;
         this.name = name;
         this.assetURL = undefined;
+        this.assetType = assetType;
         this.assetSize = undefined;
         this.notifier = notifier;
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>) : Asset{
-        const asset : Asset = new Asset(object.assetID, object.name.slice(0,Asset.maxNameLength));
+    public static fromObject(object : ReturnType<typeof this.validate>, notifier? : ClientNotifier) : Asset{
+        const asset : Asset = new Asset(
+                object.assetID,
+                object.name.slice(0,Asset.maxNameLength),
+                object.assetType,
+                notifier);
         if(object.assetURL === undefined){
             if(object.assetSize !== undefined){
                 asset.assetSize = new Vector2(object.assetSize.x, object.assetSize.y);
             }
             return asset;
         }
-        asset.setURL(object.assetURL, false); //TODO: change isInUse depending on what we need here
+        asset.setURL(object.assetURL); //TODO: change isInUse depending on what we need here
         return asset;
     }
 
@@ -36,6 +43,7 @@ class Asset{
         return {
             assetURL : asset.assetURL,
             assetID : asset.assetID,
+            assetType : asset.assetType,
             assetSize : asset.assetSize !== undefined ? Vector2.toObject(asset.assetSize) : undefined,
             name : asset.name
         }
@@ -61,16 +69,20 @@ class Asset{
         return this.assetID;
     }
 
-    //TODO: ADD CHECK FOR NAME UNIQUENESS ON THE CONTROLLER'S SIDE
-    public setName(name : string, isInUse : boolean) : boolean{
+    public setName(name : string, permissionRequirement? : Permission) : boolean{
         if(name.length <= Asset.maxNameLength){
             this.name = name;
+            this.notifier?.notifyIf({
+                status : MessageType.ASSET,
+                command : Command.SAFE_MODIFY,
+                asset : Asset.toObject(this)
+            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
             return true;
         }
         return false;
     }
 
-    public setURL(url : string, isInUse : boolean) : void{
+    public setURL(url : string, permissionRequirement? : Permission) : void{
         const image : HTMLImageElement = new HTMLImageElement()
         image.src = url;
         //This could potentially be removed in the future and the client could supply its own dimensions
@@ -78,8 +90,13 @@ class Asset{
         image.decode().then(() => {
             this.assetURL = url;
             this.assetSize = new Vector2(image.width, image.height);
+            this.notifier?.notifyIf({
+                status : MessageType.ASSET,
+                command : Command.SAFE_MODIFY,
+                asset : Asset.toObject(this)
+            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
         }).catch(() => {
-            //Notify the user that the URL isn't valid
+            //TODO: SET ERROR SPRITE INSTEAD OF THE ONE PROVIDED
         })
     }
 }

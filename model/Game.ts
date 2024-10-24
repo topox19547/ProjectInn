@@ -6,7 +6,7 @@ class Game{
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
     private readonly maxPasswordLength;
-    private readonly clientNotifier : ClientNotifier | undefined;
+    private readonly notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
     private static maxNameLength : number = 24;
@@ -21,7 +21,7 @@ class Game{
         password : weakEnsureOf(ensureString)
     });
     
-    constructor(name : string, ownerName : string, startingScene : Scene, clientNotifier? : ClientNotifier){
+    constructor(name : string, ownerName : string, startingScene : Scene, notifier? : ClientNotifier){
         this.name = name;
         this.ownerName = ownerName;
         this.players = new Array().concat(ownerName);
@@ -31,15 +31,17 @@ class Game{
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
-        this.clientNotifier = clientNotifier;
+        this.notifier = notifier;
         this.scenes.concat(this.currentScene)
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>){
+    public static fromObject(object : ReturnType<typeof this.validate>, notifier? : ClientNotifier){
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
             object.owner,
-            Scene.fromObject(object.currentScene));
+            Scene.fromObject(object.currentScene),
+            notifier);
+        //TODO: ADD NOTIFIER PROPERTY TO EVERY PART OF THE MODEL AND TO THEIR RESPECTIVE FROMOBJECT METHODS
         for(const player of object.players){
             if(!game.addPlayer(Player.fromObject(player))){
                 return undefined;
@@ -100,7 +102,7 @@ class Game{
             return false;
         }
         this.players.push(player);
-        this.clientNotifier?.notify({
+        this.notifier?.notify({
             status : MessageType.PLAYER,
             command : Command.CREATE,
             content : Player.toObject(player)})
@@ -113,7 +115,7 @@ class Game{
             return false;
         }
         this.players.splice(playerIndex, 1);
-        this.clientNotifier?.notify({
+        this.notifier?.notify({
             status : MessageType.PLAYER,
             command : Command.DELETE,
             content : Player.toObject(player)})
@@ -129,8 +131,8 @@ class Game{
             return false;
         }
         this.tokenAssets.push(asset);
-        this.clientNotifier?.notifyIf({
-            status : MessageType.TOKEN_ASSET,
+        this.notifier?.notifyIf({
+            status : MessageType.ASSET,
             command : Command.CREATE,
             content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS))
         return true;
@@ -146,9 +148,9 @@ class Game{
         if(!(this.tokenAssets.splice(assetIndex, 1).length >= 1)){
             return false
         }
-        this.clientNotifier?.notify({
-            status : MessageType.TOKEN_ASSET,
-            command : Command.CREATE,
+        this.notifier?.notify({
+            status : MessageType.ASSET,
+            command : Command.DELETE,
             content : Asset.toObject(asset)})
         return true;
     }
@@ -162,6 +164,11 @@ class Game{
             return false;
         }
         this.tokens.push(token)
+        this.notifier?.notify({
+            status : MessageType.TOKEN,
+            command : Command.CREATE,
+            content : Token.toObject(token)
+        });
         return true;
     }
 
@@ -171,6 +178,11 @@ class Game{
             return false;
         }
         this.tokens.splice(tokenIndex, 1);
+        this.notifier?.notify({
+            status : MessageType.TOKEN,
+            command : Command.DELETE,
+            content : Token.toObject(token)
+        });
         return true;
     }
 
@@ -184,6 +196,11 @@ class Game{
             return false;
         }
         this.scenes.push(scene);
+        this.notifier?.notify({
+            status : MessageType.SCENE,
+            command : Command.CREATE,
+            content : Scene.toObject(scene)
+        });
         return true;
     }
 
@@ -196,6 +213,11 @@ class Game{
             return false;
         }
         this.scenes.splice(sceneIndex, 1);
+        this.notifier?.notify({
+            status : MessageType.SCENE,
+            command : Command.DELETE,
+            content : Scene.toObject(scene)
+        });
         return true;
     }
 
@@ -209,6 +231,11 @@ class Game{
 
     public changeScene(scene : Scene) : void{
         this.currentScene = scene;
+        this.notifier?.notify({
+            status : MessageType.SCENE_CHANGED,
+            command : Command.MODIFY,
+            content : Scene.toObject(scene)
+        });
     }
 
     public checkPassword(attempt : string) : boolean{
@@ -220,6 +247,11 @@ class Game{
             return false;
         }
         this.password = password;
+        this.notifier?.notifyIf({
+            status : MessageType,
+            command : Command.MODIFY,
+            content : password
+        }, p => p.hasPermission(Permission.MASTER));
         return true;
     }
 }
