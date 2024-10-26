@@ -2,6 +2,7 @@ class Player{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;
+    private notifier : ClientNotifier | undefined;
     private static readonly maxNameLength : number = 24;
     public static readonly validate = ensureObject({
         name : ensureString,
@@ -9,10 +10,11 @@ class Player{
         permissions : ensureMapObject(ensureBoolean)
     })
 
-    constructor(name : string, color : Color){
+    constructor(name : string, color : Color, notifier? : ClientNotifier){
         this.name = name;
         this.color = color;
         this.permissions = new Map<Permission, boolean>;
+        this.notifier = notifier;
         let i : number = 0;
         for(const _ in Permission){
             this.permissions.set(i,false);
@@ -21,7 +23,10 @@ class Player{
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Player{
-        const player : Player = new Player(object.name.slice(0,Player.maxNameLength), new Color(object.color));
+        const player : Player = new Player(
+            object.name.slice(0,Player.maxNameLength),
+            new Color(object.color)
+        );
         let i : number = 0;
         for(const key in Permission){
             player.setPermission(i, object.permissions[key] != undefined ? object.permissions[key] : false);
@@ -46,6 +51,10 @@ class Player{
         return this.maxNameLength;
     }
 
+    public setNotifier(notifier : ClientNotifier) : void{
+        this.notifier = notifier;
+    }
+
     public getName() : string{
         return this.name;
     }
@@ -61,5 +70,10 @@ class Player{
 
     public setPermission(permission : Permission, value : boolean){
         this.permissions.set(permission, value);
+        this.notifier?.notify({
+            Status : MessageType.PERMISSIONS,
+            Command : Command.MODIFY,
+            Content : Player.toObject(this)
+        });
     }
 }

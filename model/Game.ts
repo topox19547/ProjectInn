@@ -6,7 +6,7 @@ class Game{
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
     private readonly maxPasswordLength;
-    private readonly notifier : ClientNotifier | undefined;
+    private notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
     private static maxNameLength : number = 24;
@@ -21,7 +21,7 @@ class Game{
         password : weakEnsureOf(ensureString)
     });
     
-    constructor(name : string, ownerName : string, startingScene : Scene, notifier? : ClientNotifier){
+    constructor(name : string, ownerName : string, startingScene : Scene){
         this.name = name;
         this.ownerName = ownerName;
         this.players = new Array().concat(ownerName);
@@ -31,16 +31,15 @@ class Game{
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
-        this.notifier = notifier;
         this.scenes.concat(this.currentScene)
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>, notifier? : ClientNotifier){
+    public static fromObject(object : ReturnType<typeof this.validate>){
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
             object.owner,
-            Scene.fromObject(object.currentScene),
-            notifier);
+            Scene.fromObject(object.currentScene)
+        );
         //TODO: ADD NOTIFIER PROPERTY TO EVERY PART OF THE MODEL AND TO THEIR RESPECTIVE FROMOBJECT METHODS
         for(const player of object.players){
             if(!game.addPlayer(Player.fromObject(player))){
@@ -87,6 +86,10 @@ class Game{
 
     public static getMaxNameLength(){
         return this.maxNameLength;
+    }
+
+    public setNotifier(notifier : ClientNotifier) : void{
+        this.notifier = notifier;
     }
 
     public getName() : string{

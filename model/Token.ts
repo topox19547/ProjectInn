@@ -1,5 +1,6 @@
 class Token{
     private name : string;
+    private notifier : ClientNotifier | undefined;
     private readonly asset : Asset;
     private readonly id : number;
     private readonly owners : Array<string>;
@@ -79,6 +80,10 @@ class Token{
             stats : statsObject,
             position : Vector2.toObject(token.position)
         }
+    }
+
+    public setNotifier(notifier : ClientNotifier) : void{
+        this.notifier = notifier;
     }
 
     public getAsset() : Asset{

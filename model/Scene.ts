@@ -4,6 +4,7 @@ class Scene{
     private gridType : GridType;
     private offset : Vector2;
     private tileSize : number;
+    private notifier : ClientNotifier | undefined;
     private static readonly maxTileSize : number = 1000;
     private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
@@ -17,9 +18,8 @@ class Scene{
     constructor(asset : Asset, grid : GridType, offset : Vector2, tileSize : number){
         this.asset = asset;
         this.gridType = grid;
-        this.offset = new Vector2(0,0);
-        this.setOffset(offset);
         this.tileSize = tileSize;
+        this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
     }
     
     public static getMaxTileSize() : number{ return this.maxTileSize; }
@@ -51,8 +51,13 @@ class Scene{
         return this.gridType;
     }
 
+    public setNotifier(notifier : ClientNotifier) : void{
+        this.notifier = notifier;
+    }
+
     public setGridType(gridType : GridType) : void{
-        this.gridType = gridType; 
+        this.gridType = gridType;
+        this.updateRemoteObjects();
     }
 
     public getOffset() :Vector2{
@@ -61,6 +66,7 @@ class Scene{
 
     public setOffset(offset : Vector2) : void{
         this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
+        this.updateRemoteObjects();
     }
 
     public getTileSize() : number{
@@ -75,6 +81,7 @@ class Scene{
         } else {
             this.tileSize = tileSize;
         }
+        this.sendNotification(MessageType.SCENE_TILESIZE, this.tileSize);
     }
 
     public isValidPosition(position : Vector2) : boolean{
@@ -82,5 +89,13 @@ class Scene{
         return mapSize != undefined &&
             Math.ceil(mapSize.getX() + this.offset.getX() / this.tileSize) >= position.getX() &&
             Math.ceil(mapSize.getY() + this.offset.getY() / this.tileSize) >= position.getY();
+    }
+
+    private sendNotification<T>(type : MessageType, modified : T) : void{
+        this.notifier?.notify({
+            status : type,
+            command : Command.MODIFY,
+            content : { id : this.asset.getID(), modified : modified}
+        });
     }
 }
