@@ -57,7 +57,7 @@ class Scene{
 
     public setGridType(gridType : GridType) : void{
         this.gridType = gridType;
-        this.updateRemoteObjects();
+        this.sendNotification(MessageType.SCENE_GRIDTYPE, this.gridType);
     }
 
     public getOffset() :Vector2{
@@ -66,7 +66,7 @@ class Scene{
 
     public setOffset(offset : Vector2) : void{
         this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
-        this.updateRemoteObjects();
+        this.sendNotification(MessageType.SCENE_OFFSET, this.offset);
     }
 
     public getTileSize() : number{

@@ -12,6 +12,8 @@ class Stat{
         this.min = min;
         this.max = max;
         this.value = value;
+        this.value = max != undefined && this.value > max ? max : this.value;
+        this.value = min != undefined && this.value < min ? min : this.value;
     }
 
     public static toObject(stat : Stat) : ReturnType<typeof this.validate> {
@@ -22,25 +24,11 @@ class Stat{
         return this.value;
     }
 
-    public setValue(value : number) : void{
-        this.value = value;
-    }
-
     public getMin() : number | undefined{
         return this.min;
     }
 
-    public setMin(min : number | undefined) : void{
-        this.min = min;
-        min != undefined && this.value < min ? this.value = min : this.value = this.value;
-    }
-
     public getMax() : number | undefined{
         return this.max;
-    }
-
-    public setMax(max : number | undefined) : void{
-        this.max = max;
-        this.value = max != undefined && this.value > max ? max : this.value;
     }
 }

@@ -1,11 +1,14 @@
 class Token{
     private name : string;
     private notifier : ClientNotifier | undefined;
+    private dragLockTimerID : number | undefined;
+    private dragLockOwner : string | undefined;
     private readonly asset : Asset;
     private readonly id : number;
     private readonly owners : Array<string>;
     private readonly notes : Map<string, string>;
     private readonly stats : Map<string, Stat>;
+    private readonly virtualPosition : Vector2;
     private readonly position : Vector2;
     private readonly maxNameLength: number;
     private readonly maxNoteLength : number;
@@ -103,6 +106,11 @@ class Token{
             return false
         }
         this.name = name;
+        this.notifier?.notify({
+            status : MessageType.TOKEN_NAME,
+            command : Command.MODIFY,
+            content : { id : this.getId(), modified : name}
+        });
         return true;
     }
 
@@ -115,6 +123,11 @@ class Token{
             return false;
         }
         this.owners.concat(name);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_OWNERSHIP,
+            command : Command.CREATE,
+            content : { id : this.getId(), modified : name}
+        });
         return true;
     }
 
@@ -124,6 +137,11 @@ class Token{
             return false;
         }
         this.owners.splice(indexToRemove, 1);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_OWNERSHIP,
+            command : Command.DELETE,
+            content : { id : this.getId(), modified : name}
+        });
         return true;
     }
 
@@ -136,11 +154,24 @@ class Token{
             return false;
         }
         this.notes.set(title, note);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_NOTE,
+            command : Command.SAFE_MODIFY,
+            content : { id : this.getId(), modified : {title : title, note : note}}
+        });
         return true;
     }
 
     public removeNote(title : string) : boolean{
-        return this.notes.delete(title);
+        if(!this.notes.delete(title)){
+            return false;
+        }
+        this.notifier?.notify({
+            status : MessageType.TOKEN_NOTE,
+            command : Command.DELETE,
+            content : { id : this.getId(), modified : title}
+        });
+        return true;
     }
 
     public getStats() : Map<string, Stat>{
@@ -152,15 +183,85 @@ class Token{
             return false;
         }
         this.stats.set(name, stat);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_STAT,
+            command : Command.SAFE_MODIFY,
+            content : { 
+                id : this.getId(),
+                modified : {name : name, stat : Stat.toObject(stat)}
+            }
+        });
         return true;
     }
 
     public removeStat(name : string) : boolean{
-        return this.stats.delete(name);
+        if(!this.stats.delete(name)){
+            return false;
+        }
+        this.notifier?.notify({
+            status : MessageType.TOKEN_STAT,
+            command : Command.DELETE,
+            content : { 
+                id : this.getId(),
+                modified : name
+            }
+        });
+        return true;
+    }
+
+    public acquireDragLock(username : string) : boolean{
+        if(this.dragLockOwner !== undefined){
+            return false;
+        }
+        this.dragLockOwner = username;
+        this.dragLockTimerID = setTimeout(this.timeoutDrag, 30)
+        return true;
+    }
+    
+    private timeoutDrag() : void {
+        this.dragLockTimerID = undefined;
+        this.dragLockOwner = undefined;
+        this.setPosition(this.position);
+    }
+
+    public drag(position : Vector2, user : string) : void{
+        if(user != this.dragLockOwner){
+            return;
+        }
+        this.virtualPosition.setTo(position);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_MOVING,
+            command : Command.MODIFY,
+            content : { 
+                id : this.getId(),
+                user : this.dragLockOwner,
+                modified : position
+            }
+        });
+        clearTimeout(this.dragLockTimerID); //refresh the time limit
+        this.dragLockTimerID = setTimeout(this.timeoutDrag, 30);
+    }
+
+    public endDrag(position : Vector2, user : string) : void{
+        if(user != this.dragLockOwner){
+            return;
+        }
+        clearTimeout(this.dragLockTimerID);
+        this.dragLockTimerID = undefined;
+        this.dragLockOwner = undefined;
+        this.setPosition(position)
     }
 
     public setPosition(position : Vector2) : void{
         this.position.setTo(position);
+        this.notifier?.notify({
+            status : MessageType.TOKEN_MOVED,
+            command : Command.MODIFY,
+            content : { 
+                id : this.getId(),
+                modified : position
+            }
+        });
     }
 
     public getPosition() : Vector2{
