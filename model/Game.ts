@@ -9,6 +9,7 @@ class Game{
     private notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
+    private gameEndCallback : undefined | (() => void);
     private static maxNameLength : number = 24;
     public static validate = ensureObject({
         name : ensureString,
@@ -31,6 +32,7 @@ class Game{
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
+        this.gameEndCallback = undefined;
         this.scenes.concat(this.currentScene)
     }
 
@@ -40,24 +42,31 @@ class Game{
             object.owner,
             Scene.fromObject(object.currentScene)
         );
-        //TODO: ADD NOTIFIER PROPERTY TO EVERY PART OF THE MODEL AND TO THEIR RESPECTIVE FROMOBJECT METHODS
+        const notifier = new ClientNotifier()
         for(const player of object.players){
-            if(!game.addPlayer(Player.fromObject(player))){
+            const newPlayer = Player.fromObject(player);
+            newPlayer.setNotifier(notifier);
+            if(!game.addPlayer(newPlayer)){
                 return undefined;
             }
         }
         for(const scene of object.scenes){
-            if(!game.addScene(Scene.fromObject(scene))){
+            const newScene = Scene.fromObject(scene);
+            newScene.setNotifier(notifier);
+            if(!game.addScene(newScene)){
                 return undefined;
             }
         }
         for(const asset of object.tokenAssets){
-            if(!game.addTokenAsset(Asset.fromObject(asset))){
+            const newAsset = Asset.fromObject(asset);
+            newAsset.setNotifier(notifier);
+            if(!game.addTokenAsset(newAsset)){
                 return undefined;
             }
         }
         for(const token of object.tokens){
             const restoredToken : Token | undefined = Token.fromObject(token, game);
+            restoredToken?.setNotifier(notifier);
             if(restoredToken === undefined){
                 return undefined;
             }
@@ -68,6 +77,7 @@ class Game{
         if(object.password !== undefined && !game.setPassword(object.password)){
             return undefined;
         }
+        game.setNotifier(notifier);
         return game;
     }
 
@@ -87,6 +97,10 @@ class Game{
     public static getMaxNameLength(){
         return this.maxNameLength;
     }
+    
+    public setEndCallback(callback : () => void){
+        this.gameEndCallback = callback;
+    }
 
     public setNotifier(notifier : ClientNotifier) : void{
         this.notifier = notifier;
@@ -101,7 +115,10 @@ class Game{
     }
 
     public addPlayer(player : Player) : boolean{
-        if(this.players.indexOf(player) != -1 || this.players.find(p => p.getName() == player.getName())){
+        if(this.players.indexOf(player) != -1){
+            return false;
+        }
+        if(this.players.find(p => p.getName() == player.getName()) !== undefined){
             return false;
         }
         this.players.push(player);
@@ -130,7 +147,10 @@ class Game{
     }
 
     public addTokenAsset(asset : Asset) : boolean{
-        if(this.tokenAssets.indexOf(asset) != -1 || this.tokenAssets.find(a => a.getName() == asset.getName())){
+        if(this.tokenAssets.indexOf(asset) != -1){
+            return false;
+        }
+        if(this.tokenAssets.find(a => a.getID() == asset.getID()) !== undefined){
             return false;
         }
         this.tokenAssets.push(asset);
@@ -164,6 +184,9 @@ class Game{
 
     public addToken(token : Token) : boolean{
         if(this.tokens.indexOf(token) != -1){
+            return false;
+        }
+        if(this.tokens.find(t => t.getID() == token.getID()) !== undefined){
             return false;
         }
         this.tokens.push(token)
@@ -242,7 +265,7 @@ class Game{
     }
 
     public checkPassword(attempt : string) : boolean{
-        return this.password == undefined || attempt == this.password;
+        return this.password === undefined || attempt == this.password;
     }
 
     public setPassword(password : string) : boolean{
@@ -251,10 +274,23 @@ class Game{
         }
         this.password = password;
         this.notifier?.notifyIf({
-            status : MessageType,
+            status : MessageType.PASSWORD_CHANGED,
             command : Command.MODIFY,
             content : password
         }, p => p.hasPermission(Permission.MASTER));
         return true;
+    }
+
+    public endGame() : void{
+        if(this.gameEndCallback !== undefined){
+            this.gameEndCallback();
+        }
+        this.notifier?.notify(
+            {
+                status : MessageType.GAME_END,
+                command : Command.DELETE,
+                content : {}
+            }
+        );
     }
 }

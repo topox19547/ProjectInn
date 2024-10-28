@@ -77,8 +77,8 @@ class Asset{
             this.notifier?.notifyIf({
                 status : MessageType.ASSET,
                 command : Command.SAFE_MODIFY,
-                asset : Asset.toObject(this)
-            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
+                content : Asset.toObject(this)
+            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
             return true;
         }
         return false;
@@ -92,13 +92,14 @@ class Asset{
         image.decode().then(() => {
             this.assetURL = url;
             this.assetSize = new Vector2(image.width, image.height);
-            this.notifier?.notifyIf({
-                status : MessageType.ASSET,
-                command : Command.SAFE_MODIFY,
-                asset : Asset.toObject(this)
-            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
         }).catch(() => {
-            //TODO: SET ERROR SPRITE INSTEAD OF THE ONE PROVIDED
-        })
+            this.assetURL = "/assets/missingSprite.jpg";
+            this.assetSize = new Vector2(500, 500);
+        });
+        this.notifier?.notifyIf({
+            status : MessageType.ASSET,
+            command : Command.SAFE_MODIFY,
+            content : Asset.toObject(this)
+        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
     }
 }

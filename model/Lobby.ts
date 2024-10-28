@@ -1,13 +1,15 @@
 class Lobby{
     private readonly games : Map<number, Game>;
     private readonly maxConcurrentGames : number;
+    private readonly notifier : ClientNotifier;
 
-    constructor(){
+    constructor(notifier : ClientNotifier){
         this.games = new Map();
         this.maxConcurrentGames = Number.MAX_SAFE_INTEGER;
+        this.notifier = notifier;
     }
 
-    public publishGame(game : Game) : number{
+    public publishGame(game : Game) : void{
         let id = 1;
         while(this.games.has(id)){
             id++;
@@ -16,7 +18,11 @@ class Lobby{
             }
         }
         this.games.set(id, game);
-        return id;
+        this.notifier.notify({
+            status : MessageType.LOBBY_UPDATE,
+            command : Command.SAFE_MODIFY,
+            content : this.getRunningGames()
+        });
     }
 
     public removeGame(game : Game) : void{
@@ -25,9 +31,14 @@ class Lobby{
                 this.games.delete(id);
             }
         }
+        this.notifier.notify({
+            status : MessageType.LOBBY_UPDATE,
+            command : Command.SAFE_MODIFY,
+            content : this.getRunningGames()
+        });
     }
 
-    public getGameById(id : number) : Game | undefined{
-        return this.games.get(id);
+    public getRunningGames() : Map<number,Game>{
+        return new Map(this.games);
     }
 }

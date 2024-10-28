@@ -8,7 +8,6 @@ class Token{
     private readonly owners : Array<string>;
     private readonly notes : Map<string, string>;
     private readonly stats : Map<string, Stat>;
-    private readonly virtualPosition : Vector2;
     private readonly position : Vector2;
     private readonly maxNameLength: number;
     private readonly maxNoteLength : number;
@@ -93,7 +92,7 @@ class Token{
         return this.asset;
     }
 
-    public getId() : number{
+    public getID() : number{
         return this.id;
     }
 
@@ -109,7 +108,7 @@ class Token{
         this.notifier?.notify({
             status : MessageType.TOKEN_NAME,
             command : Command.MODIFY,
-            content : { id : this.getId(), modified : name}
+            content : { id : this.getID(), modified : name}
         });
         return true;
     }
@@ -126,7 +125,7 @@ class Token{
         this.notifier?.notify({
             status : MessageType.TOKEN_OWNERSHIP,
             command : Command.CREATE,
-            content : { id : this.getId(), modified : name}
+            content : { id : this.getID(), modified : name}
         });
         return true;
     }
@@ -140,7 +139,7 @@ class Token{
         this.notifier?.notify({
             status : MessageType.TOKEN_OWNERSHIP,
             command : Command.DELETE,
-            content : { id : this.getId(), modified : name}
+            content : { id : this.getID(), modified : name}
         });
         return true;
     }
@@ -157,7 +156,7 @@ class Token{
         this.notifier?.notify({
             status : MessageType.TOKEN_NOTE,
             command : Command.SAFE_MODIFY,
-            content : { id : this.getId(), modified : {title : title, note : note}}
+            content : { id : this.getID(), modified : {title : title, note : note}}
         });
         return true;
     }
@@ -169,7 +168,7 @@ class Token{
         this.notifier?.notify({
             status : MessageType.TOKEN_NOTE,
             command : Command.DELETE,
-            content : { id : this.getId(), modified : title}
+            content : { id : this.getID(), modified : title}
         });
         return true;
     }
@@ -187,7 +186,7 @@ class Token{
             status : MessageType.TOKEN_STAT,
             command : Command.SAFE_MODIFY,
             content : { 
-                id : this.getId(),
+                id : this.getID(),
                 modified : {name : name, stat : Stat.toObject(stat)}
             }
         });
@@ -202,7 +201,7 @@ class Token{
             status : MessageType.TOKEN_STAT,
             command : Command.DELETE,
             content : { 
-                id : this.getId(),
+                id : this.getID(),
                 modified : name
             }
         });
@@ -224,16 +223,17 @@ class Token{
         this.setPosition(this.position);
     }
 
+    //TODO: Debug drag interaction: dragging could theoretically cause a few bugs
+    //if a client enters the game while something is being dragged
     public drag(position : Vector2, user : string) : void{
         if(user != this.dragLockOwner){
             return;
         }
-        this.virtualPosition.setTo(position);
         this.notifier?.notify({
             status : MessageType.TOKEN_MOVING,
             command : Command.MODIFY,
             content : { 
-                id : this.getId(),
+                id : this.getID(),
                 user : this.dragLockOwner,
                 modified : position
             }
@@ -258,7 +258,7 @@ class Token{
             status : MessageType.TOKEN_MOVED,
             command : Command.MODIFY,
             content : { 
-                id : this.getId(),
+                id : this.getID(),
                 modified : position
             }
         });

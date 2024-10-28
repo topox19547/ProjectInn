@@ -10,11 +10,10 @@ class Player{
         permissions : ensureMapObject(ensureBoolean)
     })
 
-    constructor(name : string, color : Color, notifier? : ClientNotifier){
+    constructor(name : string, color : Color){
         this.name = name;
         this.color = color;
         this.permissions = new Map<Permission, boolean>;
-        this.notifier = notifier;
         let i : number = 0;
         for(const _ in Permission){
             this.permissions.set(i,false);
@@ -71,9 +70,9 @@ class Player{
     public setPermission(permission : Permission, value : boolean){
         this.permissions.set(permission, value);
         this.notifier?.notify({
-            Status : MessageType.PERMISSIONS,
-            Command : Command.MODIFY,
-            Content : Player.toObject(this)
+            status : MessageType.PERMISSIONS,
+            command : Command.MODIFY,
+            content : Player.toObject(this)
         });
     }
 }

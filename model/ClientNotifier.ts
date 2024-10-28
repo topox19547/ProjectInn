@@ -13,13 +13,13 @@ class ClientNotifier{
         this.subscribers.delete(clientHandler);
     }
 
-    public notify(message : Object) : void{
+    public notify(message : Message) : void{
         this.subscribers.forEach((_, c) => {
             c.send(message);
         })
     }
 
-    public notifyIf(message : Object, check : (player : Player) => boolean) : void{
+    public notifyIf(message : Message, check : (player : Player) => boolean) : void{
         this.subscribers.forEach((p, c) => {
             if(p != undefined && check(p)){
                 c.send(message);
