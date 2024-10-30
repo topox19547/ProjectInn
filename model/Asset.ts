@@ -9,7 +9,7 @@ class Asset{
     public static readonly validate = ensureObject({
         assetID : ensureNumber,
         assetURL : weakEnsureOf(ensureString),
-        assetType : ensureNumber,
+        assetType : ensureEnumLike(Object.values(AssetType).filter(v => typeof v === "number")),
         assetSize : weakEnsureOf(Vector2.validate),
         name : ensureString
     })

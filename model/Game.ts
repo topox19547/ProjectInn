@@ -264,8 +264,8 @@ class Game{
         });
     }
 
-    public checkPassword(attempt : string) : boolean{
-        return this.password === undefined || attempt == this.password;
+    public checkPassword(attempt : string | undefined) : boolean{
+        return this.password === undefined || attempt === this.password;
     }
 
     public setPassword(password : string) : boolean{

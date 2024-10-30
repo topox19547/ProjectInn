@@ -9,7 +9,7 @@ class Scene{
     private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
         asset : Asset.validate,
-        gridType : ensureNumber,
+        gridType : ensureEnumLike(Object.values(GridType).filter(v => typeof v === "number")),
         offset : Vector2.validate,
         tileSize : ensureNumber,
     })

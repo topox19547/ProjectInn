@@ -2,6 +2,6 @@ interface ClientHandler{
     open():void
     close():void
     receive():void
-    send(message : Object):void
+    send(message : Message):void
     changeState(state : ClientState):void
 }

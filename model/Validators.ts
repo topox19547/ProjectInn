@@ -15,6 +15,16 @@ const ensureBoolean : ensureType<boolean> = (object : unknown) => {
     return object;
 }
 
+const ignore : ensureType<any> = (object : unknown) => {
+    return object;
+}
+
+const ensureEnumLike = (permittedValues : Array<number>) => (object : unknown) => {
+    if (typeof object !== "number") throw Error("not a number");
+    if (!permittedValues.includes(object)) throw Error("not a valid enum value");
+    return object;
+}
+
 const weakEnsureOf = <T>(ensureOtherType : ensureType<T>) => (object : unknown) => {
     try{
         return ensureOtherType(object);

@@ -234,8 +234,7 @@ class Token{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                user : this.dragLockOwner,
-                modified : position
+                modified : {user : this.dragLockOwner, position : position}
             }
         });
         clearTimeout(this.dragLockTimerID); //refresh the time limit

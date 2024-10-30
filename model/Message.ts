@@ -3,3 +3,4 @@ interface Message{
     command : Command,
     content : any
 }
+
