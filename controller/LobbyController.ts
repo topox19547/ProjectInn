@@ -41,6 +41,11 @@ class LobbyController extends ControllerBase{
                         }
                     }
                     this.lobby.publishGame(game);
+                    this.clientHandler.send({
+                        status : MessageType.JOIN_GAME,
+                        command : Command.CREATE,
+                        content : Game.toObject(game)
+                    })
                     this.clientHandler.changeState(new GameController(game, player, this.clientHandler));
                 }
                 case MessageType.JOIN_GAME:{
@@ -65,8 +70,16 @@ class LobbyController extends ControllerBase{
                         this.sendError("the name you chose has already been taken");
                         return;
                     }
-                    this.clientHandler.changeState(new GameController(game, player, this.clientHandler));         
+                    this.clientHandler.send({
+                        status : MessageType.JOIN_GAME,
+                        command : Command.CREATE,
+                        content : Game.toObject(game)
+                    });
+                    this.clientHandler.changeState(new GameController(game, player, this.clientHandler));      
                 }   
+                case MessageType.LOBBY_UPDATE: {
+                    this.clientHandler.send(this.lobby.buildMatchListMessage());
+                }
             }
         }catch(e){
             console.log("Message parse error: message of type " + parsedMessage.status + " is malformed")

@@ -18,11 +18,7 @@ class Lobby{
             }
         }
         this.games.set(id, game);
-        this.notifier.notify({
-            status : MessageType.LOBBY_UPDATE,
-            command : Command.SAFE_MODIFY,
-            content : this.getRunningGames()
-        });
+        this.notifier.notify(this.buildMatchListMessage());
     }
 
     public removeGame(game : Game) : void{
@@ -31,14 +27,20 @@ class Lobby{
                 this.games.delete(id);
             }
         }
-        this.notifier.notify({
-            status : MessageType.LOBBY_UPDATE,
-            command : Command.SAFE_MODIFY,
-            content : this.getRunningGames()
-        });
+        this.notifier.notify(this.buildMatchListMessage());
     }
 
     public getRunningGames() : Map<number,Game>{
         return new Map(this.games);
+    }
+
+    public buildMatchListMessage() : Message{
+        const gameList = new Array<{id : number, name : string}>;
+        this.getRunningGames().forEach((v,k) => gameList.concat({id : k, name : v.getName()}))
+        return {
+            status : MessageType.LOBBY_UPDATE,
+            command : Command.SAFE_MODIFY,
+            content : gameList
+        }
     }
 }
