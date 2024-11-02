@@ -198,8 +198,8 @@ class Game{
         return true;
     }
 
-    public removeToken(token : Token) : boolean{
-        const tokenIndex : number = this.tokens.indexOf(token);
+    public removeToken(id : number) : boolean{
+        const tokenIndex : number = this.tokens.findIndex(t => t.getID() == id);
         if(tokenIndex == -1){
             return false;
         }
@@ -207,7 +207,7 @@ class Game{
         this.notifier?.notify({
             status : MessageType.TOKEN,
             command : Command.DELETE,
-            content : Token.toObject(token)
+            content : id
         });
         return true;
     }

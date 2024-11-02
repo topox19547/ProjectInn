@@ -10,13 +10,8 @@ class LobbyController extends ControllerBase{
 
     public handleMessage(message : string): void {
         let parsedMessage : Message;
-        const validateMessage : (object : unknown) => Message = ensureObject({
-            status : ensureNumber,
-            command : ensureNumber,
-            content : ignore
-        })
         try{
-            parsedMessage = validateMessage(JSON.parse(message));
+            parsedMessage = this.validateMessage(JSON.parse(message));
         }catch(e){
             console.log("JSON parse error or malformed shape on inbound message: " + e);
             return;
