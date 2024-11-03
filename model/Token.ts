@@ -113,8 +113,8 @@ class Token{
         return true;
     }
 
-    public isOwner(name : string) : boolean{
-        return this.owners.indexOf(name) != -1;
+    public isOwner(user : Player) : boolean{
+        return this.owners.indexOf(user.getName()) != -1;
     }
 
     public addOwner(name : string) : boolean{

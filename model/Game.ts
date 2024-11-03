@@ -142,8 +142,8 @@ class Game{
         return true;
     }
 
-    public getPlayers() : Array<Player>{
-        return [...this.players];
+    public getPlayer(playerName : string) : Player | undefined{
+        return this.players.find(p => p.getName() == playerName);
     }
 
     public addTokenAsset(asset : Asset) : boolean{
@@ -212,8 +212,8 @@ class Game{
         return true;
     }
 
-    public getTokens() : Array<Token>{
-        return [... this.tokens]
+    public getToken(tokenId : number) : Token | undefined{
+        return this.tokens.find(t => t.getID() == tokenId);
     }
 
     public addScene(scene : Scene) : boolean{

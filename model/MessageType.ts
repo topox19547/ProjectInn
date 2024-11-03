@@ -24,3 +24,4 @@ enum MessageType{
     PING,
     ERROR
 }
+

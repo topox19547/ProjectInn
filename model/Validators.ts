@@ -15,7 +15,8 @@ const ensureBoolean : ensureType<boolean> = (object : unknown) => {
     return object;
 }
 
-const ignore : ensureType<any> = (object : unknown) => {
+const ensureGenericObject : ensureType<any> = (object : unknown) => {
+    if (typeof object !== "object") throw Error("not an object");
     return object;
 }
 

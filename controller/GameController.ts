@@ -26,19 +26,8 @@ class GameController extends ControllerBase{
                         position : Vector2.validate,
                         id : ensureNumber,
                     })(parsedMessage.content);
-                    const token : Token | undefined = this.currentGame.getTokens().find(t => t.getID() == content.id);
-                    if(token === undefined){
-                        this.sendError("Invalid token ID");
-                        return;
-                    }
-                    const hasPermission : boolean = (
-                        this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS) ||
-                        token.isOwner(this.clientPlayer.getName())
-                    );
-                    if(!hasPermission){
-                        this.sendError("You don't have the permission to move this token");
-                        return;
-                    }
+                    const token : Token | undefined = this.getTokenIfAuthorized(content.id, false);
+                    if(token === undefined) return;
                     const position : Vector2 = new Vector2(content.position.x, content.position.y)
                     if(!this.currentGame.getCurrentScene().isValidPosition(position)){
                         this.sendError("Invalid position sent by client");
@@ -46,40 +35,93 @@ class GameController extends ControllerBase{
                     }
                     if(parsedMessage.status == MessageType.TOKEN_MOVING){
                         token.drag(position, this.clientPlayer.getName());
-                    }
-                    else{
+                    }else{
                         token.endDrag(position, this.clientPlayer.getName());
                     }
                 }
+                case MessageType.TOKEN_STAT:{
+                    
+                }
+                case MessageType.TOKEN_NAME:{
+                    const content = ensureObject({
+                        name : ensureString,
+                        id : ensureNumber,
+                    })(parsedMessage.content);
+                    const token : Token | undefined = this.getTokenIfAuthorized(content.id, false);
+                    if(token === undefined) return;
+                    if(!token.setName(content.name)){
+                        this.sendError("Invalid name!");
+                        return;
+                    }
+                }
                 case MessageType.TOKEN:{
-                    const hasPermission : boolean = this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS);
-                    if(!hasPermission){
+                    if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
                         this.sendError("You don't have the permission to create/delete Tokens");
                         return;
                     }
-                    switch (parsedMessage.command){
-                        case Command.CREATE:{
-                            const content = Token.validate(parsedMessage.content);
-                            const token : Token | undefined = Token.fromObject(content, this.currentGame);
-                            if(token === undefined){
-                                this.sendError("Invalid token parameters detected");
-                                return;
-                            }
-                            this.currentGame.addToken(token);
+                    if(parsedMessage.command == Command.CREATE){
+                        const content = Token.validate(parsedMessage.content);
+                        const token : Token | undefined = Token.fromObject(content, this.currentGame);
+                        if(token === undefined){
+                            this.sendError("Invalid token parameters detected");
+                            return;
                         }
-                        case Command.DELETE:{
-                            const content = ensureObject({
-                                id : ensureNumber
-                            })(parsedMessage.content);
-                            if(!this.currentGame.removeToken(content.id)){
-                                this.sendError(`The token with id ${content.id} doesn't exist`);
-                                return;
-                            }
+                        this.currentGame.addToken(token);
+                    }else if(parsedMessage.command == Command.DELETE){
+                        const content = ensureObject({
+                            id : ensureNumber
+                        })(parsedMessage.content);
+                        if(!this.currentGame.removeToken(content.id)){
+                            this.sendError(`The token with id ${content.id} doesn't exist`);
+                            return;
+                        }
+                    }
+                }
+                case MessageType.TOKEN_OWNERSHIP:{
+                    const content = ensureObject({
+                        name : ensureString,
+                        id : ensureNumber,
+                    })(parsedMessage.content);
+                    const token : Token | undefined = this.getTokenIfAuthorized(content.id, true);
+                    if(token === undefined) return;
+                    if(!this.currentGame.getPlayer(content.name)){
+                        this.sendError("This player doesn't exist");
+                        return;
+                    }
+                    if(parsedMessage.command == Command.CREATE){
+                        if(!token.addOwner(content.name)){
+                            this.sendError("This player has already been added");
+                            return;
+                        }
+                    }else if(parsedMessage.command == Command.DELETE){
+                        if(!token.removeOwner(content.name)){
+                            this.sendError("This player isn't an owner");
+                            return;
                         }
                     }
                 }
             }
         }
+        catch (e){
+            console.log(`Message parse error: message of type ${parsedMessage.status} is malformed`)
+        }
+    }
+
+
+    private getTokenIfAuthorized(id : number, ignoreOwnership : boolean) : Token | undefined{
+        const token : Token | undefined = this.currentGame.getToken(id);
+        if(token === undefined){
+            this.sendError("Invalid token ID");
+            return;
+        }
+        if(!ignoreOwnership && token.isOwner(this.clientPlayer)){
+            return token;
+        }
+        if(this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
+            return token;
+        }
+        this.sendError("You don't have the permission to modify this Token");
+        return;
     }
 
     
