@@ -66,7 +66,9 @@ class GameController extends ControllerBase{
                             this.sendError("Invalid token parameters detected");
                             return;
                         }
-                        this.currentGame.addToken(token);
+                        if(!this.currentGame.addToken(token)){
+                            this.sendError("Unable to add any more tokens");
+                        }
                     }else if(parsedMessage.command == Command.DELETE){
                         const content = ensureObject({
                             id : ensureNumber

@@ -3,8 +3,8 @@ class Token{
     private notifier : ClientNotifier | undefined;
     private dragLockTimerID : number | undefined;
     private dragLockOwner : string | undefined;
+    private id : number;
     private readonly asset : Asset;
-    private readonly id : number;
     private readonly owners : Array<string>;
     private readonly notes : Map<string, string>;
     private readonly stats : Map<string, Stat>;
@@ -43,7 +43,7 @@ class Token{
             return undefined
         }
         for (const owner in object.owners){
-            if(!token.addOwner(owner) || gameContext.getPlayers().findIndex(p => p.getName() == owner) == -1){
+            if(!token.addOwner(owner) || gameContext.getPlayer(owner) === undefined){
                 return undefined
             }
         }
@@ -94,6 +94,10 @@ class Token{
 
     public getID() : number{
         return this.id;
+    }
+
+    public setID(id : number) : void{
+        this.id = id;
     }
 
     public getName() : string{

@@ -6,6 +6,9 @@ class Game{
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
     private readonly maxPasswordLength;
+    private readonly maxTokens;
+    private readonly maxTokenAssets;
+    private readonly maxScenes;
     private notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
@@ -33,6 +36,9 @@ class Game{
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
         this.gameEndCallback = undefined;
+        this.maxTokens = Number.MAX_SAFE_INTEGER;
+        this.maxTokenAssets = Number.MAX_SAFE_INTEGER;
+        this.maxScenes = Number.MAX_SAFE_INTEGER;
         this.scenes.concat(this.currentScene)
     }
 
@@ -186,15 +192,16 @@ class Game{
         if(this.tokens.indexOf(token) != -1){
             return false;
         }
-        if(this.tokens.find(t => t.getID() == token.getID()) !== undefined){
+        if(this.tokens.length >= this.maxTokens){
             return false;
         }
-        this.tokens.push(token)
+        this.addToEntityArray(this.tokens, token, (t) => t.getID(), (t,id) => t.setID(id));
         this.notifier?.notify({
             status : MessageType.TOKEN,
             command : Command.CREATE,
             content : Token.toObject(token)
         });
+        //this.tokens.sort((t1,t2) => t1.getID() < t2.getID() ? -1 : t1.getID() == t2.getID() ? 0 : 1);
         return true;
     }
 
@@ -214,6 +221,15 @@ class Game{
 
     public getToken(tokenId : number) : Token | undefined{
         return this.tokens.find(t => t.getID() == tokenId);
+    }
+
+    private getNextTokenId() : number{
+        for(let i = 0; i < this.maxTokens; i++){
+            if(this.tokens[i] == undefined){
+                return i;
+            }
+        }
+        return -1;
     }
 
     public addScene(scene : Scene) : boolean{
@@ -292,5 +308,25 @@ class Game{
                 content : {}
             }
         );
+    }
+
+    private addToEntityArray<T>(
+        array : Array<T>,
+        object : T,
+        getIdOf : (object : T) => number,
+        setIdOf : (object : T, id : number) => void ) : void{
+        let prev : number = -1;
+        let prevId : number = -1;
+        for(const [index, t] of array.entries()){
+            if(getIdOf(t) - prevId > 1){
+                array.splice(prev + 1, 0, object);
+                setIdOf(object, prevId + 1)
+                return;
+            }
+            prev = index;
+            prevId = getIdOf(t);
+        }
+        array.push(object);
+        setIdOf(object, prevId + 1)
     }
 }
