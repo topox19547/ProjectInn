@@ -1,12 +1,24 @@
-class Lobby{
+class Lobby implements NotificationSource{
     private readonly games : Map<number, Game>;
     private readonly maxConcurrentGames : number;
-    private readonly notifier : ClientNotifier;
+    private notifier : ClientNotifier | undefined;
 
     constructor(notifier : ClientNotifier){
         this.games = new Map();
         this.maxConcurrentGames = Number.MAX_SAFE_INTEGER;
+        this.notifier = undefined;
+    }
+
+    public setNotifier(notifier : ClientNotifier) : void{
         this.notifier = notifier;
+    }
+
+    public addToLobby(handler : ClientHandler){
+        this.notifier?.subscribe(handler);
+    }
+
+    public leaveLobby(handler : ClientHandler){
+        this.notifier?.unsubscribe(handler)
     }
 
     public publishGame(game : Game) : void{
@@ -18,7 +30,7 @@ class Lobby{
             }
         }
         this.games.set(id, game);
-        this.notifier.notify(this.buildMatchListMessage());
+        this.notifier?.notify(this.buildMatchListMessage());
     }
 
     public removeGame(game : Game) : void{
@@ -27,7 +39,7 @@ class Lobby{
                 this.games.delete(id);
             }
         }
-        this.notifier.notify(this.buildMatchListMessage());
+        this.notifier?.notify(this.buildMatchListMessage());
     }
 
     public getRunningGames() : Map<number,Game>{

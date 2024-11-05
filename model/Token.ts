@@ -1,4 +1,4 @@
-class Token{
+class Token implements Identifiable{
     private name : string;
     private notifier : ClientNotifier | undefined;
     private dragLockTimerID : number | undefined;

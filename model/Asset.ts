@@ -1,10 +1,10 @@
-class Asset{
+class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;
     private assetSize : Vector2 | undefined;
     private name : string;
     private notifier : ClientNotifier | undefined;
+    private assetID : number;
     private readonly assetType : AssetType;
-    private readonly assetID : number;
     private static readonly maxNameLength: number = 24;
     public static readonly validate = ensureObject({
         assetID : ensureNumber,
@@ -69,6 +69,10 @@ class Asset{
 
     public getID() : number{
         return this.assetID;
+    }
+
+    public setID(id : number) : void{
+        this.assetID = id;
     }
 
     public setName(name : string, permissionRequirement? : Permission) : boolean{

@@ -4,6 +4,7 @@ enum MessageType{
     LOBBY_UPDATE,
     GAME_END,
     PLAYER,
+    CLIENT_STATUS,
     TOKEN_MOVING,
     TOKEN_MOVED,
     TOKEN,

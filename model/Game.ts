@@ -1,4 +1,4 @@
-class Game{
+class Game implements NotificationSource{
     private readonly name : string;
     private readonly ownerName : string;
     private readonly players : Array<Player>;
@@ -42,13 +42,38 @@ class Game{
         this.scenes.concat(this.currentScene)
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>){
+    public static fromObject(object : ReturnType<typeof this.validate>) : Game | undefined{
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
             object.owner,
             Scene.fromObject(object.currentScene)
         );
-        const notifier = new ClientNotifier()
+        const notifier = new ClientNotifier();
+        const sortById = (t1 : Identifiable,t2 : Identifiable) => {
+            return t1.getID() < t2.getID() ? -1 : t1.getID() == t2.getID() ? 0 : 1
+        };
+        const restoreEntityArray = <T extends NotificationSource & Identifiable,K>(
+            source : Array<K>,
+            dest : Array<Identifiable & NotificationSource>,
+            restoreMethod : (object : K) => T | undefined,
+            maxEntities : number) : boolean => {
+                if(source.length > maxEntities){
+                    return false;
+                }
+                for(const obj of source){
+                    const restored : T | undefined = restoreMethod(obj);
+                    restored?.setNotifier(notifier);
+                    if(restored === undefined){
+                        return false;
+                    }
+                    dest.push(restored)
+                }
+                dest.sort(sortById);
+                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID()))){ //Could be optimized by using binary search
+                    return false;
+                }
+                return true;
+        }
         for(const player of object.players){
             const newPlayer = Player.fromObject(player);
             newPlayer.setNotifier(notifier);
@@ -56,29 +81,17 @@ class Game{
                 return undefined;
             }
         }
-        for(const scene of object.scenes){
-            const newScene = Scene.fromObject(scene);
-            newScene.setNotifier(notifier);
-            if(!game.addScene(newScene)){
-                return undefined;
-            }
+        if(object.scenes.length >= game.maxScenes){
+            return undefined;
         }
-        for(const asset of object.tokenAssets){
-            const newAsset = Asset.fromObject(asset);
-            newAsset.setNotifier(notifier);
-            if(!game.addTokenAsset(newAsset)){
-                return undefined;
-            }
+        if(!restoreEntityArray(object.scenes, game.scenes, Scene.fromObject, game.maxScenes)){
+            return undefined;
         }
-        for(const token of object.tokens){
-            const restoredToken : Token | undefined = Token.fromObject(token, game);
-            restoredToken?.setNotifier(notifier);
-            if(restoredToken === undefined){
-                return undefined;
-            }
-            if(!game.addToken(restoredToken)){
-                return undefined;
-            }
+        if(!restoreEntityArray(object.tokenAssets, game.tokenAssets, Asset.fromObject, game.maxTokenAssets)){
+            return undefined;
+        }
+        if(!restoreEntityArray(object.tokens, game.tokens, (t) => Token.fromObject(t,game), game.maxTokens)){
+            return undefined;
         }
         if(object.password !== undefined && !game.setPassword(object.password)){
             return undefined;
@@ -121,9 +134,6 @@ class Game{
     }
 
     public addPlayer(player : Player) : boolean{
-        if(this.players.indexOf(player) != -1){
-            return false;
-        }
         if(this.players.find(p => p.getName() == player.getName()) !== undefined){
             return false;
         }
@@ -132,6 +142,32 @@ class Game{
             status : MessageType.PLAYER,
             command : Command.CREATE,
             content : Player.toObject(player)})
+        return true;
+    }
+
+    public joinGame(player : Player, handler : ClientHandler) : boolean{
+        if(!this.getPlayer(player.getName())){
+            return false;
+        }
+        this.notifier?.subscribe(handler);
+        this.notifier?.notify({
+            status : MessageType.CLIENT_STATUS,
+            command : Command.CREATE,
+            content : player.getName()
+        })
+        return true
+    }
+
+    public leaveGame(player : Player, handler : ClientHandler) : boolean{
+        if(!this.getPlayer(player.getName())){
+            return false;
+        }
+        this.notifier?.unsubscribe(handler);
+        this.notifier?.notify({
+            status : MessageType.CLIENT_STATUS,
+            command : Command.DELETE,
+            content : player.getName()
+        })
         return true;
     }
 
@@ -153,10 +189,7 @@ class Game{
     }
 
     public addTokenAsset(asset : Asset) : boolean{
-        if(this.tokenAssets.indexOf(asset) != -1){
-            return false;
-        }
-        if(this.tokenAssets.find(a => a.getID() == asset.getID()) !== undefined){
+        if(this.tokenAssets.findIndex(a => a.getName() == asset.getName()) == -1){
             return false;
         }
         this.tokenAssets.push(asset);
@@ -189,19 +222,16 @@ class Game{
     }
 
     public addToken(token : Token) : boolean{
-        if(this.tokens.indexOf(token) != -1){
-            return false;
-        }
         if(this.tokens.length >= this.maxTokens){
             return false;
         }
-        this.addToEntityArray(this.tokens, token, (t) => t.getID(), (t,id) => t.setID(id));
+        this.addToEntityArray(this.tokens, token);
         this.notifier?.notify({
             status : MessageType.TOKEN,
             command : Command.CREATE,
             content : Token.toObject(token)
         });
-        //this.tokens.sort((t1,t2) => t1.getID() < t2.getID() ? -1 : t1.getID() == t2.getID() ? 0 : 1);
+        //this.tokens.sort();
         return true;
     }
 
@@ -223,18 +253,8 @@ class Game{
         return this.tokens.find(t => t.getID() == tokenId);
     }
 
-    private getNextTokenId() : number{
-        for(let i = 0; i < this.maxTokens; i++){
-            if(this.tokens[i] == undefined){
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public addScene(scene : Scene) : boolean{
-        if(this.scenes.indexOf(scene) != -1 || 
-        this.scenes.find(s => s.getAsset().getName() == scene.getAsset().getName())){
+        if(this.scenes.find(s => s.getAsset().getName() == scene.getAsset().getName())){
             return false;
         }
         this.scenes.push(scene);
@@ -310,23 +330,21 @@ class Game{
         );
     }
 
-    private addToEntityArray<T>(
-        array : Array<T>,
-        object : T,
-        getIdOf : (object : T) => number,
-        setIdOf : (object : T, id : number) => void ) : void{
+    private addToEntityArray(array : Array<Identifiable>, object : Identifiable){
         let prev : number = -1;
         let prevId : number = -1;
         for(const [index, t] of array.entries()){
-            if(getIdOf(t) - prevId > 1){
+            if(t.getID() - prevId > 1){
                 array.splice(prev + 1, 0, object);
-                setIdOf(object, prevId + 1)
+                object.setID(prevId + 1)
                 return;
             }
             prev = index;
-            prevId = getIdOf(t);
+            prevId = t.getID();
         }
         array.push(object);
-        setIdOf(object, prevId + 1)
+        object.setID(prevId + 1)
     }
+
+    //TODO:ID MUST BE PRESERVED ACROSS SESSIONS, SO ADDTOKEN CAN'T ASSIGN IDs INDEPENDENTLY
 }

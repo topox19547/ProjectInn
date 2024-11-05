@@ -1,5 +1,5 @@
 
-class Scene{
+class Scene implements Identifiable{
     private readonly asset : Asset;
     private gridType : GridType;
     private offset : Vector2;
@@ -41,6 +41,14 @@ class Scene{
             offset : Vector2.toObject(scene.offset),
             tileSize : scene.tileSize
         };
+    }
+
+    public getID(): number {
+        return this.asset.getID();
+    }
+
+    public setID(id: number): void {
+        this.asset.setID(id);
     }
 
     public getAsset() : Asset{
