@@ -1,5 +1,5 @@
 
-class Scene implements Identifiable{
+class Scene implements Identifiable, NotificationSource{
     private readonly asset : Asset;
     private gridType : GridType;
     private offset : Vector2;
@@ -65,7 +65,14 @@ class Scene implements Identifiable{
 
     public setGridType(gridType : GridType) : void{
         this.gridType = gridType;
-        this.sendNotification(MessageType.SCENE_GRIDTYPE, this.gridType);
+        this.notifier?.notify({
+            status : Status.SCENE_GRIDTYPE,
+            command : Command.MODIFY,
+            content : {
+                id : this.asset.getID(),
+                gridType : gridType
+            }
+        })
     }
 
     public getOffset() :Vector2{
@@ -74,7 +81,14 @@ class Scene implements Identifiable{
 
     public setOffset(offset : Vector2) : void{
         this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
-        this.sendNotification(MessageType.SCENE_OFFSET, this.offset);
+        this.notifier?.notify({
+            status : Status.SCENE_OFFSET,
+            command : Command.MODIFY,
+            content : {
+                id : this.asset.getID(),
+                offset : offset
+            }
+        })
     }
 
     public getTileSize() : number{
@@ -89,7 +103,14 @@ class Scene implements Identifiable{
         } else {
             this.tileSize = tileSize;
         }
-        this.sendNotification(MessageType.SCENE_TILESIZE, this.tileSize);
+        this.notifier?.notify({
+            status : Status.SCENE_OFFSET,
+            command : Command.MODIFY,
+            content : {
+                id : this.asset.getID(),
+                tileSize : tileSize
+            }
+        })
     }
 
     public isValidPosition(position : Vector2) : boolean{
@@ -97,13 +118,5 @@ class Scene implements Identifiable{
         return mapSize != undefined &&
             Math.ceil(mapSize.getX() + this.offset.getX() / this.tileSize) >= position.getX() &&
             Math.ceil(mapSize.getY() + this.offset.getY() / this.tileSize) >= position.getY();
-    }
-
-    private sendNotification<T>(type : MessageType, modified : T) : void{
-        this.notifier?.notify({
-            status : type,
-            command : Command.MODIFY,
-            content : { id : this.asset.getID(), modified : modified}
-        });
     }
 }

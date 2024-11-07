@@ -79,7 +79,7 @@ class Asset implements Identifiable,NotificationSource{
         if(name.length <= Asset.maxNameLength){
             this.name = name;
             this.notifier?.notifyIf({
-                status : MessageType.ASSET,
+                status : Status.ASSET,
                 command : Command.SAFE_MODIFY,
                 content : Asset.toObject(this)
             }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
@@ -101,7 +101,7 @@ class Asset implements Identifiable,NotificationSource{
             this.assetSize = new Vector2(500, 500);
         });
         this.notifier?.notifyIf({
-            status : MessageType.ASSET,
+            status : Status.ASSET,
             command : Command.SAFE_MODIFY,
             content : Asset.toObject(this)
         }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))

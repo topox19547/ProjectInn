@@ -1,4 +1,4 @@
-class Player{
+class Player implements NotificationSource{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;
@@ -70,9 +70,13 @@ class Player{
     public setPermission(permission : Permission, value : boolean){
         this.permissions.set(permission, value);
         this.notifier?.notify({
-            status : MessageType.PERMISSIONS,
+            status : Status.PERMISSIONS,
             command : Command.MODIFY,
-            content : Player.toObject(this)
+            content : {
+                name : this.name,
+                permission : permission,
+                value : value
+            }
         });
     }
 }

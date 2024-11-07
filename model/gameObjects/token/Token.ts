@@ -1,4 +1,4 @@
-class Token implements Identifiable{
+class Token implements Identifiable, NotificationSource{
     private name : string;
     private notifier : ClientNotifier | undefined;
     private dragLockTimerID : number | undefined;
@@ -110,9 +110,12 @@ class Token implements Identifiable{
         }
         this.name = name;
         this.notifier?.notify({
-            status : MessageType.TOKEN_NAME,
+            status : Status.TOKEN_NAME,
             command : Command.MODIFY,
-            content : { id : this.getID(), modified : name}
+            content : { 
+                id : this.getID(),
+                name : name
+            }
         });
         return true;
     }
@@ -127,9 +130,12 @@ class Token implements Identifiable{
         }
         this.owners.concat(name);
         this.notifier?.notify({
-            status : MessageType.TOKEN_OWNERSHIP,
+            status : Status.TOKEN_OWNERSHIP,
             command : Command.CREATE,
-            content : { id : this.getID(), modified : name}
+            content : { 
+                id : this.getID(),
+                name : name
+            }
         });
         return true;
     }
@@ -141,9 +147,12 @@ class Token implements Identifiable{
         }
         this.owners.splice(indexToRemove, 1);
         this.notifier?.notify({
-            status : MessageType.TOKEN_OWNERSHIP,
+            status : Status.TOKEN_OWNERSHIP,
             command : Command.DELETE,
-            content : { id : this.getID(), modified : name}
+            content : { 
+                id : this.getID(), 
+                name : name
+            }
         });
         return true;
     }
@@ -158,9 +167,13 @@ class Token implements Identifiable{
         }
         this.notes.set(title, note);
         this.notifier?.notify({
-            status : MessageType.TOKEN_NOTE,
+            status : Status.TOKEN_NOTE,
             command : Command.SAFE_MODIFY,
-            content : { id : this.getID(), modified : {title : title, note : note}}
+            content : { 
+                id : this.getID(),
+                title : title,
+                note : note
+            }
         });
         return true;
     }
@@ -170,9 +183,12 @@ class Token implements Identifiable{
             return false;
         }
         this.notifier?.notify({
-            status : MessageType.TOKEN_NOTE,
+            status : Status.TOKEN_NOTE,
             command : Command.DELETE,
-            content : { id : this.getID(), modified : title}
+            content : { 
+                id : this.getID(),
+                title : title
+            }
         });
         return true;
     }
@@ -187,11 +203,12 @@ class Token implements Identifiable{
         }
         this.stats.set(name, stat);
         this.notifier?.notify({
-            status : MessageType.TOKEN_STAT,
+            status : Status.TOKEN_STAT,
             command : Command.SAFE_MODIFY,
             content : { 
                 id : this.getID(),
-                modified : {name : name, stat : Stat.toObject(stat)}
+                name : name,
+                stat : Stat.toObject(stat)
             }
         });
         return true;
@@ -202,11 +219,11 @@ class Token implements Identifiable{
             return false;
         }
         this.notifier?.notify({
-            status : MessageType.TOKEN_STAT,
+            status : Status.TOKEN_STAT,
             command : Command.DELETE,
             content : { 
                 id : this.getID(),
-                modified : name
+                name : name
             }
         });
         return true;
@@ -234,11 +251,12 @@ class Token implements Identifiable{
             return;
         }
         this.notifier?.notify({
-            status : MessageType.TOKEN_MOVING,
+            status : Status.TOKEN_MOVING,
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                modified : {user : this.dragLockOwner, position : position}
+                user : this.dragLockOwner,
+                position : position
             }
         });
         clearTimeout(this.dragLockTimerID); //refresh the time limit
@@ -258,7 +276,7 @@ class Token implements Identifiable{
     public setPosition(position : Vector2) : void{
         this.position.setTo(position);
         this.notifier?.notify({
-            status : MessageType.TOKEN_MOVED,
+            status : Status.TOKEN_MOVED,
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),

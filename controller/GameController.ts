@@ -20,8 +20,8 @@ class GameController extends ControllerBase{
         }
         try{
             switch(parsedMessage.status){
-                case MessageType.TOKEN_MOVED:
-                case MessageType.TOKEN_MOVING:{
+                case Status.TOKEN_MOVED:
+                case Status.TOKEN_MOVING:{
                     const content = ensureObject({
                         position : Vector2.validate,
                         id : ensureNumber,
@@ -33,16 +33,16 @@ class GameController extends ControllerBase{
                         this.sendError("Invalid position sent by client");
                         return;
                     }
-                    if(parsedMessage.status == MessageType.TOKEN_MOVING){
+                    if(parsedMessage.status == Status.TOKEN_MOVING){
                         token.drag(position, this.clientPlayer.getName());
                     }else{
                         token.endDrag(position, this.clientPlayer.getName());
                     }
                 }
-                case MessageType.TOKEN_STAT:{
+                case Status.TOKEN_STAT:{
                     
                 }
-                case MessageType.TOKEN_NAME:{
+                case Status.TOKEN_NAME:{
                     const content = ensureObject({
                         name : ensureString,
                         id : ensureNumber,
@@ -54,7 +54,7 @@ class GameController extends ControllerBase{
                         return;
                     }
                 }
-                case MessageType.TOKEN:{
+                case Status.TOKEN:{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
                         this.sendError("You don't have the permission to create/delete Tokens");
                         return;
@@ -79,7 +79,7 @@ class GameController extends ControllerBase{
                         }
                     }
                 }
-                case MessageType.TOKEN_OWNERSHIP:{
+                case Status.TOKEN_OWNERSHIP:{
                     const content = ensureObject({
                         name : ensureString,
                         id : ensureNumber,

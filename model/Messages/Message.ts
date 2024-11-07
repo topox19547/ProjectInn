@@ -1,6 +1,6 @@
 interface Message{
-    status : MessageType,
+    status : Status,
     command : Command,
-    content : any
+    content : object
 }
 

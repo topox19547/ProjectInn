@@ -50,9 +50,11 @@ class Lobby implements NotificationSource{
         const gameList = new Array<{id : number, name : string}>;
         this.getRunningGames().forEach((v,k) => gameList.concat({id : k, name : v.getName()}))
         return {
-            status : MessageType.LOBBY_UPDATE,
+            status : Status.LOBBY_UPDATE,
             command : Command.SAFE_MODIFY,
-            content : gameList
+            content : {
+                games : gameList
+            }
         }
     }
 }

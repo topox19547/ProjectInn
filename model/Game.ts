@@ -5,10 +5,11 @@ class Game implements NotificationSource{
     private readonly tokenAssets : Array<Asset>;
     private readonly scenes : Array<Scene>;
     private readonly tokens : Array<Token>;
-    private readonly maxPasswordLength;
-    private readonly maxTokens;
-    private readonly maxTokenAssets;
-    private readonly maxScenes;
+    private readonly chat : Chat;
+    private readonly maxPasswordLength : number;
+    private readonly maxTokens : number;
+    private readonly maxTokenAssets : number;
+    private readonly maxScenes : number;
     private notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
@@ -36,6 +37,8 @@ class Game implements NotificationSource{
         this.currentScene = startingScene;
         this.maxPasswordLength = 64;
         this.gameEndCallback = undefined;
+        this.chat = new Chat();
+        this.chat.addCommand(new Dice()).addCommand(new Help(this.chat))
         this.maxTokens = Number.MAX_SAFE_INTEGER;
         this.maxTokenAssets = Number.MAX_SAFE_INTEGER;
         this.maxScenes = Number.MAX_SAFE_INTEGER;
@@ -139,7 +142,7 @@ class Game implements NotificationSource{
         }
         this.players.push(player);
         this.notifier?.notify({
-            status : MessageType.PLAYER,
+            status : Status.PLAYER,
             command : Command.CREATE,
             content : Player.toObject(player)})
         return true;
@@ -151,9 +154,11 @@ class Game implements NotificationSource{
         }
         this.notifier?.subscribe(handler);
         this.notifier?.notify({
-            status : MessageType.CLIENT_STATUS,
+            status : Status.CLIENT_STATUS,
             command : Command.CREATE,
-            content : player.getName()
+            content : {
+                name : player.getName()
+            }
         })
         return true
     }
@@ -164,9 +169,11 @@ class Game implements NotificationSource{
         }
         this.notifier?.unsubscribe(handler);
         this.notifier?.notify({
-            status : MessageType.CLIENT_STATUS,
+            status : Status.CLIENT_STATUS,
             command : Command.DELETE,
-            content : player.getName()
+            content : {
+                name : player.getName()
+            }
         })
         return true;
     }
@@ -178,9 +185,12 @@ class Game implements NotificationSource{
         }
         this.players.splice(playerIndex, 1);
         this.notifier?.notify({
-            status : MessageType.PLAYER,
+            status : Status.PLAYER,
             command : Command.DELETE,
-            content : Player.toObject(player)})
+            content : {
+                name : player.getName()
+            }
+        })
         return true;
     }
 
@@ -194,7 +204,7 @@ class Game implements NotificationSource{
         }
         this.tokenAssets.push(asset);
         this.notifier?.notifyIf({
-            status : MessageType.ASSET,
+            status : Status.ASSET,
             command : Command.CREATE,
             content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS))
         return true;
@@ -211,7 +221,7 @@ class Game implements NotificationSource{
             return false
         }
         this.notifier?.notify({
-            status : MessageType.ASSET,
+            status : Status.ASSET,
             command : Command.DELETE,
             content : Asset.toObject(asset)})
         return true;
@@ -227,7 +237,7 @@ class Game implements NotificationSource{
         }
         this.addToEntityArray(this.tokens, token);
         this.notifier?.notify({
-            status : MessageType.TOKEN,
+            status : Status.TOKEN,
             command : Command.CREATE,
             content : Token.toObject(token)
         });
@@ -242,9 +252,11 @@ class Game implements NotificationSource{
         }
         this.tokens.splice(tokenIndex, 1);
         this.notifier?.notify({
-            status : MessageType.TOKEN,
+            status : Status.TOKEN,
             command : Command.DELETE,
-            content : id
+            content : {
+                id : id
+            }
         });
         return true;
     }
@@ -259,7 +271,7 @@ class Game implements NotificationSource{
         }
         this.scenes.push(scene);
         this.notifier?.notify({
-            status : MessageType.SCENE,
+            status : Status.SCENE,
             command : Command.CREATE,
             content : Scene.toObject(scene)
         });
@@ -276,7 +288,7 @@ class Game implements NotificationSource{
         }
         this.scenes.splice(sceneIndex, 1);
         this.notifier?.notify({
-            status : MessageType.SCENE,
+            status : Status.SCENE,
             command : Command.DELETE,
             content : Scene.toObject(scene)
         });
@@ -294,7 +306,7 @@ class Game implements NotificationSource{
     public changeScene(scene : Scene) : void{
         this.currentScene = scene;
         this.notifier?.notify({
-            status : MessageType.SCENE_CHANGED,
+            status : Status.SCENE_CHANGED,
             command : Command.MODIFY,
             content : Scene.toObject(scene)
         });
@@ -310,9 +322,11 @@ class Game implements NotificationSource{
         }
         this.password = password;
         this.notifier?.notifyIf({
-            status : MessageType.PASSWORD_CHANGED,
+            status : Status.PASSWORD_CHANGED,
             command : Command.MODIFY,
-            content : password
+            content : {
+                password : password
+            }
         }, p => p.hasPermission(Permission.MASTER));
         return true;
     }
@@ -323,11 +337,25 @@ class Game implements NotificationSource{
         }
         this.notifier?.notify(
             {
-                status : MessageType.GAME_END,
+                status : Status.GAME_END,
                 command : Command.DELETE,
                 content : {}
             }
         );
+    }
+
+    public sendChatMessage(message : ChatMessage) : void{
+        this.chat.handleMessage(message);
+    }
+
+    public pingMap(position : Vector2) : void{
+        this.notifier?.notify({
+            status : Status.PING,
+            command : Command.CREATE,
+            content : {
+                position : position
+            }
+        })
     }
 
     private addToEntityArray(array : Array<Identifiable>, object : Identifiable){

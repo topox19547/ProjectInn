@@ -18,7 +18,7 @@ class LobbyController extends ControllerBase{
         }
         try{
             switch(parsedMessage.status){
-                case MessageType.CREATE_GAME:{
+                case Status.CREATE_GAME:{
                     const content = ensureObject({
                         username : ensureString,
                         playerColor : ensureString,
@@ -37,13 +37,13 @@ class LobbyController extends ControllerBase{
                     }
                     this.lobby.publishGame(game);
                     this.clientHandler.send({
-                        status : MessageType.JOIN_GAME,
+                        status : Status.JOIN_GAME,
                         command : Command.CREATE,
                         content : Game.toObject(game)
                     })
                     this.clientHandler.changeState(new GameController(game, player, this.clientHandler));
                 }
-                case MessageType.JOIN_GAME:{
+                case Status.JOIN_GAME:{
                     const content = ensureObject({
                         gameId : ensureNumber,
                         username : ensureString,
@@ -66,13 +66,13 @@ class LobbyController extends ControllerBase{
                         return;
                     }
                     this.clientHandler.send({
-                        status : MessageType.JOIN_GAME,
+                        status : Status.JOIN_GAME,
                         command : Command.CREATE,
                         content : Game.toObject(game)
                     });
                     this.clientHandler.changeState(new GameController(game, player, this.clientHandler));      
                 }   
-                case MessageType.LOBBY_UPDATE: {
+                case Status.LOBBY_UPDATE: {
                     this.clientHandler.send(this.lobby.buildMatchListMessage());
                 }
             }
