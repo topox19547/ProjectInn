@@ -1,6 +1,6 @@
 class LobbyController extends ControllerBase{
     private readonly lobby : Lobby;
-    protected readonly clientHandler : ClientHandler;
+    private readonly clientHandler : ClientHandler;
 
     constructor(lobby : Lobby, clientHandler : ClientHandler){
         super();
@@ -31,8 +31,7 @@ class LobbyController extends ControllerBase{
                     game.addPlayer(player);
                     if (content.password !== undefined){
                         if(!game.setPassword(content.password)){
-                            this.sendError("Error when setting the game's password");
-                            return;
+                            throw new ValueError("Error when setting the game's password");
                         }
                     }
                     this.lobby.publishGame(game);
@@ -54,15 +53,14 @@ class LobbyController extends ControllerBase{
                     const game = games.get(content.gameId);
                     const player = new Player(content.username, new Color(content.playerColor));
                     if(game === undefined){
-                        this.sendError("The requested game doesn't exist");
-                        return;
+                        throw new ValueError("The requested game doesn't exist");
                     }
                     if(!game.checkPassword(content.password)){
-                        this.sendError("wrong password!")
+                        throw new ValueError("Wrong password")
                         return;
                     }
                     if(!game.addPlayer(player)){
-                        this.sendError("the name you chose has already been taken");
+                        throw new ValueError("the name you chose has already been taken");
                         return;
                     }
                     this.clientHandler.send({
@@ -77,7 +75,17 @@ class LobbyController extends ControllerBase{
                 }
             }
         }catch(e){
-            console.log("Message parse error: message of type " + parsedMessage.status + " is malformed")
+            if(e instanceof ValueError){
+                this.clientHandler.send({
+                    status : Status.ERROR,
+                    command : Command.NONE,
+                    content : {
+                        error : e.message
+                    }
+                });
+            } else if (e instanceof FormatError || e instanceof SyntaxError){
+                console.log(`Message parse error: message of type ${parsedMessage.status} is malformed`)
+            }   
         }
         
     }

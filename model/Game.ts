@@ -344,8 +344,8 @@ class Game implements NotificationSource{
         );
     }
 
-    public sendChatMessage(message : ChatMessage) : void{
-        this.chat.handleMessage(message);
+    public getChatInstance() : Chat{
+        return this.chat;
     }
 
     public pingMap(position : Vector2) : void{

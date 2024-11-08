@@ -10,7 +10,7 @@ class Stat{
 
     constructor(value : number, min? : number, max? : number){
         this.min = min;
-        this.max = max;
+        this.max = max != undefined && min != undefined && max >= min ? max : min; 
         this.value = value;
         this.value = max != undefined && this.value > max ? max : this.value;
         this.value = min != undefined && this.value < min ? min : this.value;
