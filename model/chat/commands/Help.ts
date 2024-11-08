@@ -10,7 +10,7 @@ class Help implements ChatCommand{
     }
 
     getExplanation(): string {
-        return "h    shows a list of all the available commands"
+        return "!h    shows a list of all the available commands"
     }
 
     execute(args: Array<string>, playerName : string): ChatMessage {

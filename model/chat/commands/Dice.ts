@@ -8,7 +8,7 @@ class Dice implements ChatCommand{
     }
 
     getExplanation(): string {
-        return "d <number of faces>    rolls a dice with the specified amount of faces"
+        return "!d <number of faces>    rolls a dice with the specified amount of faces"
     }
 
     public execute(args: Array<string>, playerName : string): ChatMessage {

@@ -10,7 +10,9 @@ abstract class ControllerBase implements ClientState{
         this.clientHandler.send({
             status : Status.ERROR,
             command : Command.NONE,
-            content : text
+            content : {
+                error : text
+            }
         });
     }
 
