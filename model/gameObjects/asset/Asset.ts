@@ -79,16 +79,23 @@ class Asset implements Identifiable,NotificationSource{
         if(name.length <= Asset.maxNameLength){
             this.name = name;
             this.notifier?.notifyIf({
-                status : Status.ASSET,
-                command : Command.SAFE_MODIFY,
-                content : Asset.toObject(this)
+                status : Status.ASSET_NAME,
+                command : Command.MODIFY,
+                content : {
+                    id : this.assetID,
+                    type : this.assetType,
+                    name : this.name
+                }
             }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
             return true;
         }
         return false;
     }
 
-    public setURL(url : string, permissionRequirement? : Permission) : void{
+    public setURL(url : string, permissionRequirement? : Permission) : boolean{
+        if(url.length >= 2048){
+            return false;
+        }
         const image : HTMLImageElement = new HTMLImageElement()
         image.src = url;
         //This could potentially be removed in the future and the client could supply its own dimensions
@@ -101,9 +108,14 @@ class Asset implements Identifiable,NotificationSource{
             this.assetSize = new Vector2(500, 500);
         });
         this.notifier?.notifyIf({
-            status : Status.ASSET,
-            command : Command.SAFE_MODIFY,
-            content : Asset.toObject(this)
-        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
+            status : Status.ASSET_URL,
+            command : Command.MODIFY,
+            content : {
+                id : this.assetID,
+                type : this.assetType,
+                url : this.assetURL
+            }
+        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
+        return true;
     }
 }

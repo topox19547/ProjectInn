@@ -57,11 +57,9 @@ class LobbyController extends ControllerBase{
                     }
                     if(!game.checkPassword(content.password)){
                         throw new ValueError("Wrong password")
-                        return;
                     }
                     if(!game.addPlayer(player)){
                         throw new ValueError("the name you chose has already been taken");
-                        return;
                     }
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,

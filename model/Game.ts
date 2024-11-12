@@ -204,31 +204,26 @@ class Game implements NotificationSource{
         }
         this.tokenAssets.push(asset);
         this.notifier?.notifyIf({
-            status : Status.ASSET,
+            status : Status.TOKEN_ASSET,
             command : Command.CREATE,
             content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS))
         return true;
     }
 
-    public removeTokenAsset(asset : Asset) : boolean{
-        const assetIndex : number = this.tokenAssets.indexOf(asset);
-        for(let i = this.tokens.length - 1; i >= 0; i--){
-            if (this.tokens[i].getAsset() == asset){
-                this.tokens.splice(i,1);
-            }
-        }
+    public removeTokenAsset(id : number) : boolean{
+        const assetIndex : number = this.tokenAssets.findIndex(a => a.getID() == id);
         if(!(this.tokenAssets.splice(assetIndex, 1).length >= 1)){
             return false
         }
         this.notifier?.notify({
-            status : Status.ASSET,
+            status : Status.TOKEN_ASSET,
             command : Command.DELETE,
-            content : Asset.toObject(asset)})
+            content : {id : id}})
         return true;
     }
 
-    public getTokenAssets() : Array<Asset>{
-        return [...this.tokenAssets];
+    public getTokenAsset(id : number) : Asset | undefined{
+        return this.tokenAssets.find(a => a.getID() == id);
     }
 
     public addToken(token : Token) : boolean{
@@ -278,8 +273,8 @@ class Game implements NotificationSource{
         return true;
     }
 
-    public removeScene(scene : Scene) : boolean{
-        const sceneIndex : number = this.scenes.indexOf(scene);
+    public removeScene(id : number) : boolean{
+        const sceneIndex : number = this.scenes.findIndex(s => s.getID() == id);
         if(sceneIndex == -1){
             return false;
         }
@@ -290,26 +285,33 @@ class Game implements NotificationSource{
         this.notifier?.notify({
             status : Status.SCENE,
             command : Command.DELETE,
-            content : Scene.toObject(scene)
+            content : {
+                id : id
+            }
         });
         return true;
     }
 
-    public getScenes() : Array<Scene>{
-        return [... this.scenes];
+    public getScene(id : number) : Scene | undefined{
+        return this.scenes.find(s => s.getID() == id);
     }
 
     public getCurrentScene() : Scene{
         return this.currentScene;
     }
 
-    public changeScene(scene : Scene) : void{
+    public changeScene(id : number) : boolean{
+        const scene : Scene | undefined = this.getScene(id);
+        if(scene === undefined){
+            return false;
+        }
         this.currentScene = scene;
         this.notifier?.notify({
-            status : Status.SCENE_CHANGED,
-            command : Command.MODIFY,
+            status : Status.SCENE_CHANGE,
+            command : Command.SAFE_MODIFY,
             content : Scene.toObject(scene)
         });
+        return true;
     }
 
     public checkPassword(attempt : string | undefined) : boolean{
@@ -322,7 +324,7 @@ class Game implements NotificationSource{
         }
         this.password = password;
         this.notifier?.notifyIf({
-            status : Status.PASSWORD_CHANGED,
+            status : Status.PASSWORD_CHANGE,
             command : Command.MODIFY,
             content : {
                 password : password

@@ -69,6 +69,11 @@ class Player implements NotificationSource{
 
     public setPermission(permission : Permission, value : boolean){
         this.permissions.set(permission, value);
+        if(permission == Permission.MASTER){
+            this.permissions.forEach((_,k) => {
+                if (k != Permission.MASTER) this.setPermission(k,value)
+        });
+        }
         this.notifier?.notify({
             status : Status.PERMISSIONS,
             command : Command.MODIFY,
