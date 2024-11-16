@@ -1,12 +1,11 @@
-class WebSocketHandler implements ClientHandler{
+class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
     
-    constructor(webSocket : WebSocket){
+    constructor(webSocket : WebSocket, initialState : ClientState){
+        super(initialState);
         this.webSocket = webSocket;
-    }
-    
-    changeState(state: ClientState): void {
-        throw new Error("Method not implemented.");
+        webSocket.addEventListener("message", this.receive);
+        webSocket.addEventListener("close", this.close);
     }
 
     open(): void {
@@ -14,14 +13,28 @@ class WebSocketHandler implements ClientHandler{
     }
 
     close(): void {
-        throw new Error("Method not implemented.");
+        this.currentState.handleMessage({
+            status : Status.CLIENT_STATUS,
+            command : Command.DELETE,
+            content : {}
+        })
     }
 
-    receive(): void {
-        throw new Error("Method not implemented.");
+    receive(event : MessageEvent): void {
+        try{
+            const parsedMessage = validateMessage(JSON.parse(event.data))
+            this.currentState.handleMessage(parsedMessage);
+        } catch (e){
+            if(e instanceof SyntaxError){
+                console.log("invalid JSON syntax on inbound message");
+            } else if (e instanceof FormatError){
+                console.log("invalid message format on inbound message");
+            }
+        }
+            
     }
     
-    send(): void {
-        throw new Error("Method not implemented.");
+    send(message : Message): void {
+        this.webSocket.send(JSON.stringify(message));
     }
 }

@@ -1,3 +1,4 @@
 interface ClientState{
-    handleMessage(message : string) : void
+    handleMessage(message : Message) : void
+    getNextDefaultState() : ClientState
 }

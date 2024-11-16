@@ -1,53 +1,56 @@
-class GameController extends ControllerBase{
+class GameController implements ClientState{
+    private readonly lobby : Lobby
     private readonly currentGame : Game;
     private readonly clientPlayer : Player;
     private readonly clientHandler : ClientHandler;
 
-    constructor(currentGame : Game, clientPlayer : Player, clientHandler : ClientHandler){
-        super();
+    constructor(lobby : Lobby, currentGame : Game, clientPlayer : Player, clientHandler : ClientHandler){
         this.currentGame = currentGame;
         this.clientPlayer = clientPlayer;
         this.clientHandler = clientHandler;
+        this.lobby = lobby
+    }
+    
+    public getNextDefaultState(): ClientState {
+        return new LobbyController(this.lobby, this.clientHandler)
     }
 
-    public handleMessage(message : string): void {
-        let parsedMessage : Message;
+    public handleMessage(message : Message): void {
         try{
-            parsedMessage = this.validateMessage(JSON.parse(message));
-            switch(parsedMessage.status){
+            switch(message.status){
                 case Status.TOKEN_MOVED:
                 case Status.TOKEN_MOVING:{
                     const content = ensureObject({
                         position : Vector2.validate,
                         id : ensureNumber,
-                    })(parsedMessage.content);
+                    })(message.content);
                     const token : Token = this.getTokenIfAuthorized(content.id, false);
                     const position : Vector2 = new Vector2(content.position.x, content.position.y)
                     if(!this.currentGame.getCurrentScene().isValidPosition(position)){
                         throw new ValueError("Invalid position sent by client");
                     }
-                    if(parsedMessage.status == Status.TOKEN_MOVING){
+                    if(message.status == Status.TOKEN_MOVING){
                         token.drag(position, this.clientPlayer.getName());
                     }else{
                         token.endDrag(position, this.clientPlayer.getName());
                     }
                 }
                 case Status.TOKEN_STAT:{
-                    if(parsedMessage.command == Command.SAFE_MODIFY){
+                    if(message.command == Command.SAFE_MODIFY){
                         const content = ensureObject({
                             id : ensureNumber,
                             name : ensureString,
                             stat : Stat.validate
-                        })(parsedMessage.content);
+                        })(message.content);
                         const token : Token = this.getTokenIfAuthorized(content.id, false);
                         if(!token.setStat(content.name, new Stat(content.stat.value, content.stat.min, content.stat.max))){
                             throw new ValueError("The name you've chosen is too long");
                         }
-                    }else if(parsedMessage.command == Command.DELETE){
+                    }else if(message.command == Command.DELETE){
                         const content = ensureObject({
                             id : ensureNumber,
                             name : ensureString,
-                        })(parsedMessage.content);
+                        })(message.content);
                         const token : Token = this.getTokenIfAuthorized(content.id, false);
                         if(!token.removeStat(content.name)){
                             throw new ValueError(`Stat ${content.name} doesn't exist`);
@@ -58,7 +61,7 @@ class GameController extends ControllerBase{
                     const content = ensureObject({
                         name : ensureString,
                         id : ensureNumber,
-                    })(parsedMessage.content);
+                    })(message.content);
                     const token : Token = this.getTokenIfAuthorized(content.id, false);
                     if(!token.setName(content.name)){
                         throw new ValueError("Invalid name");
@@ -68,8 +71,8 @@ class GameController extends ControllerBase{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
                         new PermissionError();
                     }
-                    if(parsedMessage.command == Command.CREATE){
-                        const content = Token.validate(parsedMessage.content);
+                    if(message.command == Command.CREATE){
+                        const content = Token.validate(message.content);
                         const token : Token | undefined = Token.fromObject(content, this.currentGame);
                         if(token === undefined){
                             throw new ValueError("Invalid token parameters detected");
@@ -77,10 +80,10 @@ class GameController extends ControllerBase{
                         if(!this.currentGame.addToken(token)){
                             throw new ValueError("Unable to add any more tokens");
                         }
-                    }else if(parsedMessage.command == Command.DELETE){
+                    }else if(message.command == Command.DELETE){
                         const content = ensureObject({
                             id : ensureNumber
-                        })(parsedMessage.content);
+                        })(message.content);
                         if(!this.currentGame.removeToken(content.id)){
                             throw new ValueError(`The token with id ${content.id} doesn't exist`);
                         }
@@ -90,37 +93,37 @@ class GameController extends ControllerBase{
                     const content = ensureObject({
                         name : ensureString,
                         id : ensureNumber,
-                    })(parsedMessage.content);
+                    })(message.content);
                     const token : Token = this.getTokenIfAuthorized(content.id, true);
                     if(!this.currentGame.getPlayer(content.name)){
                         throw new ValueError("This player doesn't exist");
                     }
-                    if(parsedMessage.command == Command.CREATE){
+                    if(message.command == Command.CREATE){
                         if(!token.addOwner(content.name)){
                             throw new ValueError("This player has already been added");
                         }
-                    }else if(parsedMessage.command == Command.DELETE){
+                    }else if(message.command == Command.DELETE){
                         if(!token.removeOwner(content.name)){
                             throw new ValueError("This player isn't an owner");
                         }
                     }
                 }
                 case Status.TOKEN_NOTE : {
-                    if(parsedMessage.command == Command.SAFE_MODIFY){
+                    if(message.command == Command.SAFE_MODIFY){
                         const content = ensureObject({
                             id : ensureNumber,
                             title : ensureString,
                             note : ensureString
-                        })(parsedMessage.content);
+                        })(message.content);
                         const token : Token = this.getTokenIfAuthorized(content.id, false);
                         if(!token.setNote(content.title, content.note)){
                             throw new ValueError("The note title you've chosen is too long");
                         }
-                    }else if(parsedMessage.command == Command.DELETE){
+                    }else if(message.command == Command.DELETE){
                         const content = ensureObject({
                             id : ensureNumber,
                             title : ensureString,
-                        })(parsedMessage.content);
+                        })(message.content);
                         const token : Token = this.getTokenIfAuthorized(content.id, false);
                         if(!token.removeStat(content.title )){
                             throw new ValueError(`Note ${content.title} doesn't exist`);
@@ -130,7 +133,7 @@ class GameController extends ControllerBase{
                 case Status.CHAT : {
                     const content = ensureObject({
                         text : ensureString
-                    })(parsedMessage.content);
+                    })(message.content);
                     const chat : Chat = this.currentGame.getChatInstance();
                     chat.handleMessage({
                         text : content.text,
@@ -141,13 +144,13 @@ class GameController extends ControllerBase{
                 case Status.SCENE_PING : {
                     const content = ensureObject({
                         position : Vector2.validate
-                    })(parsedMessage.content)
+                    })(message.content)
                     this.currentGame.pingMap(new Vector2(content.position.x, content.position.y))
                 }
                 case Status.PASSWORD_CHANGE : {
                     const content = ensureObject({
                         password : ensureString
-                    })(parsedMessage.content);
+                    })(message.content);
                     if(!this.clientPlayer.hasPermission(Permission.MASTER)){
                         throw new PermissionError();
                     }
@@ -160,7 +163,7 @@ class GameController extends ControllerBase{
                         name : ensureString,
                         permission : ensureEnumLike(Object.values(Permission).filter(v => typeof v == "number")),
                         value : ensureBoolean
-                    })(parsedMessage.content);
+                    })(message.content);
                     if(!this.clientPlayer.hasPermission(Permission.MASTER)){
                         throw new PermissionError();
                     }
@@ -183,17 +186,17 @@ class GameController extends ControllerBase{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_SCENES)){
                         throw new PermissionError();
                     }
-                    if(parsedMessage.command == Command.CREATE){
-                        const content = Scene.validate(parsedMessage.content);
+                    if(message.command == Command.CREATE){
+                        const content = Scene.validate(message.content);
                         const scene : Scene = Scene.fromObject(content);
                         if(!this.currentGame.addScene(scene)){
                             throw new ValueError("There already is a scene with the same name");
                         }
                     }
-                    else if(parsedMessage.command == Command.DELETE){
+                    else if(message.command == Command.DELETE){
                         const content = ensureObject({
                             id : ensureNumber
-                        })(parsedMessage.content);
+                        })(message.content);
                         if(!this.currentGame.removeScene(content.id)){
                             throw new ValueError("Could not remove scene");
                         }
@@ -202,7 +205,7 @@ class GameController extends ControllerBase{
                 case Status.SCENE_CHANGE : {
                     const content = ensureObject({
                         id : ensureNumber
-                    })(parsedMessage.content);
+                    })(message.content);
                     if(!this.clientPlayer.hasPermission(Permission.MASTER)){
                         throw new PermissionError();
                     }
@@ -214,7 +217,7 @@ class GameController extends ControllerBase{
                     const content = ensureObject({
                         gridType : ensureEnumLike(Object.values(GridType).filter(v => typeof v == "number")),
                         id : ensureNumber
-                    })(parsedMessage.content);
+                    })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setGridType(content.gridType);
                 }
@@ -222,7 +225,7 @@ class GameController extends ControllerBase{
                     const content = ensureObject({
                         offset : Vector2.validate,
                         id : ensureNumber
-                    })(parsedMessage.content);
+                    })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setOffset(new Vector2(content.offset.x, content.offset.y));
                 }
@@ -230,7 +233,7 @@ class GameController extends ControllerBase{
                     const content = ensureObject({
                         tileSize : ensureNumber,
                         id : ensureNumber
-                    })(parsedMessage.content);
+                    })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setTileSize(content.tileSize);
                 }
@@ -238,16 +241,16 @@ class GameController extends ControllerBase{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
                         throw new PermissionError();
                     }
-                    if(parsedMessage.command == Command.CREATE){
-                        const content = Asset.validate(parsedMessage.content);
+                    if(message.command == Command.CREATE){
+                        const content = Asset.validate(message.content);
                         if(content.assetType != AssetType.TOKEN){
                             throw new ValueError("Wrong asset type passed");
                         }
                         if(!this.currentGame.addTokenAsset(Asset.fromObject(content))){
                             throw new ValueError("There already is a token asset with the same name");
                         }
-                    } else if (parsedMessage.command == Command.DELETE){
-                        const content = ensureObject({id : ensureNumber})(parsedMessage.content);
+                    } else if (message.command == Command.DELETE){
+                        const content = ensureObject({id : ensureNumber})(message.content);
                         if(!this.currentGame.removeTokenAsset(content.id)){
                             throw new ValueError("No token asset exists with this ID")
                         }
@@ -258,7 +261,7 @@ class GameController extends ControllerBase{
                         name : ensureString,
                         id : ensureNumber,
                         type : ensureEnumLike(Object.values(AssetType).filter(v => typeof v == "number"))
-                    })(parsedMessage.content);
+                    })(message.content);
                     const asset : Asset = this.getAssetIfAuthorized(content.id, content.type);
                     if(!asset.setName(content.name)){
                         throw new ValueError("The supplied name is too long")
@@ -269,7 +272,7 @@ class GameController extends ControllerBase{
                         url : ensureString,
                         id : ensureNumber,
                         type : ensureEnumLike(Object.values(AssetType).filter(v => typeof v == "number"))
-                    })(parsedMessage.content);
+                    })(message.content);
                     const asset : Asset = this.getAssetIfAuthorized(content.id, content.type);
                     if(!asset.setURL(content.url)){
                         throw new ValueError("The given url is too long")
@@ -277,9 +280,10 @@ class GameController extends ControllerBase{
                 }
                 case Status.GAME_END : {
                     if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
-                        this.currentGame.endGame();
+                        this.currentGame.endGame(this.lobby);
                     }
                 }
+                case Status.PLAYER
             }
         }
         catch (e){
@@ -291,9 +295,7 @@ class GameController extends ControllerBase{
                         error : e.message
                     }
                 });
-            } else if (e instanceof FormatError || e instanceof SyntaxError){
-                console.log(`Message parse error: message is malformed`)
-            }   
+            }
         }
     }
 

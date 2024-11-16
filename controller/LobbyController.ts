@@ -1,23 +1,19 @@
-class LobbyController extends ControllerBase{
+class LobbyController implements ClientState{
     private readonly lobby : Lobby;
     private readonly clientHandler : ClientHandler;
 
     constructor(lobby : Lobby, clientHandler : ClientHandler){
-        super();
         this.lobby = lobby;
         this.clientHandler = clientHandler;
     }
 
-    public handleMessage(message : string): void {
-        let parsedMessage : Message;
+    getNextDefaultState(): ClientState {
+        return this
+    }
+
+    public handleMessage(message : Message): void {
         try{
-            parsedMessage = this.validateMessage(JSON.parse(message));
-        }catch(e){
-            console.log("JSON parse error or malformed shape on inbound message: " + e);
-            return;
-        }
-        try{
-            switch(parsedMessage.status){
+            switch(message.status){
                 case Status.CREATE_GAME:{
                     const content = ensureObject({
                         username : ensureString,
@@ -25,7 +21,7 @@ class LobbyController extends ControllerBase{
                         gameName : ensureString,
                         password : weakEnsureOf(ensureString),
                         scene : Scene.validate
-                    })(parsedMessage.content);
+                    })(message.content);
                     const game = new Game(content.gameName, content.username, Scene.fromObject(content.scene));
                     const player = new Player(content.username, new Color(content.playerColor))
                     game.addPlayer(player);
@@ -40,7 +36,7 @@ class LobbyController extends ControllerBase{
                         command : Command.CREATE,
                         content : Game.toObject(game)
                     })
-                    this.clientHandler.changeState(new GameController(game, player, this.clientHandler));
+                    this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
                 }
                 case Status.JOIN_GAME:{
                     const content = ensureObject({
@@ -48,7 +44,7 @@ class LobbyController extends ControllerBase{
                         username : ensureString,
                         playerColor : ensureString,
                         password : weakEnsureOf(ensureString),
-                    })(parsedMessage.content);
+                    })(message.content);
                     const games = this.lobby.getRunningGames();
                     const game = games.get(content.gameId);
                     const player = new Player(content.username, new Color(content.playerColor));
@@ -66,7 +62,7 @@ class LobbyController extends ControllerBase{
                         command : Command.CREATE,
                         content : Game.toObject(game)
                     });
-                    this.clientHandler.changeState(new GameController(game, player, this.clientHandler));      
+                    this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      
                 }   
                 case Status.LOBBY_UPDATE: {
                     this.clientHandler.send(this.lobby.buildMatchListMessage());
@@ -82,7 +78,7 @@ class LobbyController extends ControllerBase{
                     }
                 });
             } else if (e instanceof FormatError || e instanceof SyntaxError){
-                console.log(`Message parse error: message of type ${parsedMessage.status} is malformed`)
+                console.log(`Message parse error: message of type ${message.status} is malformed`)
             }   
         }
         

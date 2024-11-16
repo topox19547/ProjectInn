@@ -26,4 +26,20 @@ class ClientNotifier{
             }
         });
     }
+
+    public removeAllClients(){
+        this.subscribers.forEach((_,c) => {
+            c.leaveCurrentState();
+        })
+        this.subscribers.clear();
+    }
+
+    public removeClientsIf(check : (player : Player) => boolean){
+        this.subscribers.forEach((p,c) => {
+            if(p != undefined && check(p)){
+                c.leaveCurrentState();
+                this.subscribers.delete(c);
+            }
+        })
+    }
 }
