@@ -1,4 +1,6 @@
-class Stat{
+import { ensureObject, weakEnsureOf, ensureNumber } from "../../messages/Validators";
+
+export class Stat{
     private min : number | undefined;
     private max : number | undefined;
     private value : number;

@@ -1,4 +1,4 @@
-enum GridType{
+export enum GridType{
     SQUARE,
     HEXAGONAL
 }

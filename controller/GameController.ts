@@ -1,4 +1,26 @@
-class GameController implements ClientState{
+import { PermissionError } from "../errors/PermissionError";
+import { ValueError } from "../errors/ValueError";
+import { Chat } from "../model/chat/Chat";
+import { Game } from "../model/Game";
+import { Asset } from "../model/gameObjects/asset/Asset";
+import { AssetType } from "../model/gameObjects/asset/AssetType";
+import { Permission } from "../model/gameObjects/player/Permission";
+import { Player } from "../model/gameObjects/player/Player";
+import { GridType } from "../model/gameObjects/scene/GridType";
+import { Scene } from "../model/gameObjects/scene/Scene";
+import { Stat } from "../model/gameObjects/token/Stat";
+import { Token } from "../model/gameObjects/token/Token";
+import { Vector2 } from "../model/gameObjects/Vector2";
+import { Lobby } from "../model/Lobby";
+import { Message } from "../model/messages/Message";
+import { Status } from "../model/messages/Status";
+import { ensureBoolean, ensureEnumLike, ensureNumber, ensureObject, ensureString } from "../model/messages/Validators";
+import { ClientHandler } from "./ClientHandler";
+import { ClientState } from "./ClientState";
+import { Command } from "./Command";
+import { LobbyController } from "./LobbyController";
+
+export class GameController implements ClientState{
     private readonly lobby : Lobby
     private readonly currentGame : Game;
     private readonly clientPlayer : Player;
@@ -280,10 +302,10 @@ class GameController implements ClientState{
                 }
                 case Status.GAME_END : {
                     if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
-                        this.currentGame.endGame(this.lobby);
+                        this.currentGame.endGame();
+                        this.lobby.removeGame(this.currentGame);
                     }
                 }
-                case Status.PLAYER
             }
         }
         catch (e){

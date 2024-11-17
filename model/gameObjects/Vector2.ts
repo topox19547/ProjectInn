@@ -1,8 +1,10 @@
+import { ensureObject, ensureNumber } from "../messages/Validators";
+
 /**
  * class representing a vector with two components
  * a few useful methods added for convenience
  */
-class Vector2{
+export class Vector2{
     private x:number;
     private y:number;
     public static readonly validate = ensureObject({x : ensureNumber, y : ensureNumber});

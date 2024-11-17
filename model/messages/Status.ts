@@ -1,4 +1,4 @@
-enum Status{
+export enum Status{
     CREATE_GAME,
     JOIN_GAME,
     LOBBY_UPDATE,

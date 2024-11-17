@@ -1,4 +1,12 @@
-class Lobby implements NotificationSource{
+import { ClientHandler } from "../controller/ClientHandler";
+import { Command } from "../controller/Command";
+import { ClientNotifier } from "./ClientNotifier";
+import { Game } from "./Game";
+import { Message } from "./messages/Message";
+import { Status } from "./messages/Status";
+import { NotificationSource } from "./NotificationSource";
+
+export class Lobby implements NotificationSource{
     private readonly games : Map<number, Game>;
     private readonly maxConcurrentGames : number;
     private notifier : ClientNotifier | undefined;

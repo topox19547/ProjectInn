@@ -1,4 +1,8 @@
-class Help implements ChatCommand{
+import { Chat } from "../Chat";
+import { ChatMessage } from "../ChatMessage";
+import { ChatCommand } from "./ChatCommand";
+
+export class Help implements ChatCommand{
     private readonly visualName;
     private readonly commandName;
     private readonly chat : Chat;

@@ -1,4 +1,8 @@
-class ClientNotifier{
+import { ClientHandler } from "../controller/ClientHandler";
+import { Player } from "./gameObjects/player/Player";
+import { Message } from "./messages/Message";
+
+export class ClientNotifier{
     private readonly subscribers : Map<ClientHandler, Player | undefined>;
 
     constructor(){

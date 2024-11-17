@@ -1,5 +1,14 @@
+import { Command } from "../../../controller/Command";
+import { ClientNotifier } from "../../ClientNotifier";
+import { Status } from "../../messages/Status";
+import { ensureObject, ensureEnumLike, ensureNumber } from "../../messages/Validators";
+import { NotificationSource } from "../../NotificationSource";
+import { Asset } from "../asset/Asset";
+import { Identifiable } from "../Identifiable";
+import { Vector2 } from "../Vector2";
+import { GridType } from "./GridType";
 
-class Scene implements Identifiable, NotificationSource{
+export class Scene implements Identifiable, NotificationSource{
     private readonly asset : Asset;
     private gridType : GridType;
     private offset : Vector2;

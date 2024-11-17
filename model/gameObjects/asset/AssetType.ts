@@ -1,4 +1,4 @@
-enum AssetType{
+export enum AssetType{
     SCENE,
     TOKEN
 }

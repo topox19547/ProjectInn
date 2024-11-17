@@ -1,4 +1,11 @@
-class WebSocketHandler extends ClientHandler{
+import { FormatError } from "../errors/FormatError";
+import { validateMessage, Message } from "../model/messages/Message";
+import { Status } from "../model/messages/Status";
+import { ClientHandler } from "./ClientHandler";
+import { ClientState } from "./ClientState";
+import { Command } from "./Command";
+
+export class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
     
     constructor(webSocket : WebSocket, initialState : ClientState){

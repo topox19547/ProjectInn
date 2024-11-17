@@ -1,4 +1,11 @@
-class Chat implements NotificationSource{
+import { Command } from "../../controller/Command";
+import { ClientNotifier } from "../ClientNotifier";
+import { Status } from "../messages/Status";
+import { NotificationSource } from "../NotificationSource";
+import { ChatMessage } from "./ChatMessage";
+import { ChatCommand } from "./commands/ChatCommand";
+
+export class Chat implements NotificationSource{
     private readonly commandMap : Map<string,ChatCommand>;
     private readonly chatHistory : Array<ChatMessage>;
     private readonly commandPrefix : string;

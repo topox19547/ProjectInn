@@ -1,4 +1,7 @@
-class Dice implements ChatCommand{
+import { ChatMessage } from "../ChatMessage";
+import { ChatCommand } from "./ChatCommand";
+
+export class Dice implements ChatCommand{
     private readonly visualName;
     private readonly commandName;
 

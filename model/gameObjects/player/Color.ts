@@ -1,5 +1,5 @@
 /** class that represents a color, formatted as hexadecimal*/
-class Color{
+export class Color{
     private color:string;
     private readonly defaultColor:string = "#FFFFFF"
     private readonly validityChecker:RegExp

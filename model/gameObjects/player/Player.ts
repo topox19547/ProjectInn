@@ -1,4 +1,12 @@
-class Player implements NotificationSource{
+import { Command } from "../../../controller/Command";
+import { ClientNotifier } from "../../ClientNotifier";
+import { Status } from "../../messages/Status";
+import { ensureObject, ensureString, ensureMapObject, ensureBoolean } from "../../messages/Validators";
+import { NotificationSource } from "../../NotificationSource";
+import { Color } from "./Color";
+import { Permission } from "./Permission";
+
+export class Player implements NotificationSource{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;

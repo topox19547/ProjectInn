@@ -1,4 +1,19 @@
-class LobbyController implements ClientState{
+import { FormatError } from "../errors/FormatError";
+import { ValueError } from "../errors/ValueError";
+import { Game } from "../model/Game";
+import { Color } from "../model/gameObjects/player/Color";
+import { Player } from "../model/gameObjects/player/Player";
+import { Scene } from "../model/gameObjects/scene/Scene";
+import { Lobby } from "../model/Lobby";
+import { Message } from "../model/messages/Message";
+import { Status } from "../model/messages/Status";
+import { ensureObject, ensureString, weakEnsureOf, ensureNumber } from "../model/messages/Validators";
+import { ClientHandler } from "./ClientHandler";
+import { ClientState } from "./ClientState";
+import { Command } from "./Command";
+import { GameController } from "./GameController";
+
+export class LobbyController implements ClientState{
     private readonly lobby : Lobby;
     private readonly clientHandler : ClientHandler;
 

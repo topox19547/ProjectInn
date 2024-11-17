@@ -1,4 +1,7 @@
-abstract class ClientHandler{
+import { Message } from "../model/messages/Message";
+import { ClientState } from "./ClientState";
+
+export abstract class ClientHandler{
     protected currentState : ClientState;
     public abstract open():void
     public abstract close():void

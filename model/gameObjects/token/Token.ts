@@ -1,7 +1,19 @@
-class Token implements Identifiable, NotificationSource{
+import { Command } from "../../../controller/Command";
+import { ClientNotifier } from "../../ClientNotifier";
+import { Game } from "../../Game";
+import { Status } from "../../messages/Status";
+import { ensureObject, ensureString, ensureNumber, ensureArrayOf, ensureMapObject } from "../../messages/Validators";
+import { NotificationSource } from "../../NotificationSource";
+import { Asset } from "../asset/Asset";
+import { Identifiable } from "../Identifiable";
+import { Player } from "../player/Player";
+import { Vector2 } from "../Vector2";
+import { Stat } from "./Stat";
+
+export class Token implements Identifiable, NotificationSource{
     private name : string;
     private notifier : ClientNotifier | undefined;
-    private dragLockTimerID : number | undefined;
+    private dragLockTimer : NodeJS.Timeout | undefined;
     private dragLockOwner : string | undefined;
     private id : number;
     private readonly asset : Asset;
@@ -34,7 +46,7 @@ class Token implements Identifiable, NotificationSource{
     }
 
     public static fromObject(object: ReturnType<typeof this.validate>, gameContext : Game): Token | undefined {
-        const asset : Asset | undefined = gameContext.getTokenAssets().find(a => a.getID() == object.id);
+        const asset : Asset | undefined = gameContext.getTokenAsset(object.id);
         if(asset == undefined){
             return undefined
         }
@@ -234,12 +246,12 @@ class Token implements Identifiable, NotificationSource{
             return false;
         }
         this.dragLockOwner = username;
-        this.dragLockTimerID = setTimeout(this.timeoutDrag, 30)
+        this.dragLockTimer = setTimeout(this.timeoutDrag, 30)
         return true;
     }
     
     private timeoutDrag() : void {
-        this.dragLockTimerID = undefined;
+        this.dragLockTimer = undefined;
         this.dragLockOwner = undefined;
         this.setPosition(this.position);
     }
@@ -259,16 +271,16 @@ class Token implements Identifiable, NotificationSource{
                 position : position
             }
         });
-        clearTimeout(this.dragLockTimerID); //refresh the time limit
-        this.dragLockTimerID = setTimeout(this.timeoutDrag, 30);
+        clearTimeout(this.dragLockTimer); //refresh the time limit
+        this.dragLockTimer = setTimeout(this.timeoutDrag, 30);
     }
 
     public endDrag(position : Vector2, user : string) : void{
         if(user != this.dragLockOwner){
             return;
         }
-        clearTimeout(this.dragLockTimerID);
-        this.dragLockTimerID = undefined;
+        clearTimeout(this.dragLockTimer);
+        this.dragLockTimer = undefined;
         this.dragLockOwner = undefined;
         this.setPosition(position)
     }

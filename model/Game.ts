@@ -1,4 +1,21 @@
-class Game implements NotificationSource{
+import { ClientHandler } from "../controller/ClientHandler";
+import { Command } from "../controller/Command";
+import { Chat } from "./chat/Chat";
+import { Dice } from "./chat/commands/Dice";
+import { Help } from "./chat/commands/Help";
+import { ClientNotifier } from "./ClientNotifier";
+import { Asset } from "./gameObjects/asset/Asset";
+import { Identifiable } from "./gameObjects/Identifiable";
+import { Permission } from "./gameObjects/player/Permission";
+import { Player } from "./gameObjects/player/Player";
+import { Scene } from "./gameObjects/scene/Scene";
+import { Token } from "./gameObjects/token/Token";
+import { Vector2 } from "./gameObjects/Vector2";
+import { Status } from "./messages/Status";
+import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf } from "./messages/Validators";
+import { NotificationSource } from "./NotificationSource";
+
+export class Game implements NotificationSource{
     private readonly name : string;
     private readonly ownerName : string;
     private readonly players : Array<Player>;
@@ -328,8 +345,7 @@ class Game implements NotificationSource{
         return true;
     }
 
-    public endGame(lobby : Lobby) : void{
-        lobby.removeGame(this)
+    public endGame() : void{
         this.notifier?.notify(
             {
                 status : Status.GAME_END,

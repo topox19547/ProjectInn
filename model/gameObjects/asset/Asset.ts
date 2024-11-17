@@ -1,4 +1,14 @@
-class Asset implements Identifiable,NotificationSource{
+import { Command } from "../../../controller/Command";
+import { ClientNotifier } from "../../ClientNotifier";
+import { Status } from "../../messages/Status";
+import { ensureObject, ensureNumber, weakEnsureOf, ensureString, ensureEnumLike } from "../../messages/Validators";
+import { NotificationSource } from "../../NotificationSource";
+import { Identifiable } from "../Identifiable";
+import { Permission } from "../player/Permission";
+import { Vector2 } from "../Vector2";
+import { AssetType } from "./AssetType";
+
+export class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;
     private assetSize : Vector2 | undefined;
     private name : string;
