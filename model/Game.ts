@@ -1,19 +1,21 @@
-import { ClientHandler } from "../controller/ClientHandler";
-import { Command } from "../controller/Command";
-import { Chat } from "./chat/Chat";
-import { Dice } from "./chat/commands/Dice";
-import { Help } from "./chat/commands/Help";
-import { ClientNotifier } from "./ClientNotifier";
-import { Asset } from "./gameObjects/asset/Asset";
-import { Identifiable } from "./gameObjects/Identifiable";
-import { Permission } from "./gameObjects/player/Permission";
-import { Player } from "./gameObjects/player/Player";
-import { Scene } from "./gameObjects/scene/Scene";
-import { Token } from "./gameObjects/token/Token";
-import { Vector2 } from "./gameObjects/Vector2";
-import { Status } from "./messages/Status";
-import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf } from "./messages/Validators";
-import { NotificationSource } from "./NotificationSource";
+import { ClientHandler } from "../controller/ClientHandler.js";
+import { Chat } from "./chat/Chat.js";
+import { Dice } from "./chat/commands/Dice.js";
+import { Help } from "./chat/commands/Help.js";
+import { ClientNotifier } from "./ClientNotifier.js";
+import { Asset } from "./gameObjects/asset/Asset.js";
+import { Identifiable } from "./gameObjects/Identifiable.js";
+import { Permission } from "./gameObjects/player/Permission.js";
+import { Player } from "./gameObjects/player/Player.js";
+import { Scene } from "./gameObjects/scene/Scene.js";
+import { Token } from "./gameObjects/token/Token.js";
+import { Vector2 } from "./gameObjects/Vector2.js";
+import { Command } from "./messages/Command.js";
+import { Status } from "./messages/Status.js";
+import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf } from "./messages/Validators.js";
+import { NotificationSource } from "./NotificationSource.js";
+
+
 
 export class Game implements NotificationSource{
     private readonly name : string;

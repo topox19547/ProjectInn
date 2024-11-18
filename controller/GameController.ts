@@ -1,24 +1,25 @@
-import { PermissionError } from "../errors/PermissionError";
-import { ValueError } from "../errors/ValueError";
-import { Chat } from "../model/chat/Chat";
-import { Game } from "../model/Game";
-import { Asset } from "../model/gameObjects/asset/Asset";
-import { AssetType } from "../model/gameObjects/asset/AssetType";
-import { Permission } from "../model/gameObjects/player/Permission";
-import { Player } from "../model/gameObjects/player/Player";
-import { GridType } from "../model/gameObjects/scene/GridType";
-import { Scene } from "../model/gameObjects/scene/Scene";
-import { Stat } from "../model/gameObjects/token/Stat";
-import { Token } from "../model/gameObjects/token/Token";
-import { Vector2 } from "../model/gameObjects/Vector2";
-import { Lobby } from "../model/Lobby";
-import { Message } from "../model/messages/Message";
-import { Status } from "../model/messages/Status";
-import { ensureBoolean, ensureEnumLike, ensureNumber, ensureObject, ensureString } from "../model/messages/Validators";
-import { ClientHandler } from "./ClientHandler";
-import { ClientState } from "./ClientState";
-import { Command } from "./Command";
-import { LobbyController } from "./LobbyController";
+import { PermissionError } from "../errors/PermissionError.js";
+import { ValueError } from "../errors/ValueError.js";
+import { Chat } from "../model/chat/Chat.js";
+import { Game } from "../model/Game.js";
+import { Asset } from "../model/gameObjects/asset/Asset.js";
+import { AssetType } from "../model/gameObjects/asset/AssetType.js";
+import { Permission } from "../model/gameObjects/player/Permission.js";
+import { Player } from "../model/gameObjects/player/Player.js";
+import { GridType } from "../model/gameObjects/scene/GridType.js";
+import { Scene } from "../model/gameObjects/scene/Scene.js";
+import { Stat } from "../model/gameObjects/token/Stat.js";
+import { Token } from "../model/gameObjects/token/Token.js";
+import { Vector2 } from "../model/gameObjects/Vector2.js";
+import { Lobby } from "../model/Lobby.js";
+import { Command } from "../model/messages/Command.js";
+import { Message } from "../model/messages/Message.js";
+import { Status } from "../model/messages/Status.js";
+import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean } from "../model/messages/Validators.js";
+import { ClientHandler } from "./ClientHandler.js";
+import { ClientState } from "./ClientState.js";
+import { LobbyController } from "./LobbyController.js";
+
 
 export class GameController implements ClientState{
     private readonly lobby : Lobby

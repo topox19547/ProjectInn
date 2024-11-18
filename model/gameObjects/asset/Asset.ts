@@ -1,12 +1,13 @@
-import { Command } from "../../../controller/Command";
-import { ClientNotifier } from "../../ClientNotifier";
-import { Status } from "../../messages/Status";
-import { ensureObject, ensureNumber, weakEnsureOf, ensureString, ensureEnumLike } from "../../messages/Validators";
-import { NotificationSource } from "../../NotificationSource";
-import { Identifiable } from "../Identifiable";
-import { Permission } from "../player/Permission";
-import { Vector2 } from "../Vector2";
-import { AssetType } from "./AssetType";
+import { ClientNotifier } from "../../ClientNotifier.js";
+import { Command } from "../../messages/Command.js";
+import { Status } from "../../messages/Status.js";
+import { ensureObject, ensureNumber, weakEnsureOf, ensureString, ensureEnumLike } from "../../messages/Validators.js";
+import { NotificationSource } from "../../NotificationSource.js";
+import { Identifiable } from "../Identifiable.js";
+import { Permission } from "../player/Permission.js";
+import { Vector2 } from "../Vector2.js";
+import { AssetType } from "./AssetType.js";
+
 
 export class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;

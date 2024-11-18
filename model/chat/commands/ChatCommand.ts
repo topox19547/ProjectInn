@@ -1,4 +1,5 @@
-import { ChatMessage } from "../ChatMessage"
+import { ChatMessage } from "../ChatMessage.js"
+
 
 export interface ChatCommand{
     execute(args : Array<string>, playerName : string) : ChatMessage

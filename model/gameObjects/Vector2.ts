@@ -1,4 +1,4 @@
-import { ensureObject, ensureNumber } from "../messages/Validators";
+import { ensureObject, ensureNumber } from "../messages/Validators.js";
 
 /**
  * class representing a vector with two components

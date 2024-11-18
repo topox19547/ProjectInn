@@ -1,4 +1,4 @@
-import { FormatError } from "../../errors/FormatError";
+import { FormatError } from "../../errors/FormatError.js";
 
 export type ensureType<T> = (object : unknown) => T;
 

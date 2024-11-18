@@ -1,15 +1,15 @@
-import { FormatError } from "../errors/FormatError";
-import { validateMessage, Message } from "../model/messages/Message";
-import { Status } from "../model/messages/Status";
-import { ClientHandler } from "./ClientHandler";
-import { ClientState } from "./ClientState";
-import { Command } from "./Command";
+import { FormatError } from "../errors/FormatError.js";
+import { Command } from "../model/messages/Command.js";
+import { validateMessage, Message } from "../model/messages/Message.js";
+import { Status } from "../model/messages/Status.js";
+import { ClientHandler } from "./ClientHandler.js";
+
 
 export class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
     
-    constructor(webSocket : WebSocket, initialState : ClientState){
-        super(initialState);
+    constructor(webSocket : WebSocket){
+        super()
         this.webSocket = webSocket;
         webSocket.addEventListener("message", this.receive);
         webSocket.addEventListener("close", this.close);
@@ -20,7 +20,7 @@ export class WebSocketHandler extends ClientHandler{
     }
 
     close(): void {
-        this.currentState.handleMessage({
+        this.currentState?.handleMessage({
             status : Status.CLIENT_STATUS,
             command : Command.DELETE,
             content : {}
@@ -30,7 +30,7 @@ export class WebSocketHandler extends ClientHandler{
     receive(event : MessageEvent): void {
         try{
             const parsedMessage = validateMessage(JSON.parse(event.data))
-            this.currentState.handleMessage(parsedMessage);
+            this.currentState?.handleMessage(parsedMessage);
         } catch (e){
             if(e instanceof SyntaxError){
                 console.log("invalid JSON syntax on inbound message");

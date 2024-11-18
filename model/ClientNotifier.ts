@@ -1,6 +1,7 @@
-import { ClientHandler } from "../controller/ClientHandler";
-import { Player } from "./gameObjects/player/Player";
-import { Message } from "./messages/Message";
+import { ClientHandler } from "../controller/ClientHandler.js";
+import { Player } from "./gameObjects/player/Player.js";
+import { Message } from "./messages/Message.js";
+
 
 export class ClientNotifier{
     private readonly subscribers : Map<ClientHandler, Player | undefined>;

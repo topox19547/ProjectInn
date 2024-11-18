@@ -1,5 +1,5 @@
-import { ChatMessage } from "../ChatMessage";
-import { ChatCommand } from "./ChatCommand";
+import { ChatMessage } from "../ChatMessage.js";
+import { ChatCommand } from "./ChatCommand.js";
 
 export class Dice implements ChatCommand{
     private readonly visualName;

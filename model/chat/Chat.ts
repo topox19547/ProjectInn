@@ -1,9 +1,10 @@
-import { Command } from "../../controller/Command";
-import { ClientNotifier } from "../ClientNotifier";
-import { Status } from "../messages/Status";
-import { NotificationSource } from "../NotificationSource";
-import { ChatMessage } from "./ChatMessage";
-import { ChatCommand } from "./commands/ChatCommand";
+import { ClientNotifier } from "../ClientNotifier.js";
+import { Command } from "../messages/Command.js";
+import { Status } from "../messages/Status.js";
+import { NotificationSource } from "../NotificationSource.js";
+import { ChatMessage } from "./ChatMessage.js";
+import { ChatCommand } from "./commands/ChatCommand.js";
+
 
 export class Chat implements NotificationSource{
     private readonly commandMap : Map<string,ChatCommand>;

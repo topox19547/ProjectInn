@@ -1,14 +1,16 @@
-import { Command } from "../../../controller/Command";
-import { ClientNotifier } from "../../ClientNotifier";
-import { Game } from "../../Game";
-import { Status } from "../../messages/Status";
-import { ensureObject, ensureString, ensureNumber, ensureArrayOf, ensureMapObject } from "../../messages/Validators";
-import { NotificationSource } from "../../NotificationSource";
-import { Asset } from "../asset/Asset";
-import { Identifiable } from "../Identifiable";
-import { Player } from "../player/Player";
-import { Vector2 } from "../Vector2";
-import { Stat } from "./Stat";
+import { ClientNotifier } from "../../ClientNotifier.js";
+import { Game } from "../../Game.js";
+import { Command } from "../../messages/Command.js";
+import { Status } from "../../messages/Status.js";
+import { ensureObject, ensureString, ensureNumber, ensureArrayOf, ensureMapObject } from "../../messages/Validators.js";
+import { NotificationSource } from "../../NotificationSource.js";
+import { Asset } from "../asset/Asset.js";
+import { Identifiable } from "../Identifiable.js";
+import { Player } from "../player/Player.js";
+import { Vector2 } from "../Vector2.js";
+import { Stat } from "./Stat.js";
+
+
 
 export class Token implements Identifiable, NotificationSource{
     private name : string;

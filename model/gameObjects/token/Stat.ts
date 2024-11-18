@@ -1,4 +1,6 @@
-import { ensureObject, weakEnsureOf, ensureNumber } from "../../messages/Validators";
+import { ensureObject, weakEnsureOf, ensureNumber } from "../../messages/Validators.js";
+
+
 
 export class Stat{
     private min : number | undefined;

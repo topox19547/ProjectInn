@@ -1,17 +1,19 @@
-import { FormatError } from "../errors/FormatError";
-import { ValueError } from "../errors/ValueError";
-import { Game } from "../model/Game";
-import { Color } from "../model/gameObjects/player/Color";
-import { Player } from "../model/gameObjects/player/Player";
-import { Scene } from "../model/gameObjects/scene/Scene";
-import { Lobby } from "../model/Lobby";
-import { Message } from "../model/messages/Message";
-import { Status } from "../model/messages/Status";
-import { ensureObject, ensureString, weakEnsureOf, ensureNumber } from "../model/messages/Validators";
-import { ClientHandler } from "./ClientHandler";
-import { ClientState } from "./ClientState";
-import { Command } from "./Command";
-import { GameController } from "./GameController";
+import { FormatError } from "../errors/FormatError.js";
+import { ValueError } from "../errors/ValueError.js";
+import { Game } from "../model/Game.js";
+import { Color } from "../model/gameObjects/player/Color.js";
+import { Player } from "../model/gameObjects/player/Player.js";
+import { Scene } from "../model/gameObjects/scene/Scene.js";
+import { Lobby } from "../model/Lobby.js";
+import { Command } from "../model/messages/Command.js";
+import { Message } from "../model/messages/Message.js";
+import { Status } from "../model/messages/Status.js";
+import { ensureObject, ensureString, weakEnsureOf, ensureNumber } from "../model/messages/Validators.js";
+import { ClientHandler } from "./ClientHandler.js";
+import { ClientState } from "./ClientState.js";
+import { GameController } from "./GameController.js";
+
+
 
 export class LobbyController implements ClientState{
     private readonly lobby : Lobby;

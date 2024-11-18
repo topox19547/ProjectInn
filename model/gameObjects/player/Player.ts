@@ -1,10 +1,10 @@
-import { Command } from "../../../controller/Command";
-import { ClientNotifier } from "../../ClientNotifier";
-import { Status } from "../../messages/Status";
-import { ensureObject, ensureString, ensureMapObject, ensureBoolean } from "../../messages/Validators";
-import { NotificationSource } from "../../NotificationSource";
-import { Color } from "./Color";
-import { Permission } from "./Permission";
+import { ClientNotifier } from "../../ClientNotifier.js";
+import { Command } from "../../messages/Command.js";
+import { Status } from "../../messages/Status.js";
+import { ensureObject, ensureString, ensureMapObject, ensureBoolean } from "../../messages/Validators.js";
+import { NotificationSource } from "../../NotificationSource.js";
+import { Color } from "./Color.js";
+import { Permission } from "./Permission.js";
 
 export class Player implements NotificationSource{
     private readonly name : string;

@@ -1,6 +1,7 @@
-import { Command } from "../../controller/Command"
-import { Status } from "./Status"
-import { ensureObject, ensureEnumLike, ensureGenericObject } from "./Validators"
+import { Command } from "./Command.js"
+import { Status } from "./Status.js"
+import { ensureObject, ensureEnumLike, ensureGenericObject } from "./Validators.js"
+
 
 export interface Message{
     status : Status,

@@ -1,6 +1,7 @@
-import { Chat } from "../Chat";
-import { ChatMessage } from "../ChatMessage";
-import { ChatCommand } from "./ChatCommand";
+import { Chat } from "../Chat.js";
+import { ChatMessage } from "../ChatMessage.js";
+import { ChatCommand } from "./ChatCommand.js";
+
 
 export class Help implements ChatCommand{
     private readonly visualName;

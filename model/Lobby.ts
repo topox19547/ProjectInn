@@ -1,10 +1,12 @@
-import { ClientHandler } from "../controller/ClientHandler";
-import { Command } from "../controller/Command";
-import { ClientNotifier } from "./ClientNotifier";
-import { Game } from "./Game";
-import { Message } from "./messages/Message";
-import { Status } from "./messages/Status";
-import { NotificationSource } from "./NotificationSource";
+import { ClientHandler } from "../controller/ClientHandler.js";
+import { ClientNotifier } from "./ClientNotifier.js";
+import { Game } from "./Game.js";
+import { Command } from "./messages/Command.js";
+import { Message } from "./messages/Message.js";
+import { Status } from "./messages/Status.js";
+import { NotificationSource } from "./NotificationSource.js";
+
+
 
 export class Lobby implements NotificationSource{
     private readonly games : Map<number, Game>;

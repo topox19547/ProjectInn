@@ -1,12 +1,13 @@
-import { Command } from "../../../controller/Command";
-import { ClientNotifier } from "../../ClientNotifier";
-import { Status } from "../../messages/Status";
-import { ensureObject, ensureEnumLike, ensureNumber } from "../../messages/Validators";
-import { NotificationSource } from "../../NotificationSource";
-import { Asset } from "../asset/Asset";
-import { Identifiable } from "../Identifiable";
-import { Vector2 } from "../Vector2";
-import { GridType } from "./GridType";
+import { ClientNotifier } from "../../ClientNotifier.js";
+import { Command } from "../../messages/Command.js";
+import { Status } from "../../messages/Status.js";
+import { ensureObject, ensureEnumLike, ensureNumber } from "../../messages/Validators.js";
+import { NotificationSource } from "../../NotificationSource.js";
+import { Asset } from "../asset/Asset.js";
+import { Identifiable } from "../Identifiable.js";
+import { Vector2 } from "../Vector2.js";
+import { GridType } from "./GridType.js";
+
 
 export class Scene implements Identifiable, NotificationSource{
     private readonly asset : Asset;
