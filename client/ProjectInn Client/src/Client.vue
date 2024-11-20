@@ -1,20 +1,14 @@
 <script setup lang="ts">
+  import Lobby from "./components/Lobby.vue"
 
 </script>
 
 <template>
-  <header>
-
-    <div class="wrapper">
-      <h1>TEST!!!!</h1>
-    </div>
-  </header>
-
-  <main>
-    <h1>TEST!!!!</h1>
-  </main>
+    <Lobby></Lobby>
 </template>
 
-<style scoped>
-
+<style>
+  body{
+    background-color: #242424;
+  }
 </style>
