@@ -10,6 +10,8 @@ import { Player } from "../player/Player.js";
 import { Vector2 } from "../Vector2.js";
 import { Stat } from "./Stat.js";
 
+type TokenInt = typeof Game.validate
+
 
 
 export class Token implements Identifiable, NotificationSource{
@@ -34,6 +36,7 @@ export class Token implements Identifiable, NotificationSource{
         stats : ensureMapObject(Stat.validate),
         position : Vector2.validate
     });
+
 
     constructor(asset : Asset, id : number){
         this.asset = asset;

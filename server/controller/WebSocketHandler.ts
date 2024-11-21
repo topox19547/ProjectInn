@@ -37,8 +37,7 @@ export class WebSocketHandler extends ClientHandler{
             } else if (e instanceof FormatError){
                 console.log("invalid message format on inbound message");
             }
-        }
-            
+        }  
     }
     
     send(message : Message): void {
