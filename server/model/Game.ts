@@ -35,7 +35,7 @@ export class Game implements NotificationSource{
     private static maxNameLength : number = 24;
     public static validate = ensureObject({
         name : ensureString,
-        owner : ensureString,
+        ownerName : ensureString,
         players : ensureArrayOf(Player.validate),
         scenes : ensureArrayOf(Scene.validate),
         tokenAssets : ensureArrayOf(Asset.validate),
@@ -65,7 +65,7 @@ export class Game implements NotificationSource{
     public static fromObject(object : ReturnType<typeof this.validate>) : Game | undefined{
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
-            object.owner,
+            object.ownerName,
             Scene.fromObject(object.currentScene)
         );
         const notifier = new ClientNotifier();
@@ -165,6 +165,7 @@ export class Game implements NotificationSource{
         if(!this.getPlayer(player.getName())){
             return false;
         }
+        player.setConnected(true)
         this.notifier?.subscribe(handler);
         this.notifier?.notify({
             status : Status.CLIENT_STATUS,
@@ -180,6 +181,7 @@ export class Game implements NotificationSource{
         if(!this.getPlayer(player.getName())){
             return false;
         }
+        player.setConnected(false)
         this.notifier?.unsubscribe(handler);
         this.notifier?.notify({
             status : Status.CLIENT_STATUS,
@@ -240,6 +242,16 @@ export class Game implements NotificationSource{
         return this.tokenAssets.find(a => a.getID() == id);
     }
 
+    public updateClientTokenAssets(player : Player) : void{
+        this.tokenAssets.forEach(a => {
+            this.notifier?.notifyIf({
+                status : Status.TOKEN_ASSET,
+                command : Command.CREATE,
+                content : Asset.toObject(a)
+            }, p => p.getName() == player.getName());
+        });
+    }
+
     public addToken(token : Token) : boolean{
         if(this.tokens.length >= this.maxTokens){
             return false;
@@ -279,11 +291,11 @@ export class Game implements NotificationSource{
             return false;
         }
         this.scenes.push(scene);
-        this.notifier?.notify({
+        this.notifier?.notifyIf({
             status : Status.SCENE,
             command : Command.CREATE,
             content : Scene.toObject(scene)
-        });
+        }, p => p.hasPermission(Permission.MANAGE_SCENES));
         return true;
     }
 
@@ -326,6 +338,16 @@ export class Game implements NotificationSource{
             content : Scene.toObject(scene)
         });
         return true;
+    }
+
+    public updateClientScenes(player : Player) : void{
+        this.scenes.forEach(s => {
+            this.notifier?.notifyIf({
+                status : Status.SCENE,
+                command : Command.CREATE,
+                content : Scene.toObject(s)
+            }, p => p.getName() == player.getName());
+        });
     }
 
     public checkPassword(attempt : string | undefined) : boolean{

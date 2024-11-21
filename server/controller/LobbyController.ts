@@ -2,6 +2,7 @@ import { FormatError } from "../errors/FormatError.js";
 import { ValueError } from "../errors/ValueError.js";
 import { Game } from "../model/Game.js";
 import { Color } from "../model/gameObjects/player/Color.js";
+import { Permission } from "../model/gameObjects/player/Permission.js";
 import { Player } from "../model/gameObjects/player/Player.js";
 import { Scene } from "../model/gameObjects/scene/Scene.js";
 import { Lobby } from "../model/Lobby.js";
@@ -64,20 +65,38 @@ export class LobbyController implements ClientState{
                     })(message.content);
                     const games = this.lobby.getRunningGames();
                     const game = games.get(content.gameId);
-                    const player = new Player(content.username, new Color(content.playerColor));
                     if(game === undefined){
                         throw new ValueError("The requested game doesn't exist");
                     }
                     if(!game.checkPassword(content.password)){
                         throw new ValueError("Wrong password")
                     }
-                    if(!game.addPlayer(player)){
-                        throw new ValueError("the name you chose has already been taken");
+                    let player : Player | undefined = game.getPlayer(content.username);
+                    if(!player){
+                        player = new Player(content.username, new Color(content.playerColor));
+                        if(!game.addPlayer(player)){
+                            throw new ValueError("an error occurred while creating the player");
+                        }
+                    }
+                    if(player.isConnected()){
+                        throw new ValueError("This player name is already taken");
+                    }
+                    game.joinGame(player,this.clientHandler);
+                    const gameObject : ReturnType<typeof Game.validate> = Game.toObject(game);
+                    //Hide certain elements from the player if they don't have the specific permissions
+                    if(!player.hasPermission(Permission.MANAGE_SCENES)){
+                        gameObject.scenes = gameObject.scenes.filter(
+                            s => s.asset.assetID == gameObject.currentScene.asset.assetID)
+                    } 
+                    if(!player.hasPermission(Permission.MANAGE_TOKENS)){
+                        gameObject.tokenAssets = gameObject.tokenAssets.filter(a =>
+                            gameObject.tokens.find(t => t.assetID == a.assetID)
+                        );
                     }
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
-                        content : Game.toObject(game)
+                        content : gameObject
                     });
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      
                 }   

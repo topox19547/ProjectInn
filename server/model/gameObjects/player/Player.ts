@@ -10,6 +10,7 @@ export class Player implements NotificationSource{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;
+    private connected : boolean;
     private notifier : ClientNotifier | undefined;
     private static readonly maxNameLength : number = 24;
     public static readonly validate = ensureObject({
@@ -22,6 +23,7 @@ export class Player implements NotificationSource{
         this.name = name;
         this.color = color;
         this.permissions = new Map<Permission, boolean>;
+        this.connected = false
         let i : number = 0;
         for(const _ in Permission){
             this.permissions.set(i,false);
@@ -68,6 +70,14 @@ export class Player implements NotificationSource{
 
     public getColor() : Color{
         return this.color;
+    }
+
+    public isConnected() : boolean{
+        return this.connected;
+    }
+
+    public setConnected(connected : boolean) : void{
+        this.connected = connected;
     }
 
     public hasPermission(permission : Permission) : boolean{

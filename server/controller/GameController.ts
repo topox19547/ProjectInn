@@ -1,3 +1,4 @@
+import { permission } from "process";
 import { PermissionError } from "../errors/PermissionError.js";
 import { ValueError } from "../errors/ValueError.js";
 import { Chat } from "../model/chat/Chat.js";
@@ -204,6 +205,14 @@ export class GameController implements ClientState{
                     } else {
                         throw new PermissionError();
                     }
+                    if(!content.value == true){
+                        return;
+                    }
+                    if(content.permission == Permission.MANAGE_SCENES){
+                        this.currentGame.updateClientScenes(this.clientPlayer);
+                    } else if (content.permission == Permission.MANAGE_TOKENS){
+                        this.currentGame.updateClientTokenAssets(this.clientPlayer);
+                    }
                 }
                 case Status.SCENE : {
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_SCENES)){
@@ -305,6 +314,11 @@ export class GameController implements ClientState{
                     if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
                         this.currentGame.endGame();
                         this.lobby.removeGame(this.currentGame);
+                    }
+                }
+                case Status.CLIENT_STATUS : {
+                    if(message.command == Command.DELETE){
+                        this.currentGame.leaveGame(this.clientPlayer, this.clientHandler);
                     }
                 }
             }
