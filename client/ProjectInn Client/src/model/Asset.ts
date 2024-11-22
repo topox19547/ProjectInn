@@ -5,6 +5,6 @@ export interface Asset{
     assetID : number
     assetURL : string | undefined
     assetType : AssetType
-    assetSize : WeakVector2
+    assetSize : WeakVector2 | undefined
     name : string
 }

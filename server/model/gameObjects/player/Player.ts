@@ -16,7 +16,8 @@ export class Player implements NotificationSource{
     public static readonly validate = ensureObject({
         name : ensureString,
         color : ensureString,
-        permissions : ensureMapObject(ensureBoolean)
+        permissions : ensureMapObject(ensureBoolean),
+        connected : ensureBoolean
     })
 
     constructor(name : string, color : Color){
@@ -52,7 +53,8 @@ export class Player implements NotificationSource{
         return {
             name : player.name,
             color : player.color.getColor(),
-            permissions : permissions
+            permissions : permissions,
+            connected : player.connected
         }
     }
 
@@ -78,6 +80,14 @@ export class Player implements NotificationSource{
 
     public setConnected(connected : boolean) : void{
         this.connected = connected;
+        this.notifier?.notify({
+            status : Status.CLIENT_STATUS,
+            command : Command.NONE,
+            content : {
+                name : this.name,
+                connected : connected
+            }
+        })
     }
 
     public hasPermission(permission : Permission) : boolean{
@@ -87,18 +97,21 @@ export class Player implements NotificationSource{
 
     public setPermission(permission : Permission, value : boolean){
         this.permissions.set(permission, value);
-        if(permission == Permission.MASTER){
+        if(permission == Permission.MASTER){ //MASTER automatically grants all the other permissions
             this.permissions.forEach((_,k) => {
-                if (k != Permission.MASTER) this.setPermission(k,value)
+                if (k != Permission.MASTER) this.permissions.set(k, value);
         });
+        }
+        const permissions : Record<string,boolean> = {}
+        for(const [key,value] of this.permissions){
+            permissions[key] = value
         }
         this.notifier?.notify({
             status : Status.PERMISSIONS,
             command : Command.MODIFY,
             content : {
                 name : this.name,
-                permission : permission,
-                value : value
+                permissions : permissions
             }
         });
     }

@@ -114,6 +114,14 @@ export class Asset implements Identifiable,NotificationSource{
         image.decode().then(() => {
             this.assetURL = url;
             this.assetSize = new Vector2(image.width, image.height);
+            this.notifier?.notifyIf({
+                status : Status.ASSET_SIZE,
+                command : Command.MODIFY,
+                content : {
+                    id : this.assetID,
+                    size : this.assetSize
+                }
+            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
         }).catch(() => {
             this.assetURL = "/assets/missingSprite.jpg";
             this.assetSize = new Vector2(500, 500);

@@ -5,5 +5,5 @@ import { Status } from "./Status.js"
 export interface Message{
     status : Status,
     command : Command,
-    content : object
+    content : any
 }

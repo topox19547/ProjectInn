@@ -2,8 +2,9 @@ import type { Token } from "./Token.js"
 import type { Player } from "./Player.js"
 import type { Scene } from "./Scene.js"
 import type { Asset } from "./Asset.js"
+import type { ChatMessage } from "./ChatMessage.js"
 
-interface Game{
+export interface Game{
     name : string
     ownerName : string
     players : Array<Player>
@@ -12,4 +13,5 @@ interface Game{
     tokens : Array<Token>
     currentScene : Scene 
     password : string
+    chat : Array<ChatMessage>
 }

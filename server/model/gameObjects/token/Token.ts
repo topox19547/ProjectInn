@@ -86,17 +86,13 @@ export class Token implements Identifiable, NotificationSource{
     }
 
     public static toObject(token : Token) : ReturnType<typeof this.validate>{
-        const statsObject : Record<string,ReturnType<typeof Stat.toObject>> = {};
-        const notesObject : Record<string,string> = {};
-        token.stats.forEach((v,k) => statsObject[k] = Stat.toObject(v));
-        token.notes.forEach((v,k) => notesObject[k] = v);
         return {
             name : token.name,
             id : token.id,
             assetID : token.asset.getID(),
             owners : [...token.owners],
-            notes : notesObject,
-            stats : statsObject,
+            notes : Token.MapToStringRecord(token.notes, s => s),
+            stats : Token.MapToStringRecord(token.stats, Stat.toObject),
             position : Vector2.toObject(token.position)
         }
     }
@@ -148,10 +144,10 @@ export class Token implements Identifiable, NotificationSource{
         this.owners.concat(name);
         this.notifier?.notify({
             status : Status.TOKEN_OWNERSHIP,
-            command : Command.CREATE,
+            command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                name : name
+                owners : this.owners
             }
         });
         return true;
@@ -165,10 +161,10 @@ export class Token implements Identifiable, NotificationSource{
         this.owners.splice(indexToRemove, 1);
         this.notifier?.notify({
             status : Status.TOKEN_OWNERSHIP,
-            command : Command.DELETE,
+            command : Command.MODIFY,
             content : { 
                 id : this.getID(), 
-                name : name
+                owners : this.owners
             }
         });
         return true;
@@ -185,26 +181,27 @@ export class Token implements Identifiable, NotificationSource{
         this.notes.set(title, note);
         this.notifier?.notify({
             status : Status.TOKEN_NOTE,
-            command : Command.SAFE_MODIFY,
+            command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                title : title,
-                note : note
+                notes : Token.MapToStringRecord(this.notes, s => s)
             }
         });
         return true;
     }
 
     public removeNote(title : string) : boolean{
+        const notesObject : Record<string,string> = {};
+        this.notes.forEach((v,k) => notesObject[k] = v);
         if(!this.notes.delete(title)){
             return false;
         }
         this.notifier?.notify({
             status : Status.TOKEN_NOTE,
-            command : Command.DELETE,
+            command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                title : title
+                notes : Token.MapToStringRecord(this.notes, s => s)
             }
         });
         return true;
@@ -221,11 +218,10 @@ export class Token implements Identifiable, NotificationSource{
         this.stats.set(name, stat);
         this.notifier?.notify({
             status : Status.TOKEN_STAT,
-            command : Command.SAFE_MODIFY,
+            command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                name : name,
-                stat : Stat.toObject(stat)
+                stats : Token.MapToStringRecord(this.stats, Stat.toObject)
             }
         });
         return true;
@@ -240,7 +236,7 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.DELETE,
             content : { 
                 id : this.getID(),
-                name : name
+                stats : Token.MapToStringRecord(this.stats, Stat.toObject)
             }
         });
         return true;
@@ -272,8 +268,7 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                user : this.dragLockOwner,
-                position : position
+                position : { coordinates : position, inDrag : true, byUser : user}
             }
         });
         clearTimeout(this.dragLockTimer); //refresh the time limit
@@ -297,12 +292,18 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                modified : position
+                position : { coordinates : position, inDrag : false, byUser : undefined}
             }
         });
     }
 
     public getPosition() : Vector2{
         return this.position;
+    }
+
+    private static MapToStringRecord<T,V>(map :Map<string,V>, toObject : (val : V) => T) : Record<string,T>{
+        const record : Record<string,T> = {};
+        map.forEach((v,k) => record[k] = toObject(v));
+        return record;
     }
 }

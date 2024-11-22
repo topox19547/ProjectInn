@@ -12,7 +12,7 @@ import { Token } from "./gameObjects/token/Token.js";
 import { Vector2 } from "./gameObjects/Vector2.js";
 import { Command } from "./messages/Command.js";
 import { Status } from "./messages/Status.js";
-import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf } from "./messages/Validators.js";
+import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericObject } from "./messages/Validators.js";
 import { NotificationSource } from "./NotificationSource.js";
 
 
@@ -41,7 +41,8 @@ export class Game implements NotificationSource{
         tokenAssets : ensureArrayOf(Asset.validate),
         tokens : ensureArrayOf(Token.validate),
         currentScene : Scene.validate,
-        password : weakEnsureOf(ensureString)
+        password : weakEnsureOf(ensureString),
+        chat : ensureArrayOf(ensureGenericObject) //The chat doesn't get restored whenever a save is loaded
     });
     
     constructor(name : string, ownerName : string, startingScene : Scene){
@@ -120,7 +121,7 @@ export class Game implements NotificationSource{
         return game;
     }
 
-    public static toObject(game : Game){
+    public static toObject(game : Game) : ReturnType<typeof Game.validate>{
         return {
             name : game.name,
             ownerName : game.ownerName,
@@ -129,7 +130,8 @@ export class Game implements NotificationSource{
             scenes : game.scenes.map(s => Scene.toObject(s)),
             tokens : game.tokens.map(t => Token.toObject(t)),
             password : game.password,
-            currentScene : Scene.toObject(game.currentScene)
+            currentScene : Scene.toObject(game.currentScene),
+            chat : game.chat.getChatHistory()
         };
     }
 
@@ -167,13 +169,6 @@ export class Game implements NotificationSource{
         }
         player.setConnected(true)
         this.notifier?.subscribe(handler);
-        this.notifier?.notify({
-            status : Status.CLIENT_STATUS,
-            command : Command.CREATE,
-            content : {
-                name : player.getName()
-            }
-        })
         return true
     }
 
@@ -183,13 +178,9 @@ export class Game implements NotificationSource{
         }
         player.setConnected(false)
         this.notifier?.unsubscribe(handler);
-        this.notifier?.notify({
-            status : Status.CLIENT_STATUS,
-            command : Command.DELETE,
-            content : {
-                name : player.getName()
-            }
-        })
+        if(this.players.every(p => !p.isConnected())){
+            this.endGame();
+        }
         return true;
     }
 
@@ -370,14 +361,26 @@ export class Game implements NotificationSource{
     }
 
     public endGame() : void{
-        this.notifier?.notify(
+        this.players.forEach(p => p.setConnected(false));
+        this.notifier?.notifyIf(
             {
                 status : Status.GAME_END,
                 command : Command.DELETE,
                 content : {}
-            }
+            },
+            p => p.getName() != this.ownerName
         );
-        this.notifier?.removeAllClients()
+        const gameSave = Game.toObject(this);
+        gameSave.chat = [];
+        this.notifier?.notifyIf(
+            {
+                status : Status.GAME_END,
+                command : Command.DELETE,
+                content : gameSave
+            },
+            p => p.getName() == this.ownerName
+        );
+        this.notifier?.removeAllClients();
     }
 
     public getChatInstance() : Chat{
