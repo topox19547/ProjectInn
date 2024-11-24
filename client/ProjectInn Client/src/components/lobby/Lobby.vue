@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GameList from './gamelists/GameList.vue';
+import GameListRoot from './gamelists/GameListRoot.vue';
 
     
 </script>
@@ -8,9 +8,9 @@ import GameList from './gamelists/GameList.vue';
     <div class="pageMargin">
         <header class="title">Project Inn</header>
         <main class="lobby">
-            <div class="contentContainer">
-                <GameList></GameList>
-                <GameList></GameList>
+            <div class="contentContainer">  
+                <GameListRoot title="test"></GameListRoot>
+                <GameListRoot title="test2"></GameListRoot>
             </div>
         </main>
     </div> 
@@ -19,9 +19,11 @@ import GameList from './gamelists/GameList.vue';
 <style scoped>
     .title {
         text-align: left;
-        font-size: 48px;
+        font-size: 42px;
         font-weight: bold;
+        margin-top: 32px;
         color: #D9D9D9;
+        margin-left: 16px;
     }
     .pageMargin{
         max-width: fit-content;
@@ -32,5 +34,7 @@ import GameList from './gamelists/GameList.vue';
         margin-top: 64px;
         display: flex;
         gap: 64px;
+        flex-wrap: wrap;
+        justify-content: space-around;
     }
 </style>

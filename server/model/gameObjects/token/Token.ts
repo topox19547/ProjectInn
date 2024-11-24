@@ -147,7 +147,7 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                owners : this.owners
+                owners : [...this.owners]
             }
         });
         return true;
@@ -164,7 +164,7 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(), 
-                owners : this.owners
+                owners : [...this.owners]
             }
         });
         return true;
