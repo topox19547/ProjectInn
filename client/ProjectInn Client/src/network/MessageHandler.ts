@@ -11,15 +11,25 @@ import { AssetType } from "../model/AssetType.js";
 
 export class MessageHandler{
     private lobby : Ref<Lobby>;
-    private game : Ref<Game>;
+    private game : Ref<Game | undefined>;
 
-    constructor(lobby : Ref<Lobby>, game : Ref<Game>){
+    constructor(lobby : Ref<Lobby>, game : Ref<Game | undefined>){
         this.lobby = lobby;
         this.game = game;
     }
 
     handleMessage(message : Message){
         const content = message.content;
+
+        if(this.game.value === undefined){ //Handle lobby messages
+            switch(message.status){
+                case Status.LOBBY_UPDATE:{
+                    this.lobby.value.activeGames = content;
+                }
+            }
+            return;
+        }
+
         switch(message.status){
             case Status.TOKEN:{
                 if(message.command == Command.CREATE){
@@ -95,9 +105,6 @@ export class MessageHandler{
             }
             case Status.CHAT:{
                 this.game.value.chat.push(content);
-            }
-            case Status.LOBBY_UPDATE:{
-                this.lobby.value.activeGames = content;
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

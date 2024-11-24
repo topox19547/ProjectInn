@@ -1,7 +1,5 @@
 import type { Message } from "./message/Message.js"
 
-export interface ServerHandler{
-    receive(message : MessageEvent) : void
-    close() : void
+export interface ServerPublisher{
     send(message : Message) : void
 }

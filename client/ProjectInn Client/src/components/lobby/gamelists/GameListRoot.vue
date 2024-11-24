@@ -11,18 +11,10 @@ import type { Component, Ref } from 'vue';
 
 <template>
     <div class="container">
-        <header class="categoryTitle"> Title </header>
+        <header class="categoryTitle"> {{ title }} </header>
         <div class="gameListCard">
-            <div class="empty">
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-                <GameEntry title="a" info="a" emit-signal="p" :game-id=0></GameEntry>
-            </div>
+            <slot name="content"></slot>
+            <div class="spacer"></div>
         </div>
         <slot name="fab"></slot>
     </div>
@@ -46,14 +38,14 @@ import type { Component, Ref } from 'vue';
         max-height: 800px;
         width:60vmin;
         height: 65vmin;
-        overflow-y: overlay;
+        overflow-y: auto;
         box-shadow: 0px 0px 3px;
         scrollbar-color: #d9d9d9 transparent;
     }
     .container{
         position: relative;
     }
-    .empty{
-       overflow-y: auto;
+    .spacer{
+        height: 64px;
     }
 </style>

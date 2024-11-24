@@ -2,24 +2,25 @@
     const props = defineProps<{
         title : string,
         info : string
-        emitSignal : string
         gameId : number
     }>();
 </script>
 
 <template>
-    <div class="gameEntry" @click="$emit(emitSignal,gameId)">
-        <div class="gameInfo">
-            <div class="gameTitle">{{ props.title }}</div>
-            <div class="gameDesc">{{ props.info }}</div>
+    <div class="gameEntry">
+        <div class="content">
+            <div class="gameInfo">
+                <div class="gameTitle">{{ props.title }}</div>
+                <div class="gameDesc">{{ props.info }}</div>
+            </div>
+            <slot name="actions"></slot>
         </div>
-        <slot name="actions"></slot>
+        <div class="divider"></div>
     </div>
-    <div class="divider"></div>
 </template>
 
-<style>
-    .gameEntry{
+<style scoped>
+    .content{
         font-size:16px;
         height: 64px;
         color: #D9D9D9;
@@ -27,7 +28,7 @@
         justify-content: space-between;
         padding: 16px;
     }
-    .gameEntry:hover{
+    .content:hover{
         background-color: #3b3b3b;
     }
     .action{

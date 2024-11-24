@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import GameListRoot from './gamelists/GameListRoot.vue';
+    import GameListRoot from './gamelists/GameListRoot.vue';
+    import LocalGameList from './gamelists/LocalGameList.vue';
+    import RemoteGameList from './gamelists/RemoteGameList.vue';
 
     
 </script>
@@ -9,8 +11,8 @@ import GameListRoot from './gamelists/GameListRoot.vue';
         <header class="title">Project Inn</header>
         <main class="lobby">
             <div class="contentContainer">  
-                <GameListRoot title="test"></GameListRoot>
-                <GameListRoot title="test2"></GameListRoot>
+                <LocalGameList :local-games="[{name:'a',id:1,info:'s'}]"></LocalGameList>
+                <RemoteGameList :remote-games="[{name:'a',id:1,info:'s'}]"></RemoteGameList>
             </div>
         </main>
     </div> 

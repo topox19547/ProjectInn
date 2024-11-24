@@ -1,21 +1,29 @@
 import type { Message } from "./message/Message.js";
 import { MessageHandler } from "./MessageHandler.js";
-import type { ServerHandler } from "./ServerHandler.js";
+import type { ServerPublisher } from "./ServerHandler.js";
 
-export class WebSocketHandler implements ServerHandler{
+export class WebSocketHandler implements ServerPublisher{
     private readonly messageHandler : MessageHandler;
     private readonly socket : WebSocket;
 
-    constructor(socket : WebSocket, messageHandler : MessageHandler){
+    constructor(messageHandler : MessageHandler, url? : string){
         this.messageHandler = messageHandler;
-        this.socket = socket;
+        //The default behavior is that the server has the same hostname as the website the client is using
+        this.socket = new WebSocket(url !== undefined ? url : window.location.hostname);
+        this.socket.addEventListener("close",this.close);
+        this.socket.addEventListener("error",this.error);
+        this.socket.addEventListener("message",this.receive);
     }
 
-    close(): void {
+    private close(): void {
         throw new Error("Method not implemented.");
     }
 
-    receive(event : MessageEvent): void {
+    private error(): void{
+        throw new Error("Method not implemented.");
+    }
+
+    private receive(event : MessageEvent): void {
         try{
             const parsedMessage = JSON.parse(event.data) as Message
             this.messageHandler.handleMessage(parsedMessage);
@@ -26,7 +34,7 @@ export class WebSocketHandler implements ServerHandler{
         }  
     }
 
-    send(message: Message): void {
+    public send(message: Message): void {
         this.socket.send(JSON.stringify(message));
     }
     

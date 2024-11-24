@@ -1,6 +1,5 @@
 <script setup lang="ts">
     const props = defineProps<{ 
-        emitSignal : string 
         text : string
         icon : string
     }>();
@@ -8,7 +7,7 @@
 
 <template>
     <button class="fab">
-        <div class="buttonText" @click="$emit(emitSignal)">{{ props.text }}</div>
+        <div class="buttonText">{{ props.text }}</div>
         <img class="buttonIcon" :src=props.icon></img>
     </button>
 </template>
@@ -44,5 +43,6 @@
     .buttonIcon{
         width: 28px;
         height: 100%;
+        margin-right: 4px;
     }
 </style>
