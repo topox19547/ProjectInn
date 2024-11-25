@@ -24,7 +24,8 @@ export class WebSocketHandler extends ClientHandler{
             status : Status.CLIENT_STATUS,
             command : Command.DELETE,
             content : {}
-        })
+        });
+        console.log("A player has left");
     }
 
     receive(event : MessageEvent): void {

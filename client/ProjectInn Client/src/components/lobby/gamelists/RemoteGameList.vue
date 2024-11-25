@@ -4,6 +4,9 @@
     import GameListRoot from './GameListRoot.vue';
     import Login from '../../../assets/icons/login.svg';
     import Info from '../../../assets/icons/info.svg';
+    import NoGamesText from './NoGamesText.vue';
+    import type { GamePreview } from '../../../model/gamePreview.js';
+
     const emits = defineEmits<{
         (e: 'openGameInfo', id : number) : void,
         (e: 'joinGame', id : number) : void
@@ -16,6 +19,7 @@
 <template>
     <GameListRoot title="Ongoing games">
         <template v-slot:content>
+            <NoGamesText v-if="remoteGames.length == 0">Looks like no one is currently playing...</NoGamesText>
             <GameEntry v-for="game in remoteGames" :title="game.name" :game-id="game.id" :info="game.info" 
             @click="$emit('joinGame',game.id)">
                 <template v-slot:actions>
@@ -23,6 +27,7 @@
                 </template>
             </GameEntry>
         </template>
+        <div class="spacer" v-if="remoteGames.length > 0"></div>
         <template v-slot:fab>
             <Fab text="Join with ID" :icon=Login></Fab>
         </template>
@@ -36,5 +41,8 @@
     }
     .infoButton:hover{
         opacity: 75%;
+    }
+    .spacer{
+        height: 64px;
     }
 </style>

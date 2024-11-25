@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import GameListRoot from './gamelists/GameListRoot.vue';
+    import type { Lobby } from '../../model/Lobby.js';
     import LocalGameList from './gamelists/LocalGameList.vue';
     import RemoteGameList from './gamelists/RemoteGameList.vue';
-
     
+    const props = defineProps<Lobby>();
 </script>
 
 <template>
@@ -11,8 +11,8 @@
         <header class="title">Project Inn</header>
         <main class="lobby">
             <div class="contentContainer">  
-                <LocalGameList :local-games="[{name:'a',id:1,info:'s'}]"></LocalGameList>
-                <RemoteGameList :remote-games="[{name:'a',id:1,info:'s'}]"></RemoteGameList>
+                <LocalGameList :local-games="props.localGames"></LocalGameList>
+                <RemoteGameList :remote-games="props.activeGames"></RemoteGameList>
             </div>
         </main>
     </div> 

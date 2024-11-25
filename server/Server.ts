@@ -10,7 +10,7 @@ export class Server{
         console.log("Starting ProjectInn server");
         const lobbyNotifier : ClientNotifier = new ClientNotifier();
         const lobby : Lobby = new Lobby(lobbyNotifier);
-        const server : WebSocketServer = new WebSocketServer({port : 8080});
+        const server : WebSocketServer = new WebSocketServer({port : 23435});
         server.addListener("connection",(w : WebSocket) =>{
             const handler : ClientHandler = new WebSocketHandler(w);
             handler.changeState(new LobbyController(lobby, handler));

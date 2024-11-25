@@ -6,6 +6,7 @@ import { Command } from "./message/Command.js";
 import type { Token } from "../model/Token.js";
 import type { Stat } from "../model/Stat.js";
 import { AssetType } from "../model/AssetType.js";
+import type { Lobby } from "../model/Lobby.js";
 
 
 
@@ -19,6 +20,7 @@ export class MessageHandler{
     }
 
     handleMessage(message : Message){
+        console.log(message);
         const content = message.content;
 
         if(this.game.value === undefined){ //Handle lobby messages

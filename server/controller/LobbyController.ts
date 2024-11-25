@@ -103,6 +103,11 @@ export class LobbyController implements ClientState{
                 case Status.LOBBY_UPDATE: {
                     this.clientHandler.send(this.lobby.buildMatchListMessage());
                 }
+                case Status.CLIENT_STATUS:{
+                    if(message.command == Command.DELETE){
+                        this.lobby.leaveLobby(this.clientHandler);
+                    }
+                }
             }
         }catch(e){
             if(e instanceof ValueError){

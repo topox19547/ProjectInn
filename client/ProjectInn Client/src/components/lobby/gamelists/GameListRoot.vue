@@ -1,8 +1,4 @@
 <script setup lang="ts">
-    import Fab from './Fab.vue';
-    import Add from '../../../assets/icons/add.svg';
-    import GameEntry from './GameEntry.vue';
-import type { Component, Ref } from 'vue';
     defineEmits(['newGame']);
     const props = defineProps<{
         title : string,
@@ -14,7 +10,6 @@ import type { Component, Ref } from 'vue';
         <header class="categoryTitle"> {{ title }} </header>
         <div class="gameListCard">
             <slot name="content"></slot>
-            <div class="spacer"></div>
         </div>
         <slot name="fab"></slot>
     </div>
@@ -44,8 +39,5 @@ import type { Component, Ref } from 'vue';
     }
     .container{
         position: relative;
-    }
-    .spacer{
-        height: 64px;
     }
 </style>

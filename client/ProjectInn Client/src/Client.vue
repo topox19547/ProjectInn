@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import Lobby from './components/lobby/Lobby.vue';
   import GameView from './components/game/GameView.vue';
   import { WebSocketHandler } from './network/WebsocketHandler.js';
   import { MessageHandler } from './network/MessageHandler.js';
-  import { ref, type Ref } from 'vue';
+  import { provide, ref, type Ref } from 'vue';
   import type { ServerPublisher } from './network/ServerHandler.js';
   import type { Game } from './model/Game.js';
+  import type { Lobby } from './model/Lobby.js';
+  import LobbyView from './components/lobby/LobbyView.vue';
   
   const lobby : Ref<Lobby> = ref({
     activeGames : [],
@@ -14,6 +15,7 @@
   const game : Ref<Game | undefined> = ref(undefined);
   const messageHandler : MessageHandler = new MessageHandler(lobby,game);
   const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler);
+  provide("serverPublisher", serverPublisher);
 
 
 
@@ -21,7 +23,7 @@
 </script>
 
 <template>
-  <Lobby></Lobby>
+  <LobbyView :local-games="lobby.localGames" :active-games="lobby.activeGames"></LobbyView>
   <GameView></GameView>
 </template>
 
