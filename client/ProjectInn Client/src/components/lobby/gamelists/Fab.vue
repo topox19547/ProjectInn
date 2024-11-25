@@ -26,14 +26,13 @@
         background-color: #303F9F;
         border: 0px;
         box-shadow: 0px 0px 3px;
-        z-index: 10;
         padding-inline: 8px;
         transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
         transition-duration: 0.5s;
     }
     .fab:hover{
         background-color: #3F51B5;
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
     .buttonText{
         margin-top: auto;

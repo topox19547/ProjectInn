@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import type { Lobby } from '../../model/Lobby.js';
+    import WindowBase from '../shared/WindowBase.vue';
     import LocalGameList from './gamelists/LocalGameList.vue';
     import RemoteGameList from './gamelists/RemoteGameList.vue';
     
@@ -13,6 +14,7 @@
             <div class="contentContainer">  
                 <LocalGameList :local-games="props.localGames"></LocalGameList>
                 <RemoteGameList :remote-games="props.activeGames"></RemoteGameList>
+                <WindowBase windowWidth="700px" windowHeight="300px"></WindowBase>
             </div>
         </main>
     </div> 

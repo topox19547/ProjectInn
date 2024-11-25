@@ -7,12 +7,25 @@
   import type { Game } from './model/Game.js';
   import type { Lobby } from './model/Lobby.js';
   import LobbyView from './components/lobby/LobbyView.vue';
+  import { SaveManager } from './filesystem/SaveManager.js';
   
-  const lobby : Ref<Lobby> = ref({
-    activeGames : [],
-    localGames : []
-  });
   const game : Ref<Game | undefined> = ref(undefined);
+  const saveManager : SaveManager = new SaveManager();
+  const lobby : Ref<Lobby> = ref({
+    activeGames : [
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+      {name : "pipino", info : "a", id : 2},
+    ],
+    localGames : saveManager.getGameList()
+  });
   const messageHandler : MessageHandler = new MessageHandler(lobby,game);
   const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler);
   provide("serverPublisher", serverPublisher);
