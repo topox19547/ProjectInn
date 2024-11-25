@@ -7,7 +7,7 @@ export class SaveManager{
     constructor(){
         this.gamesKey = "innGames";
         if(localStorage.getItem(this.gamesKey) === null){
-            localStorage.setItem(this.gamesKey,JSON.stringify([]));
+            this.clearSaves();
         }
     }
 
@@ -66,6 +66,10 @@ export class SaveManager{
         return gamesPreview;
     }
     
+    public clearSaves() : void{
+        localStorage.setItem(this.gamesKey, JSON.stringify([]));
+    }
+
     private handleSaveError(e : unknown){
         if(e instanceof SyntaxError){
             throw Error("Malformed saved games file. please try clearing the local data for this website.");

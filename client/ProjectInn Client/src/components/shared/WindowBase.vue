@@ -16,7 +16,7 @@
 
 <style scoped>
     .background{
-        display: none;
+        display: flex;
         position: fixed;
         z-index: 1;
         left: 0px;
@@ -36,4 +36,4 @@
         box-shadow: 0px 0px 3px;
         border-radius: 16px;
     }
-</style>
+</style> 

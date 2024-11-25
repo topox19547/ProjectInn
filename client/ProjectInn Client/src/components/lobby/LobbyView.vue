@@ -14,7 +14,6 @@
             <div class="contentContainer">  
                 <LocalGameList :local-games="props.localGames"></LocalGameList>
                 <RemoteGameList :remote-games="props.activeGames"></RemoteGameList>
-                <WindowBase windowWidth="700px" windowHeight="300px"></WindowBase>
             </div>
         </main>
     </div> 
