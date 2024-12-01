@@ -11,6 +11,7 @@
   import type { GamePreview } from './model/gamePreview.js';
   import ErrorWindow from './components/shared/windows/ErrorWindow.vue';
   import ButtonBase from './components/shared/ButtonBase.vue';
+import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
   
   const failedLoadText = 
   `Your save data is corrupted.
@@ -62,12 +63,13 @@
       <ButtonBase @click="clearSaveData" text="Clear data"></ButtonBase>
     </template>
   </ErrorWindow>
+  <SceneEditWindow title="Starting Scene"></SceneEditWindow>
 </template>
 <style>
   body{
     background-color: #242424;
   }
   *{
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
 </style>

@@ -35,5 +35,7 @@
         background: #242424;
         box-shadow: 0px 0px 3px;
         border-radius: 16px;
+        transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
+        transition-duration: 0.5s;
     }
 </style> 
