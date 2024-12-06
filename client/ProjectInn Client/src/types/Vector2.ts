@@ -59,6 +59,10 @@ export class Vector2{
         this.setX(this.getX() * number);
         this.setY(this.getY() * number);
     }
+    
+    public distanceTo(vector:Vector2):number{
+        return Math.sqrt(Math.pow(vector.x - this.x,2) + Math.pow(vector.y - this.y,2));
+    }
 
     public equals(vector:Vector2):boolean{
         return vector.getX() == this.getX() && vector.getY() == this.getY();

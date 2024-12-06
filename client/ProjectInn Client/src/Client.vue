@@ -11,11 +11,7 @@
   import type { GamePreview } from './model/gamePreview.js';
   import ErrorWindow from './components/shared/windows/ErrorWindow.vue';
   import ButtonBase from './components/shared/ButtonBase.vue';
-import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
-  
-  const failedLoadText = 
-  `Your save data is corrupted.
-  Press the button below to clear it.`
+  import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
 
   const game : Ref<Game | undefined> = ref(undefined);
   const saveManager : SaveManager = new SaveManager();
@@ -45,25 +41,14 @@ import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
   const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler);
   provide("serverPublisher", serverPublisher);
 
-  function clearSaveData(){
-    const saveManager = new SaveManager();
-    saveManager.clearSaves();
-    window.location.reload();
-  }
-
-
 
 </script>
 
 <template>
-  <LobbyView :local-games="lobby.localGames" :active-games="lobby.activeGames"></LobbyView>
-  <GameView></GameView>
-  <ErrorWindow v-if="invalidLocalGames" title="Load error" :message="failedLoadText">
-    <template v-slot:button>
-      <ButtonBase @click="clearSaveData" text="Clear data"></ButtonBase>
-    </template>
-  </ErrorWindow>
-  <SceneEditWindow title="Starting Scene"></SceneEditWindow>
+  <LobbyView v-if="game === undefined" 
+  :lobby="lobby"
+  :invalid-local-games="invalidLocalGames"></LobbyView>
+  <GameView v-if="game !== undefined"></GameView>
 </template>
 <style>
   body{
@@ -71,5 +56,8 @@ import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
   }
   *{
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  body:has(.windowBackground){
+    overflow: hidden;
   }
 </style>

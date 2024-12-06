@@ -41,7 +41,14 @@ export class MessageHandler{
                     this.game.value.tokens.splice(index,1);
                 }
             }
-            case Status.TOKEN_ASSET:
+            case Status.TOKEN_ASSET:{
+                if(message.command == Command.CREATE){
+                    this.game.value.tokenAssets.push(content);
+                } else if (message.command == Command.DELETE){
+                    const index : number = this.game.value.tokenAssets.findIndex(t => t.assetID == content.id);
+                    this.game.value.tokenAssets.splice(index,1);
+                }
+            }
             case Status.TOKEN_MOVED:
             case Status.TOKEN_MOVING:
             case Status.TOKEN_NAME:
@@ -107,6 +114,10 @@ export class MessageHandler{
             }
             case Status.CHAT:{
                 this.game.value.chat.push(content);
+            }
+            case Status.CLIENT_STATUS:{
+                const index : number = this.game.value.players.findIndex(p => p.name == content.name);
+                this.game.value.players[index].connected = content.connected
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

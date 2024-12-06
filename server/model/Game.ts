@@ -328,6 +328,20 @@ export class Game implements NotificationSource{
             command : Command.SAFE_MODIFY,
             content : Scene.toObject(scene)
         });
+        const newPosition : Vector2 = new Vector2(0,0)
+        //reset token positions by putting all of them next to
+        //each other starting from the top left corner
+        for(const token of this.tokens){
+            token.setPosition(newPosition);
+            newPosition.translateX(1); //try moving along the x axis
+            if(!this.currentScene.isValidPosition(newPosition)){
+                newPosition.translateX(-1);
+                newPosition.translateY(1); //try moving along the y axis
+            }
+            if(!this.currentScene.isValidPosition){
+                newPosition.translateY(-1); //if no tiles are available, stack on the last tile
+            }
+        }
         return true;
     }
 

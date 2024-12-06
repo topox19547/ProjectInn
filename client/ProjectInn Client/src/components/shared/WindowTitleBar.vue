@@ -42,7 +42,7 @@ import CloseButton from './CloseButton.vue';
         position: relative;
         height: 64px;
         width: 100%;
-        padding-inline: 16px;
+        padding-inline: 0px;
         gap: 32px;
         justify-content: center;
     }

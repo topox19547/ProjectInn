@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WindowBackground from '../WindowBackground.vue';
 import WindowBase from '../WindowBase.vue';
 
     const props = defineProps<
@@ -11,6 +12,7 @@ import WindowBase from '../WindowBase.vue';
 
 
 <template>
+    <WindowBackground></WindowBackground>
     <WindowBase window-height="225px" window-width="325px">
         <template v-slot:content>
             <div class="content">
@@ -28,10 +30,10 @@ import WindowBase from '../WindowBase.vue';
         color: #d9d9d9;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         width: 325px;
-        padding: 16px;
+        height: 100%;
         gap: 24px;
     }
     .title{

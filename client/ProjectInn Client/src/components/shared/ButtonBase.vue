@@ -2,11 +2,12 @@
     const props = defineProps<{
         text : string
         width? : string
+        height? : string
     }>();
 </script>
 
 <template>
-    <button class="button" style="width: width">
+    <button class="button" :style="{width: width, height: height}">
         <div class="buttonText">{{ props.text }}</div>
     </button>
 </template>
@@ -26,10 +27,15 @@
         transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
         transition-duration: 0.5s;
     }
-    .button:hover{
+    .button:hover:enabled{
         background-color: #3F51B5;
         transform: scale(1.05);
     }
+
+    .button:disabled{
+        background-color: #7e7e7e;
+    }
+
     .buttonText{
         margin-top: auto;
         margin-bottom: auto;

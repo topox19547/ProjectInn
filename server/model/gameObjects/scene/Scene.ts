@@ -15,8 +15,8 @@ export class Scene implements Identifiable, NotificationSource{
     private offset : Vector2;
     private tileSize : number;
     private notifier : ClientNotifier | undefined;
-    private static readonly maxTileSize : number = 1000;
-    private static readonly minTileSize : number = 30;
+    private static readonly maxTileSize : number = 300;
+    private static readonly minTileSize : number = 10;
     public static readonly validate = ensureObject({
         asset : Asset.validate,
         gridType : ensureEnumLike(Object.values(GridType).filter(v => typeof v === "number")),

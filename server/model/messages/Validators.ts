@@ -49,7 +49,7 @@ export const ensureObject = <T extends Record<string, ensureType<any>>>(ensureOb
         if (typeof object !== "object" || object === null) throw new FormatError("not an object / object is null");
         const toReturn : {[K in keyof T] : ReturnType<T[K]>} = {} as any;
         for (const key in object){
-            if (ensureObject.hasOwnProperty(key)) throw new FormatError("invalid key")
+            if (!ensureObject.hasOwnProperty(key)) throw new FormatError(`invalid key ${key}`)
         }
         for (const key in ensureObject){
             toReturn[key] = ensureObject[key]((object as any)[key]);

@@ -275,6 +275,9 @@ export class GameController implements ClientState{
                     }
                     if(message.command == Command.CREATE){
                         const content = Asset.validate(message.content);
+                        if(content.name.length > Asset.getMaxNameLength()){
+                            throw new ValueError("Asset name is too long");
+                        }
                         if(content.assetType != AssetType.TOKEN){
                             throw new ValueError("Wrong asset type passed");
                         }

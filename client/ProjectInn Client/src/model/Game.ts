@@ -12,6 +12,6 @@ export interface Game{
     tokenAssets : Array<Asset>
     tokens : Array<Token>
     currentScene : Scene 
-    password : string
+    password : string | undefined
     chat : Array<ChatMessage>
 }
