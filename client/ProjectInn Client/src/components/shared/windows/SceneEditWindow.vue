@@ -67,11 +67,11 @@ import ButtonBase from '../ButtonBase.vue';
                         <div class="gridTypeSelection">
                             <div class = "subCategory">
                                 <div class="subOption">Square</div>
-                                <input class="radioButton" value="0" type="radio" v-model="scene.gridType" title="GridType" name="test">
+                                <input class="radioButton" :value="0" type="radio" v-model="scene.gridType" title="GridType" name="test">
                             </div>
                             <div class = "subCategory">
                                 <div class="subOption">Hexagonal</div>
-                                <input class="radioButton" type="radio" v-model="scene.gridType" value="1"  title="GridType" name="test">
+                                <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" title="GridType" name="test">
                             </div>      
                         </div>
                         <div class="inputTitle">Tile width (pixels)</div>

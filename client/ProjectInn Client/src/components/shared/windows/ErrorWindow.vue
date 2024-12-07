@@ -30,17 +30,19 @@ import WindowBase from '../WindowBase.vue';
         color: #d9d9d9;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         width: 325px;
         height: 100%;
         gap: 24px;
+        padding-block: 16px;
     }
     .title{
         font-weight: bold;
         font-size: 20px;
     }
     .message{
+        padding: 8px;
         white-space: pre-wrap;
         text-align: center;
     }

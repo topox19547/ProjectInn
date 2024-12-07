@@ -25,6 +25,7 @@ export class Lobby implements NotificationSource{
 
     public addToLobby(handler : ClientHandler){
         this.notifier?.subscribe(handler);
+        console.log("a player has joined the lobby")
     }
 
     public leaveLobby(handler : ClientHandler){

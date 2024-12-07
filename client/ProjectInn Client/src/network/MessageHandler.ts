@@ -27,6 +27,10 @@ export class MessageHandler{
             switch(message.status){
                 case Status.LOBBY_UPDATE:{
                     this.lobby.value.activeGames = content.activeGames;
+                    break;
+                }
+                case Status.JOIN_GAME:{
+                    this.game.value = content
                 }
             }
             return;
@@ -40,6 +44,7 @@ export class MessageHandler{
                     const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
                     this.game.value.tokens.splice(index,1);
                 }
+                break;
             }
             case Status.TOKEN_ASSET:{
                 if(message.command == Command.CREATE){
@@ -48,6 +53,7 @@ export class MessageHandler{
                     const index : number = this.game.value.tokenAssets.findIndex(t => t.assetID == content.id);
                     this.game.value.tokenAssets.splice(index,1);
                 }
+                break;
             }
             case Status.TOKEN_MOVED:
             case Status.TOKEN_MOVING:
@@ -68,6 +74,7 @@ export class MessageHandler{
                     const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.id);
                     this.game.value.scenes.splice(index,1);
                 }
+                break;
             }
             case Status.SCENE_GRIDTYPE:
             case Status.SCENE_OFFSET:
@@ -76,7 +83,8 @@ export class MessageHandler{
                 if (scene === undefined){
                     throw Error("Message refers to a scene that doesn't exist");
                 }
-                Object.keys(content).forEach(k => scene[k] = content[k])
+                Object.keys(content).forEach(k => scene[k] = content[k]);
+                break;
             }
             case Status.ASSET_NAME:
             case Status.ASSET_URL:
@@ -95,6 +103,7 @@ export class MessageHandler{
                     }
                 }
                 Object.keys(content).forEach(k => asset[k] = content[k]);
+                break;
             }
             case Status.PLAYER:{
                 if(message.command == Command.CREATE){
@@ -103,7 +112,7 @@ export class MessageHandler{
                     const index : number = this.game.value.players.findIndex(p => p.name == content.name);
                     this.game.value.players.splice(index,1);
                 }
-                
+                break;
             }
             case Status.PERMISSIONS:{
                 const player : any = this.game.value.players.find(p => p.name == content.name);
@@ -111,13 +120,16 @@ export class MessageHandler{
                     throw Error("Message refers to a token asset that doesn't exist");
                 }
                 player.permissions = content.permissions;
+                break;
             }
             case Status.CHAT:{
                 this.game.value.chat.push(content);
+                break;
             }
             case Status.CLIENT_STATUS:{
                 const index : number = this.game.value.players.findIndex(p => p.name == content.name);
-                this.game.value.players[index].connected = content.connected
+                this.game.value.players[index].connected = content.connected;
+                break;
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

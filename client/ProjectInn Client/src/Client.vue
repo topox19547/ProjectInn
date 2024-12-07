@@ -15,6 +15,7 @@
 import { Status } from './network/message/Status.js';
 import { Command } from './network/message/Command.js';
 
+  const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
   const saveManager : SaveManager = new SaveManager();
   let localGames : Array<GamePreview> = new Array();
@@ -29,7 +30,7 @@ import { Command } from './network/message/Command.js';
     localGames : localGames
   });
   const messageHandler : MessageHandler = new MessageHandler(lobby,game);
-  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames);
+  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames,notifyNetworkError);
   provide("serverPublisher", serverPublisher);
 
   function requestGames(){
@@ -41,6 +42,15 @@ import { Command } from './network/message/Command.js';
       }
     )
   }
+
+  function notifyNetworkError(){
+    console.log("network error detected");
+    showNetworkError.value = true;
+  }
+
+  function reloadPage(){
+    window.location.reload();
+  }
 </script>
 
 <template>
@@ -48,6 +58,11 @@ import { Command } from './network/message/Command.js';
   :lobby="lobby"
   :invalid-local-games="invalidLocalGames"></LobbyView>
   <GameView v-if="game !== undefined"></GameView>
+  <ErrorWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
+    <template v-slot:button>
+      <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
+    </template>
+  </ErrorWindow>
 </template>
 <style>
   body{

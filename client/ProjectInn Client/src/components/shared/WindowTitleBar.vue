@@ -35,12 +35,12 @@ import CloseButton from './CloseButton.vue';
     }
     .windowIcon{
         width: 24px;
-        height: 64px;
+        padding-top: 4px;
     }
     .container{
         display: flex;
         position: relative;
-        height: 64px;
+        padding: 12px;
         width: 100%;
         padding-inline: 0px;
         gap: 32px;

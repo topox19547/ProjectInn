@@ -18,6 +18,7 @@ import { parseJsonSourceFileConfigFileContent } from 'typescript';
 import { Status } from '../../network/message/Status.js';
 import { Command } from '../../network/message/Command.js';
 import { Vector2 } from '../../types/Vector2.js';
+import GameInfo from './windows/gameInfoWindow/GameInfo.vue';
 
       
     const failedLoadText = 
@@ -27,7 +28,9 @@ Press the button below to clear it.`;
     const showNewSceneMenu = ref(false);
     const showPlayerMenu = ref(false);
     const showNewGameMenu = ref(false);
-    const newGameData = ref<Game>(getStartingGameData())
+    const showGameInfo = ref(false);
+    const gameInfoId = ref(-1);
+    const newGameData = ref<Game>(getStartingGameData());
     const serverPublisher : ServerPublisher = inject("serverPublisher") as ServerPublisher;
     const props = defineProps<{
         lobby : Lobby,
@@ -97,6 +100,11 @@ Press the button below to clear it.`;
             }
         })
     }
+    
+    function openGameInfo(id : number){
+        gameInfoId.value = id;
+        showGameInfo.value = true;
+    }
 </script>
 
 <template>
@@ -125,12 +133,17 @@ Press the button below to clear it.`;
     :on-confirm="sendNewGameInfo"
     @close="showNewGameMenu = false"
     ></GameEditWindow>
+    <GameInfo
+    :game-id="gameInfoId"
+    :show="showGameInfo"
+    @close="showGameInfo = false"
+    ></GameInfo>
     <div class="pageMargin">
         <header class="title">Project Inn</header>
         <main class="lobby">
             <div class="contentContainer">  
                 <LocalGameList :local-games="props.lobby.localGames"  @new-game="showNewSceneMenu = true"></LocalGameList>
-                <RemoteGameList :remote-games="props.lobby.activeGames"></RemoteGameList>
+                <RemoteGameList :remote-games="props.lobby.activeGames" @open-game-info="openGameInfo"></RemoteGameList>
             </div>
         </main>
     </div>
