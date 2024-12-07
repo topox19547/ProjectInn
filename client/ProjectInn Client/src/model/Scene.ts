@@ -6,5 +6,5 @@ export interface Scene{
     asset : Asset
     gridType : GridType
     offset : WeakVector2
-    tileSize : WeakVector2
+    tileSize : number
 }

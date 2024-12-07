@@ -32,7 +32,7 @@ export const weakEnsureOf = <T>(ensureOtherType : ensureType<T>) => (object : un
     try{
         return ensureOtherType(object);
     } catch(e) {
-        if (typeof object !== undefined){
+        if (typeof object !== "undefined"){
             throw new FormatError("not undefined or of the desired type");
         }
         return undefined;

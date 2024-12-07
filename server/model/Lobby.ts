@@ -13,7 +13,7 @@ export class Lobby implements NotificationSource{
     private readonly maxConcurrentGames : number;
     private notifier : ClientNotifier | undefined;
 
-    constructor(notifier : ClientNotifier){
+    constructor(){
         this.games = new Map();
         this.maxConcurrentGames = Number.MAX_SAFE_INTEGER;
         this.notifier = undefined;

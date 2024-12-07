@@ -17,6 +17,7 @@ import type { ServerPublisher } from '../../network/ServerHandler.js';
 import { parseJsonSourceFileConfigFileContent } from 'typescript';
 import { Status } from '../../network/message/Status.js';
 import { Command } from '../../network/message/Command.js';
+import { Vector2 } from '../../types/Vector2.js';
 
       
     const failedLoadText = 
@@ -56,11 +57,11 @@ Press the button below to clear it.`;
                 asset : {
                     name : "starting scene",
                     assetID : 0,
-                    assetSize : {x : 0, y: 0},
                     assetType : AssetType.SCENE,
+                    assetSize : {x : 0, y : 0},
                     assetURL : undefined
                 },
-                tileSize : {x : 25, y: 25},
+                tileSize : 25,
                 gridType : GridType.SQUARE,
                 offset : {x : 0, y : 0}
             },

@@ -11,12 +11,7 @@
     import ButtonBase from '../ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
 import type { Game } from '../../../model/Game.js';
-    const minTileSize = ref(10);
-    const maxTileSize = ref(300);
-    const tileSizeValue = ref(35);
-    const confirmDisabled = ref(true);
     const passwordEnabled = ref(false);
-    const passwordValue = ref("");
     const emits = defineEmits<{
         close : void
     }>();
@@ -50,7 +45,8 @@ import type { Game } from '../../../model/Game.js';
                     <div class="editor">
                         <div class="subCategory" v-if=isNewGame>
                             <div class="inputTitle">Game name</div>
-                            <input class="textBox" v-model="game.name" maxlength="24" type="text" title="sceneName">
+                            <input class="textBox" v-model="game.name" 
+                            maxlength="24" type="text" title="sceneName">
                         </div>
                         <div class="multiLineSubCategory">
                             <div class="section">
@@ -68,7 +64,7 @@ import type { Game } from '../../../model/Game.js';
                 </div>
                 <div class="buttonContainer">
                     <ButtonBase text="Next" @click="onConfirm" height="42px" 
-                    :disabled="game.name.length == 0 || (passwordEnabled && game.password?.length == 0)">
+                    :disabled="game.name.length == 0 || (passwordEnabled && !game.password)">
                     </ButtonBase>
                 </div>
             </template>
@@ -108,12 +104,8 @@ import type { Game } from '../../../model/Game.js';
     .section{
         display: flex;
         justify-content: space-between;
-    }
-
-    .toggle{
         accent-color:#303F9F;
     }
-
 
     .coordinateName{
         padding-left: 4px;
@@ -144,7 +136,6 @@ import type { Game } from '../../../model/Game.js';
         flex-direction: column;
         justify-content: space-evenly;
         box-sizing: border-box;
-        padding: 16px;
         height: 100%;
     }
 
@@ -185,7 +176,7 @@ import type { Game } from '../../../model/Game.js';
     }
 
     .textBox:disabled{
-        background-color: #4e4e4e;
+        background-color: #3d3d3d;
         color:#9a9a9a;
     }
     

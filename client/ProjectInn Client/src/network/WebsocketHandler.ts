@@ -6,13 +6,14 @@ export class WebSocketHandler implements ServerPublisher{
     private readonly messageHandler : MessageHandler;
     private readonly socket : WebSocket;
 
-    constructor(messageHandler : MessageHandler, url? : string){
+    constructor(messageHandler : MessageHandler, onConnect : () => void, url? : string){
         this.messageHandler = messageHandler;
         //The default behavior is that the server has the same hostname as the website the client is using
         this.socket = new WebSocket(url !== undefined ? url : `ws://${window.location.hostname}:23435`);
-        this.socket.addEventListener("close",this.close);
-        this.socket.addEventListener("error",this.error);
-        this.socket.addEventListener("message",this.receive);
+        this.socket.addEventListener("close",() => this.close());
+        this.socket.addEventListener("error",() => this.error());
+        this.socket.addEventListener("message",(m) => this.receive(m));
+        this.socket.addEventListener("open", onConnect)
     }
 
     private close(): void {

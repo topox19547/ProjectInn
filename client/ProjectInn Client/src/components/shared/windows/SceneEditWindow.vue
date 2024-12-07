@@ -25,11 +25,11 @@ import ButtonBase from '../ButtonBase.vue';
     }>();
     watch(tileSizeValue,(newValue) => {
         if(newValue < minTileSize.value){
-            props.scene.tileSize.x = minTileSize.value;
+            props.scene.tileSize = minTileSize.value;
         } else if (newValue > maxTileSize.value){
-            props.scene.tileSize.x = maxTileSize.value;
+            props.scene.tileSize = maxTileSize.value;
         } else {
-            props.scene.tileSize.x = newValue;
+            props.scene.tileSize = newValue;
         }
     })
     watch(props.scene.asset, (newValue, oldValue) => {
@@ -37,6 +37,11 @@ import ButtonBase from '../ButtonBase.vue';
             confirmDisabled.value = true;
         }
     })
+
+    function enableConfirm(image : ImageBitmap){
+        props.scene.asset.assetSize = {x : image.width, y : image.height};
+        confirmDisabled.value = false;
+    }
 </script>
 
 
@@ -87,7 +92,7 @@ import ButtonBase from '../ButtonBase.vue';
                     <div class="preview">
                         <div>
                             <BoardCanvas 
-                            :onLoadSuccess="() => confirmDisabled = false"
+                            :onLoadSuccess="(img) => enableConfirm(img)"
                             :rounded="true" 
                             :tokens="[]" 
                             :token-assets="[]" 

@@ -26,9 +26,11 @@ export class Player implements NotificationSource{
         this.permissions = new Map<Permission, boolean>;
         this.connected = false
         let i : number = 0;
-        for(const _ in Permission){
-            this.permissions.set(i,false);
-            i++;
+        for(const entry in Permission){
+            if(typeof entry == "number"){
+                this.permissions.set(i,false);
+                i++;
+            }
         }
     }
 

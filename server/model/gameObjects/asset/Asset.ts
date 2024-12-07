@@ -11,7 +11,7 @@ import { AssetType } from "./AssetType.js";
 
 export class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;
-    private assetSize : Vector2 | undefined;
+    private assetSize : Vector2;
     private name : string;
     private notifier : ClientNotifier | undefined;
     private assetID : number;
@@ -19,9 +19,9 @@ export class Asset implements Identifiable,NotificationSource{
     private static readonly maxNameLength: number = 24;
     public static readonly validate = ensureObject({
         assetID : ensureNumber,
-        assetURL : weakEnsureOf(ensureString),
+        assetURL : ensureString,
         assetType : ensureEnumLike(Object.values(AssetType).filter(v => typeof v === "number")),
-        assetSize : weakEnsureOf(Vector2.validate),
+        assetSize : Vector2.validate,
         name : ensureString
     })
 
@@ -30,7 +30,7 @@ export class Asset implements Identifiable,NotificationSource{
         this.name = name;
         this.assetURL = undefined;
         this.assetType = assetType;
-        this.assetSize = undefined;
+        this.assetSize = new Vector2(0,0);
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Asset{
@@ -38,22 +38,16 @@ export class Asset implements Identifiable,NotificationSource{
                 object.assetID,
                 object.name.slice(0,Asset.maxNameLength),
                 object.assetType);
-        if(object.assetURL === undefined){
-            if(object.assetSize !== undefined){
-                asset.assetSize = new Vector2(object.assetSize.x, object.assetSize.y);
-            }
-            return asset;
-        }
-        asset.setURL(object.assetURL); //TODO: change isInUse depending on what we need here
+        asset.setURL(object.assetURL,asset.assetSize); //TODO: change isInUse depending on what we need here
         return asset;
     }
 
     public static toObject(asset : Asset) : ReturnType<typeof this.validate>{
         return {
-            assetURL : asset.assetURL,
+            assetURL : asset.assetURL !== undefined ? asset.assetURL : "",
             assetID : asset.assetID,
             assetType : asset.assetType,
-            assetSize : asset.assetSize !== undefined ? Vector2.toObject(asset.assetSize) : undefined,
+            assetSize : Vector2.toObject(asset.assetSize),
             name : asset.name
         }
     }
@@ -103,29 +97,12 @@ export class Asset implements Identifiable,NotificationSource{
         return false;
     }
 
-    public setURL(url : string, permissionRequirement? : Permission) : boolean{
+    public setURL(url : string, assetSize : Vector2, permissionRequirement? : Permission) : boolean{
         if(url.length >= 2048){
             return false;
         }
-        const image : HTMLImageElement = new HTMLImageElement()
-        image.src = url;
-        //This could potentially be removed in the future and the client could supply its own dimensions
-        //if it starts becoming a performance bottleneck
-        image.decode().then(() => {
-            this.assetURL = url;
-            this.assetSize = new Vector2(image.width, image.height);
-            this.notifier?.notifyIf({
-                status : Status.ASSET_SIZE,
-                command : Command.MODIFY,
-                content : {
-                    id : this.assetID,
-                    size : this.assetSize
-                }
-            }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
-        }).catch(() => {
-            this.assetURL = "/assets/missingSprite.jpg";
-            this.assetSize = new Vector2(500, 500);
-        });
+        this.assetURL = url;
+        this.assetSize = assetSize;
         this.notifier?.notifyIf({
             status : Status.ASSET_URL,
             command : Command.MODIFY,

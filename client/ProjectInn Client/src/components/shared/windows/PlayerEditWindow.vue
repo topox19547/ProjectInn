@@ -10,9 +10,6 @@
     import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
-    const minTileSize = ref(10);
-    const maxTileSize = ref(300);
-    const tileSizeValue = ref(35);
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         close : void
@@ -87,10 +84,11 @@
     .contentContainer{
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
+        justify-content: center;
         width: 100%;
         border-radius: 16px;
         padding: 16px;
+        gap:8px;
         box-sizing: border-box;
         height: 100%;
     }

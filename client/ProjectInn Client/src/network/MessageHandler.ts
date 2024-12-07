@@ -26,7 +26,7 @@ export class MessageHandler{
         if(this.game.value === undefined){ //Handle lobby messages
             switch(message.status){
                 case Status.LOBBY_UPDATE:{
-                    this.lobby.value.activeGames = content;
+                    this.lobby.value.activeGames = content.activeGames;
                 }
             }
             return;

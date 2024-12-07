@@ -18,7 +18,7 @@
         width : string;
         height : string
         onLoadError? : () => void;
-        onLoadSuccess? : () => void;  
+        onLoadSuccess? : (img : ImageBitmap) => void;  
     }>();
     const loadError = ref(false);
     const canvas = useTemplateRef("board");
@@ -40,9 +40,9 @@
             let grid : Grid;
             const offset : Vector2 = new Vector2(newScene.offset.x,newScene.offset.y);
             if(newScene.gridType == GridType.SQUARE){
-                grid = new SquareGrid(newScene.tileSize.x,offset,1);
+                grid = new SquareGrid(newScene.tileSize,offset,1);
             } else {
-                grid = new HexagonGrid(newScene.tileSize.x,offset,1);
+                grid = new HexagonGrid(newScene.tileSize,offset,1);
             }
             renderer.setMap(newScene.asset.assetURL,grid, props.onLoadSuccess, props.onLoadError);
         }, { immediate : true });

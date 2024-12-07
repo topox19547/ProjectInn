@@ -76,7 +76,11 @@ export class BoardRenderer{
         })
     }
 
-    public setMap(url : string | undefined, grid:Grid, onSuccess? : () => void, onFail? : () => void):void{
+    public setMap(
+        url : string | undefined,
+        grid:Grid,
+        onSuccess? : (img : ImageBitmap) => void,
+        onFail? : () => void):void{
         this.grid = grid;
         if(url === undefined || this.backgroundSource === url){
             return;//Avoid reloading the same iamge again
@@ -93,7 +97,7 @@ export class BoardRenderer{
                 this.viewOffset.setY(0);
                 this.updateOnScreenTokens();
                 if(onSuccess !== undefined){
-                    onSuccess();
+                    onSuccess(bg);
                 }
             }).catch(onFail);
         })

@@ -12,6 +12,8 @@
   import ErrorWindow from './components/shared/windows/ErrorWindow.vue';
   import ButtonBase from './components/shared/ButtonBase.vue';
   import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
+import { Status } from './network/message/Status.js';
+import { Command } from './network/message/Command.js';
 
   const game : Ref<Game | undefined> = ref(undefined);
   const saveManager : SaveManager = new SaveManager();
@@ -23,25 +25,22 @@
     invalidLocalGames = true;
   }
   const lobby : Ref<Lobby> = ref({
-    activeGames : [
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-      {name : "pipino", info : "a", id : 2},
-    ],
+    activeGames : [],
     localGames : localGames
   });
   const messageHandler : MessageHandler = new MessageHandler(lobby,game);
-  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler);
+  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames);
   provide("serverPublisher", serverPublisher);
 
-
+  function requestGames(){
+    serverPublisher.send(
+      {
+        status : Status.LOBBY_UPDATE,
+        command : Command.NONE,
+        content : {}
+      }
+    )
+  }
 </script>
 
 <template>

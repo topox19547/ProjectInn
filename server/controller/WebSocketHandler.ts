@@ -11,8 +11,8 @@ export class WebSocketHandler extends ClientHandler{
     constructor(webSocket : WebSocket){
         super()
         this.webSocket = webSocket;
-        webSocket.addEventListener("message", this.receive);
-        webSocket.addEventListener("close", this.close);
+        webSocket.addEventListener("message", (m) => this.receive(m));
+        webSocket.addEventListener("close", () => this.close());
     }
 
     open(): void {
@@ -31,8 +31,11 @@ export class WebSocketHandler extends ClientHandler{
     receive(event : MessageEvent): void {
         try{
             const parsedMessage = validateMessage(JSON.parse(event.data))
-            this.currentState?.handleMessage(parsedMessage);
-            console.log(this.currentState);
+            if(this.currentState === undefined){
+                console.log("handler currently isn't in any state")
+                return;
+            }
+            this.currentState.handleMessage(parsedMessage);
         } catch (e){
             if(e instanceof SyntaxError){
                 console.log("invalid JSON syntax on inbound message");

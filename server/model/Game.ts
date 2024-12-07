@@ -48,7 +48,7 @@ export class Game implements NotificationSource{
     constructor(name : string, ownerName : string, startingScene : Scene){
         this.name = name;
         this.ownerName = ownerName;
-        this.players = new Array().concat(ownerName);
+        this.players = new Array();
         this.tokenAssets = new Array<Asset>;
         this.scenes = new Array<Scene>;
         this.tokens = new Array<Token>;

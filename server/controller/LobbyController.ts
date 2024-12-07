@@ -55,6 +55,8 @@ export class LobbyController implements ClientState{
                         content : Game.toObject(game)
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
+                    console.log(`new game created by ${content.username}: ${content.gameName}`);
+                    break;
                 }
                 case Status.JOIN_GAME:{
                     const content = ensureObject({
@@ -99,18 +101,22 @@ export class LobbyController implements ClientState{
                         content : gameObject
                     });
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      
+                    break;
                 }   
                 case Status.LOBBY_UPDATE: {
                     this.clientHandler.send(this.lobby.buildMatchListMessage());
+                    break;
                 }
                 case Status.CLIENT_STATUS:{
                     if(message.command == Command.DELETE){
                         this.lobby.leaveLobby(this.clientHandler);
                     }
+                    break;
                 }
             }
         }catch(e){
             if(e instanceof ValueError){
+                console.log(e);
                 this.clientHandler.send({
                     status : Status.ERROR,
                     command : Command.NONE,
@@ -119,6 +125,7 @@ export class LobbyController implements ClientState{
                     }
                 });
             } else if (e instanceof FormatError || e instanceof SyntaxError){
+                console.log(e);
                 console.log(`Message parse error: message of type ${message.status} is malformed`)
             }   
         }

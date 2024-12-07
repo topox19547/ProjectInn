@@ -305,11 +305,12 @@ export class GameController implements ClientState{
                 case Status.ASSET_URL : {
                     const content = ensureObject({
                         url : ensureString,
+                        size : Vector2.validate,
                         id : ensureNumber,
                         type : ensureEnumLike(Object.values(AssetType).filter(v => typeof v == "number"))
                     })(message.content);
                     const asset : Asset = this.getAssetIfAuthorized(content.id, content.type);
-                    if(!asset.setURL(content.url)){
+                    if(!asset.setURL(content.url, new Vector2(content.size.x, content.size.y))){
                         throw new ValueError("The given url is too long")
                     }
                 }
