@@ -6,6 +6,7 @@
     import Delete from '../../../assets/icons/delete.svg';
     import NoGamesText from './NoGamesText.vue';
     import type { GamePreview } from '../../../model/gamePreview.js';
+    import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
     
     const emits = defineEmits<{
         (e: 'newGame') : void,

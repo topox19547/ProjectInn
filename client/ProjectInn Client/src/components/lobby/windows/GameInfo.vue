@@ -1,10 +1,10 @@
 <script setup lang="ts">
-    import InfoIcon from '../../../../assets/icons/info.svg'
-    import WindowBase from '../../../shared/WindowBase.vue';
-    import WindowTitleBar from '../../../shared/WindowTitleBar.vue';
-    import CloseButton from '../../../shared/CloseButton.vue';
+    import InfoIcon from '../../../assets/icons/info.svg'
+    import WindowBase from '../../shared/WindowBase.vue';
+    import WindowTitleBar from '../../shared/WindowTitleBar.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
     import { ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../../../shared/WindowBackground.vue';
+    import WindowBackground from '../../shared/WindowBackground.vue';
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         close : void

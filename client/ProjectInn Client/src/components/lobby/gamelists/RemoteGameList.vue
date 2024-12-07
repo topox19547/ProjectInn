@@ -2,14 +2,15 @@
     import Fab from './Fab.vue';
     import GameEntry from './GameEntry.vue';
     import GameListRoot from './GameListRoot.vue';
-    import Login from '../../../assets/icons/login.svg';
+    import Join from '../../../assets/icons/join.svg';
     import Info from '../../../assets/icons/info.svg';
     import NoGamesText from './NoGamesText.vue';
     import type { GamePreview } from '../../../model/gamePreview.js';
 
     const emits = defineEmits<{
-        (e: 'openGameInfo', id : number) : void,
-        (e: 'joinGame', id : number) : void
+        (e : 'openGameInfo' , id : number) : void,
+        (e : 'joinGame', id : number) : void,
+        (e : 'joinById') : void
     }>();
     const props = defineProps<{
         remoteGames : Array<GamePreview>
@@ -29,7 +30,7 @@
         </template>
         <div class="spacer" v-if="remoteGames.length > 0"></div>
         <template v-slot:fab>
-            <Fab text="Join with ID" :icon=Login></Fab>
+            <Fab text="Join with ID" @click="$emit('joinById')"  :icon=Join></Fab>
         </template>
     </GameListRoot>
 </template>
