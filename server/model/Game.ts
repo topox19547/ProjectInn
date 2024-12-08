@@ -32,6 +32,7 @@ export class Game implements NotificationSource{
     private notifier : ClientNotifier | undefined;
     private currentScene : Scene;
     private password : string | undefined;
+    private endCallback : () => void;
     private static maxNameLength : number = 24;
     public static validate = ensureObject({
         name : ensureString,
@@ -54,13 +55,14 @@ export class Game implements NotificationSource{
         this.tokens = new Array<Token>;
         this.password = undefined;
         this.currentScene = startingScene;
-        this.maxPasswordLength = 64;
+        this.maxPasswordLength = 24;
         this.chat = new Chat();
         this.chat.addCommand(new Dice()).addCommand(new Help(this.chat))
         this.maxTokens = Number.MAX_SAFE_INTEGER;
         this.maxTokenAssets = Number.MAX_SAFE_INTEGER;
         this.maxScenes = Number.MAX_SAFE_INTEGER;
-        this.scenes.concat(this.currentScene)
+        this.scenes.concat(this.currentScene);
+        this.endCallback = () => {};
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Game | undefined{
@@ -141,6 +143,10 @@ export class Game implements NotificationSource{
 
     public setNotifier(notifier : ClientNotifier) : void{
         this.notifier = notifier;
+    }
+
+    public setEndCallback(callback : () => void) : void{
+        this.endCallback = callback;
     }
 
     public getName() : string{
@@ -395,6 +401,7 @@ export class Game implements NotificationSource{
             p => p.getName() == this.ownerName
         );
         this.notifier?.removeAllClients();
+        this.endCallback();
     }
 
     public getChatInstance() : Chat{

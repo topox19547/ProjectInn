@@ -46,7 +46,7 @@ import type { Game } from '../../../model/Game.js';
                         <div class="subCategory" v-if=isNewGame>
                             <div class="inputTitle">Game name</div>
                             <input class="textBox" v-model="game.name" 
-                            maxlength="24" type="text" title="sceneName">
+                            maxlength="24" type="text">
                         </div>
                         <div class="multiLineSubCategory">
                             <div class="section">

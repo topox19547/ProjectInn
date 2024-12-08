@@ -41,6 +41,7 @@ export class LobbyController implements ClientState{
                         scene : Scene.validate
                     })(message.content);
                     const game = new Game(content.gameName, content.username, Scene.fromObject(content.scene));
+                    game.setEndCallback(() => this.lobby.removeGame(game))
                     const player = new Player(content.username, new Color(content.playerColor))
                     game.addPlayer(player);
                     if (content.password !== undefined){
@@ -48,6 +49,7 @@ export class LobbyController implements ClientState{
                             throw new ValueError("Error when setting the game's password");
                         }
                     }
+                    game.joinGame(player, this.clientHandler);
                     this.lobby.publishGame(game);
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,

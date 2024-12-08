@@ -58,7 +58,10 @@ Press the button below to clear it.`;
     </ErrorWindow>
     <NewGameWizard :show-wizard="showNewGameWizard" @close="showNewGameWizard = false">
     </NewGameWizard>
-    <JoinGameWizard :show-wizard="showJoinGameWizard" @close="showJoinGameWizard = false">
+    <JoinGameWizard 
+    :show-wizard="showJoinGameWizard" 
+    :active-games="lobby.activeGames" 
+    @close="showJoinGameWizard = false">
     </JoinGameWizard>
     <GameInfo
     :game-id="gameInfoId"

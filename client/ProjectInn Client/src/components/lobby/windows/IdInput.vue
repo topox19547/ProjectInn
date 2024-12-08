@@ -15,7 +15,7 @@
         close : void
     }>();
     const props = defineProps<{
-        joinData : { gameId : number, player : Player}
+        joinData : { gameId : number, player : Player, password : string | undefined}
         show : boolean
         onConfirm : () => void
     }>();
@@ -40,7 +40,7 @@
                 <div class="contentContainer">
                     <div class="subCategory">
                         <div class="inputTitle">Game id</div>
-                        <input class="textBox" v-model="joinData.gameId" maxlength="24" type="number" title="sceneName">
+                        <input class="textBox" v-model="joinData.gameId" maxlength="24" type="number">
                     </div>
                 </div>
                 <div class="buttonContainer">

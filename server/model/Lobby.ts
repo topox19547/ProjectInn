@@ -58,10 +58,11 @@ export class Lobby implements NotificationSource{
     }
 
     public buildMatchListMessage() : Message{
-        const gameList = new Array<{id : number, name : string, info : string}>;
+        const gameList = new Array<{id : number, name : string, private : boolean, info : string}>;
         this.getRunningGames().forEach((v,k) => gameList.push({
             id : k,
             name : v.getName(),
+            private : !v.checkPassword(undefined),
             info : `${v.checkPassword(undefined) ? "Public 🔓" : "Private 🔒"}, created by ${v.getOwnerName()}`
         }));
         return {

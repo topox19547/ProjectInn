@@ -1,26 +1,26 @@
 <script setup lang="ts">
-    import PlayerIcon from '../../../assets/icons/player.svg';
-    import WindowBase from '../WindowBase.vue';
-    import WindowTitleBar from '../WindowTitleBar.vue';
-    import CloseButton from '../CloseButton.vue';
+    import JoinIcon from '../../../assets/icons/join.svg';
+    import WindowBase from '../../shared/WindowBase.vue';
+    import WindowTitleBar from '../../shared/WindowTitleBar.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
     import { ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../WindowBackground.vue';
+    import WindowBackground from '../../shared/WindowBackground.vue';
     import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
     import { AssetType } from '../../../model/AssetType.js';
     import { GridType } from '../../../model/GridType.js';
-    import ButtonBase from '../ButtonBase.vue';
+    import ButtonBase from '../../shared/ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         close : void
     }>();
     const props = defineProps<{
-        player : Player
+        joinData : { gameId : number, player : Player, password : string | undefined}
         show : boolean
         onConfirm : () => void
     }>();
-    watch(props.player,(newPlayer) => {
-        confirmDisabled.value = newPlayer.name.length == 0;
+    watch(props.joinData,(joinData) => {
+        confirmDisabled.value = joinData.gameId <= 0;
     })
 </script>
 
@@ -30,21 +30,17 @@
         <WindowBackground  v-if="show" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="400px" window-width="500px"  v-if="show" >
+        <WindowBase window-height="250px" window-width="500px"  v-if="show" >
             <template v-slot:content>
-                <WindowTitleBar title="Player" :icon="PlayerIcon">
+                <WindowTitleBar title="Password" :icon="JoinIcon">
                     <template v-slot:back>
                         <CloseButton @click="$emit('close')"></CloseButton>
                     </template>
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="inputTitle">Player name</div>
-                        <input class="textBox" v-model="player.name" maxlength="24" type="text">
-                    </div>
-                    <div class="subCategory">
-                        <div class="inputTitle">Player color</div>
-                        <input type="color" v-model="player.color" class="colorPicker">
+                        <div class="inputTitle">Enter password</div>
+                        <input class="textBox" v-model="joinData.password" maxlength="24" type="text">
                     </div>
                 </div>
                 <div class="buttonContainer">

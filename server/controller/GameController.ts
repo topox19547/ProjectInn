@@ -317,7 +317,6 @@ export class GameController implements ClientState{
                 case Status.GAME_END : {
                     if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
                         this.currentGame.endGame();
-                        this.lobby.removeGame(this.currentGame);
                     }
                 }
                 case Status.CLIENT_STATUS : {

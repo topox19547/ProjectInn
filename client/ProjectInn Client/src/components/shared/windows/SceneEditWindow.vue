@@ -60,31 +60,31 @@ import ButtonBase from '../ButtonBase.vue';
                 <div class="contentContainer">
                     <div class="editor">
                         <div class="inputTitle">Scene name</div>
-                        <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text" title="sceneName">
+                        <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text">
                         <div class="inputTitle">Image URL</div>
-                        <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text" title="URL">
+                        <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text">
                         <div class="inputTitle">Grid Type</div>
                         <div class="gridTypeSelection">
                             <div class = "subCategory">
                                 <div class="subOption">Square</div>
-                                <input class="radioButton" :value="0" type="radio" v-model="scene.gridType" title="GridType" name="test">
+                                <input class="radioButton" :value="0" type="radio" v-model="scene.gridType" name="test">
                             </div>
                             <div class = "subCategory">
                                 <div class="subOption">Hexagonal</div>
-                                <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" title="GridType" name="test">
+                                <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" name="test">
                             </div>      
                         </div>
                         <div class="inputTitle">Tile width (pixels)</div>
-                        <input class="textBox" type="number" v-model="tileSizeValue" title="sceneName">
+                        <input class="textBox" type="number" v-model="tileSizeValue">
                         <div class="inputTitle">Tile offset (pixels)</div>
                         <div class="subCategory">
                             <div class="subCategory">
                                 <div class="coordinateName">X</div>
-                                <input class="textBox" v-model="scene.offset.x" type="number" title="sceneName">
+                                <input class="textBox" v-model="scene.offset.x" type="number">
                             </div>
                             <div class="subCategory">
                                 <div class="coordinateName">Y</div>
-                                <input class="textBox" v-model="scene.offset.y" type="number" title="sceneName">
+                                <input class="textBox" v-model="scene.offset.y" type="number">
                             </div>
                         </div>
                        
