@@ -27,7 +27,7 @@
             players : [
                 {
                     name: "",
-                    color : "#303f9f", //pretty purple :3
+                    color : "#303f9f", //THE GAMECUBE???
                     permissions : {},
                     connected : false
                 }

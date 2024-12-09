@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
-    import { Vector2 } from '../../../types/Vector2.js';
+    import { Vector2, type WeakVector2 } from '../../../types/Vector2.js';
     import type { Token } from '../../../model/Token.js';
     import type { Scene } from '../../../model/Scene.js';
     import type { Asset } from '../../../model/Asset.js';
@@ -11,17 +11,17 @@
     import { HexagonGrid } from './grid/HexagonGrid.js';
     import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
     const props = defineProps<{
-        tokens : Array<Token>;
-        currentScene : Scene;
-        tokenAssets : Array<Asset>;
+        tokens : Array<Token>
+        currentScene : Scene
+        tokenAssets : Array<Asset>
         rounded : boolean
-        width : string;
-        height : string
+        canvasSize : WeakVector2
         onLoadError? : () => void;
         onLoadSuccess? : (img : ImageBitmap) => void;  
     }>();
     const loadError = ref(false);
     const canvas = useTemplateRef("board");
+    
 
     onMounted(() => {
         let renderer : BoardRenderer;
@@ -50,7 +50,7 @@
 </script>
 
 <template>
-    <canvas ref="board" class="canvas" :class="{ rounded: rounded }" :width="width" :height="height">
+    <canvas ref="board" class="canvas" :class="{ rounded: rounded }" :width="canvasSize.x" :height="canvasSize.y" >
         Game board
     </canvas>
     <ErrorWindow title="Load error" 

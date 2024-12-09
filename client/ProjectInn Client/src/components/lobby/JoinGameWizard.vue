@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject, ref, watch } from 'vue';
 import type { Player } from '../../model/Player.js';
 import IdInput from './windows/IdInput.vue';
 import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
@@ -15,6 +15,7 @@ import PasswordInput from './windows/PasswordInput.vue';
     }>();
 
     const props = defineProps<{
+        joinID : undefined | number
         showWizard : boolean
         activeGames : Array<GamePreview>
     }>();
@@ -30,7 +31,7 @@ import PasswordInput from './windows/PasswordInput.vue';
             gameId : 0,
             player : {
                 name: '',
-                color: '',
+                color : "#303f9f", //THE GAMECUBE???,
                 permissions: {},
                 connected: false
             },
@@ -43,6 +44,7 @@ import PasswordInput from './windows/PasswordInput.vue';
     }
 
     function submitJoinData(){
+        joinData.value.gameId = props.joinID !== undefined ? props.joinID : joinData.value.gameId;
         showPlayerMenu.value = false;
         const game : GamePreview | undefined = props.activeGames.find(g => g.id == joinData.value.gameId);
         if(game === undefined){
@@ -83,6 +85,7 @@ import PasswordInput from './windows/PasswordInput.vue';
         });
         joinData.value = getJoinDataBaseValue();
     }
+
 </script>
 
 <template>
@@ -103,17 +106,23 @@ import PasswordInput from './windows/PasswordInput.vue';
     <IdInput 
     :join-data="joinData" 
     :on-confirm="() => {
-        $emit('close');
         showPlayerEditor();
+        $emit('close');
     }"
-    :show="showWizard"
+    :show="showWizard && joinID === undefined"
     @close="$emit('close')">
     </IdInput>
     <PlayerEditWindow 
     :player="joinData.player"
-    :on-confirm="submitJoinData"
-    :show="showPlayerMenu"
-    @close="showPlayerMenu = false">
+    :on-confirm="() => {
+        submitJoinData();
+        $emit('close');
+    }"
+    :show="showPlayerMenu || showWizard && joinID !== undefined"
+    @close="() => {
+        showPlayerMenu = false;
+        $emit('close');
+    }">
     </PlayerEditWindow>
     <PasswordInput
     :join-data="joinData"

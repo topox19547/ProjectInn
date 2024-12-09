@@ -57,7 +57,7 @@ import { Command } from './network/message/Command.js';
   <LobbyView v-if="game === undefined" 
   :lobby="lobby"
   :invalid-local-games="invalidLocalGames"></LobbyView>
-  <GameView v-if="game !== undefined"></GameView>
+  <GameView v-if="game !== undefined" :game=game></GameView>
   <ErrorWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
     <template v-slot:button>
       <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>

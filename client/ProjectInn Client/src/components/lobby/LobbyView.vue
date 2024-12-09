@@ -7,7 +7,7 @@
     import ButtonBase from '../shared/ButtonBase.vue';
     import LocalGameList from './gamelists/LocalGameList.vue';
     import RemoteGameList from './gamelists/RemoteGameList.vue';
-    import { inject, ref } from 'vue';
+    import { inject, ref, type Ref } from 'vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
 import type { Game } from '../../model/Game.js';
 import { GridType } from '../../model/GridType.js';
@@ -29,6 +29,7 @@ Press the button below to clear it.`;
     
     const showNewGameWizard = ref(false);
     const showJoinGameWizard = ref(false);
+    const joinID : Ref<undefined | number> = ref(undefined);
     const showGameInfo = ref(false);
     const gameInfoId = ref(-1);
     
@@ -48,6 +49,16 @@ Press the button below to clear it.`;
         gameInfoId.value = id;
         showGameInfo.value = true;
     }
+
+    function joinGame(id : number){
+        joinID.value = id;
+        showJoinGameWizard.value = true;
+    }
+
+    function closeJoinGameWizard(){
+        joinID.value = undefined;
+        showJoinGameWizard.value = false;
+    }
 </script>
 
 <template>
@@ -58,10 +69,11 @@ Press the button below to clear it.`;
     </ErrorWindow>
     <NewGameWizard :show-wizard="showNewGameWizard" @close="showNewGameWizard = false">
     </NewGameWizard>
-    <JoinGameWizard 
+    <JoinGameWizard
+    :join-i-d="joinID"
     :show-wizard="showJoinGameWizard" 
     :active-games="lobby.activeGames" 
-    @close="showJoinGameWizard = false">
+    @close="closeJoinGameWizard()">
     </JoinGameWizard>
     <GameInfo
     :game-id="gameInfoId"
@@ -78,7 +90,8 @@ Press the button below to clear it.`;
                 <RemoteGameList 
                 :remote-games="props.lobby.activeGames"
                 @open-game-info="openGameInfo"
-                @join-by-id="showJoinGameWizard = true"></RemoteGameList>
+                @join-by-id="showJoinGameWizard = true"
+                @join-game="joinGame"></RemoteGameList>
             </div>
         </main>
     </div>

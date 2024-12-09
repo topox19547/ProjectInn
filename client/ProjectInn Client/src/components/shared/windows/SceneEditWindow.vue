@@ -97,7 +97,7 @@ import ButtonBase from '../ButtonBase.vue';
                             :tokens="[]" 
                             :token-assets="[]" 
                             :current-scene="scene"
-                            height="256" width="256">
+                            :canvas-size="{ x : 256, y : 256}">
                             </BoardCanvas>
                             <div class="previewLabel">
                                 Interactive preview
