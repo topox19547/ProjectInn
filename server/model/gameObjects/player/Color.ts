@@ -5,7 +5,7 @@ export class Color{
     private readonly validityChecker:RegExp
 
     constructor(color:string){
-        this.validityChecker = new RegExp("/^#?([a-f0-9]{6}|[a-f0-9]{3})$/"); //from https://gist.github.com/daxburatto/307e8365c41fd5401f9ac315676490bf
+        this.validityChecker = new RegExp("^#(?:[0-9a-fA-F]{3,4}){1,2}$"); //from https://gist.github.com/daxburatto/307e8365c41fd5401f9ac315676490bf
         this.color = this.validityChecker.test(color) ? color : this.defaultColor;
     }
 

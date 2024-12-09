@@ -3,11 +3,13 @@
         text : string
         width? : string
         height? : string
+        disableShadow? : boolean
     }>();
 </script>
 
 <template>
-    <button class="button" :style="{width: width, height: height}">
+    <button class="button" 
+    :style="{width: width, height: height, 'box-shadow' : disableShadow ? '0px 0px 0px' : '0px 0px 3px'}">
         <div class="buttonText">{{ props.text }}</div>
     </button>
 </template>

@@ -58,6 +58,7 @@ export class GameController implements ClientState{
                     }else{
                         token.endDrag(position, this.clientPlayer.getName());
                     }
+                    break;
                 }
                 case Status.TOKEN_STAT:{
                     if(message.command == Command.SAFE_MODIFY){
@@ -80,6 +81,7 @@ export class GameController implements ClientState{
                             throw new ValueError(`Stat ${content.name} doesn't exist`);
                         }
                     }
+                    break;
                 }
                 case Status.TOKEN_NAME:{
                     const content = ensureObject({
@@ -90,6 +92,7 @@ export class GameController implements ClientState{
                     if(!token.setName(content.name)){
                         throw new ValueError("Invalid name");
                     }
+                    break;
                 }
                 case Status.TOKEN:{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
@@ -112,6 +115,7 @@ export class GameController implements ClientState{
                             throw new ValueError(`The token with id ${content.id} doesn't exist`);
                         }
                     }
+                    break;
                 }
                 case Status.TOKEN_OWNERSHIP:{
                     const content = ensureObject({
@@ -131,6 +135,7 @@ export class GameController implements ClientState{
                             throw new ValueError("This player isn't an owner");
                         }
                     }
+                    break;
                 }
                 case Status.TOKEN_NOTE : {
                     if(message.command == Command.SAFE_MODIFY){
@@ -153,6 +158,7 @@ export class GameController implements ClientState{
                             throw new ValueError(`Note ${content.title} doesn't exist`);
                         }
                     }
+                    break;
                 }
                 case Status.CHAT : {
                     const content = ensureObject({
@@ -164,12 +170,14 @@ export class GameController implements ClientState{
                         sender : this.clientPlayer.getName(),
                         isSystem : false
                     });
+                    break;
                 }
                 case Status.SCENE_PING : {
                     const content = ensureObject({
                         position : Vector2.validate
                     })(message.content)
                     this.currentGame.pingMap(new Vector2(content.position.x, content.position.y))
+                    break;
                 }
                 case Status.PASSWORD_CHANGE : {
                     const content = ensureObject({
@@ -181,6 +189,7 @@ export class GameController implements ClientState{
                     if(!this.currentGame.setPassword(content.password)){
                         throw new ValueError("The password you've chosen is too long");
                     }
+                    break;
                 }
                 case Status.PERMISSIONS : {
                     const content = ensureObject({
@@ -213,6 +222,7 @@ export class GameController implements ClientState{
                     } else if (content.permission == Permission.MANAGE_TOKENS){
                         this.currentGame.updateClientTokenAssets(this.clientPlayer);
                     }
+                    break;
                 }
                 case Status.SCENE : {
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_SCENES)){
@@ -233,6 +243,7 @@ export class GameController implements ClientState{
                             throw new ValueError("Could not remove scene");
                         }
                     }
+                    break;
                 }
                 case Status.SCENE_CHANGE : {
                     const content = ensureObject({
@@ -244,6 +255,7 @@ export class GameController implements ClientState{
                     if(!this.currentGame.changeScene(content.id)){
                         throw new ValueError("No scene exists with this ID");
                     }
+                    break;
                 }
                 case Status.SCENE_GRIDTYPE : {
                     const content = ensureObject({
@@ -252,6 +264,7 @@ export class GameController implements ClientState{
                     })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setGridType(content.gridType);
+                    break;
                 }
                 case Status.SCENE_OFFSET : {
                     const content = ensureObject({
@@ -260,6 +273,7 @@ export class GameController implements ClientState{
                     })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setOffset(new Vector2(content.offset.x, content.offset.y));
+                    break;
                 }
                 case Status.SCENE_TILESIZE : {
                     const content = ensureObject({
@@ -268,6 +282,7 @@ export class GameController implements ClientState{
                     })(message.content);
                     const scene : Scene = this.getSceneIfAuthorized(content.id);
                     scene.setTileSize(content.tileSize);
+                    break;
                 }
                 case Status.TOKEN_ASSET : {
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
@@ -290,6 +305,7 @@ export class GameController implements ClientState{
                             throw new ValueError("No token asset exists with this ID")
                         }
                     }
+                    break;
                 }
                 case Status.ASSET_NAME : {
                     const content = ensureObject({
@@ -301,6 +317,7 @@ export class GameController implements ClientState{
                     if(!asset.setName(content.name)){
                         throw new ValueError("The supplied name is too long")
                     }
+                    break;
                 }
                 case Status.ASSET_URL : {
                     const content = ensureObject({
@@ -313,16 +330,19 @@ export class GameController implements ClientState{
                     if(!asset.setURL(content.url, new Vector2(content.size.x, content.size.y))){
                         throw new ValueError("The given url is too long")
                     }
+                    break;
                 }
                 case Status.GAME_END : {
                     if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
                         this.currentGame.endGame();
                     }
+                    break;
                 }
                 case Status.CLIENT_STATUS : {
                     if(message.command == Command.DELETE){
                         this.currentGame.leaveGame(this.clientPlayer, this.clientHandler);
                     }
+                    break;
                 }
             }
         }

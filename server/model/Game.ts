@@ -92,7 +92,7 @@ export class Game implements NotificationSource{
                     dest.push(restored)
                 }
                 dest.sort(sortById);
-                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID()))){ //Could be optimized by using binary search
+                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID()))){
                     return false;
                 }
                 return true;
@@ -143,6 +143,7 @@ export class Game implements NotificationSource{
 
     public setNotifier(notifier : ClientNotifier) : void{
         this.notifier = notifier;
+        this.chat.setNotifier(notifier);
     }
 
     public setEndCallback(callback : () => void) : void{
@@ -162,6 +163,9 @@ export class Game implements NotificationSource{
             return false;
         }
         this.players.push(player);
+        if(this.notifier !== undefined){
+            player.setNotifier(this.notifier);
+        }
         this.notifier?.notify({
             status : Status.PLAYER,
             command : Command.CREATE,
@@ -216,6 +220,9 @@ export class Game implements NotificationSource{
             return false;
         }
         this.tokenAssets.push(asset);
+        if(this.notifier !== undefined){
+            asset.setNotifier(this.notifier);
+        }
         this.notifier?.notifyIf({
             status : Status.TOKEN_ASSET,
             command : Command.CREATE,
@@ -254,6 +261,9 @@ export class Game implements NotificationSource{
             return false;
         }
         this.addToEntityArray(this.tokens, token);
+        if(this.notifier !== undefined){
+            token.setNotifier(this.notifier);
+        }
         this.notifier?.notify({
             status : Status.TOKEN,
             command : Command.CREATE,
@@ -288,6 +298,9 @@ export class Game implements NotificationSource{
             return false;
         }
         this.scenes.push(scene);
+        if(this.notifier !== undefined){
+            scene.setNotifier(this.notifier);
+        }
         this.notifier?.notifyIf({
             status : Status.SCENE,
             command : Command.CREATE,

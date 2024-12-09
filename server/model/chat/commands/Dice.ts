@@ -11,21 +11,32 @@ export class Dice implements ChatCommand{
     }
 
     getExplanation(): string {
-        return "!d <number of faces>    rolls a dice with the specified amount of faces"
+        return "!d <faces faces...>    rolls one or more dice with the specified amount of faces (separated by spaces)"
     }
 
     public execute(args: Array<string>, playerName : string): ChatMessage {
-        const faces : number = Number(args[0]);
-        if(faces > 1){
-            const roll : number = Math.round(Math.random() * faces) + 1;
-            return {
-                text : `you rolled ${roll}`,
-                sender : this.visualName,
-                isSystem : true
+        const errorMessage = {
+            text : "invalid arguments",
+            sender : this.visualName,
+            isSystem : true
+        };
+        if(args.length == 0){
+            return errorMessage
+        }
+        let messageText = "you rolled";
+        for(const [i, arg] of args.entries()){
+            const faces : number = parseInt(arg);
+            if(Number.isNaN(faces) || faces < 1){
+                return errorMessage
+            }
+            const roll : number = Math.floor(Math.random() * faces) + 1;
+            messageText += " " + roll;
+            if(i != args.length - 1){
+                messageText += ","
             }
         }
         return {
-            text : "invalid arguments",
+            text : messageText,
             sender : this.visualName,
             isSystem : true
         }

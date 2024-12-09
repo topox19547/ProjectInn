@@ -5,9 +5,14 @@
     import PlayersIcon from '../../../assets/icons/players.svg';
     import ChatIcon from '../../../assets/icons/chat.svg';
     import TabButton from './TabButton.vue';
+    import Chat from './panels/Chat/Chat.vue';
+    import type { Player } from '../../../model/Player.js';
+    import type { ChatMessage } from '../../../model/ChatMessage.js';
 
     const props = defineProps<{
-        currentTab : SideBarTab
+        currentTab : SideBarTab,
+        players : Array<Player>,
+        chat : Array<ChatMessage>
     }>();
 
     const emits = defineEmits<{
@@ -37,11 +42,21 @@
             @click="$emit('tabChanged', 3)"></TabButton>
         </div>
     </div>
-    <div class = "content"></div>
+    <div class = "content">
+        <Chat :chat="chat" :players="players"></Chat>
+    </div>
 </template>
 
 
 <style scoped>
+    .content{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow-y: hidden;
+    }
+
     .tabsContainer{
         height: 64px;
         display: flex;

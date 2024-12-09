@@ -4,13 +4,13 @@ import { ChatCommand } from "./ChatCommand.js";
 
 
 export class Help implements ChatCommand{
-    private readonly visualName;
+    private readonly readableName;
     private readonly commandName;
     private readonly chat : Chat;
 
     constructor(chat : Chat){
         this.chat = chat;
-        this.visualName = "Help";
+        this.readableName = "Help";
         this.commandName = "h";
     }
 
@@ -19,13 +19,13 @@ export class Help implements ChatCommand{
     }
 
     execute(args: Array<string>, playerName : string): ChatMessage {
-        const text : string = "Available commands: \n";
-        this.chat.getAvailableCommands().forEach(c => text.concat(c.getExplanation() + "\n"))
+        let text : string = "Available commands: <br>";
+        this.chat.getAvailableCommands().forEach(c => text += c.getExplanation() + "<br>");
         return {
             text : text,
-            sender : this.visualName,
+            sender : this.readableName,
             isSystem : true
-        }
+        };
     }
 
     getCommandName(): string {

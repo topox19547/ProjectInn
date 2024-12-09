@@ -41,12 +41,16 @@
             :canvas-size="canvasSize"></BoardCanvas>
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">
-            <Sidebar :current-tab="currentTab" @tab-changed="changeTab"></Sidebar>
+            <Sidebar
+            :current-tab="currentTab"
+            @tab-changed="changeTab"
+            :players="game.players"
+            :chat="game.chat"></Sidebar>
         </div>
     </div>
 </template>
 
-<style>
+<style scoped>
     .background{
         background-color: #242424;
         position: absolute;
@@ -67,5 +71,9 @@
 
     .sidebar{
         background-color: #242424;
+        display: flex;
+        flex-direction: column;
+        max-height: 100%;
+        overflow-y: hidden;
     }
 </style>

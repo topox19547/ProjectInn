@@ -62,7 +62,8 @@ export class Chat implements NotificationSource{
             }, p => p.getName() == message.sender)
             return;
         }
-        const response : ChatMessage = command.execute(splitQuery.splice(0,1),message.sender);
+        splitQuery.splice(0,1)
+        const response : ChatMessage = command.execute(splitQuery,message.sender);
         this.notifier?.notify({
             status : Status.CHAT,
             command : Command.CREATE,

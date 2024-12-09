@@ -1,5 +1,6 @@
 import { FormatError } from "../errors/FormatError.js";
 import { ValueError } from "../errors/ValueError.js";
+import { ClientNotifier } from "../model/ClientNotifier.js";
 import { Game } from "../model/Game.js";
 import { Color } from "../model/gameObjects/player/Color.js";
 import { Permission } from "../model/gameObjects/player/Permission.js";
@@ -41,6 +42,7 @@ export class LobbyController implements ClientState{
                         scene : Scene.validate
                     })(message.content);
                     const game = new Game(content.gameName, content.username, Scene.fromObject(content.scene));
+                    game.setNotifier(new ClientNotifier());
                     game.setEndCallback(() => this.lobby.removeGame(game))
                     const player = new Player(content.username, new Color(content.playerColor))
                     game.addPlayer(player);
