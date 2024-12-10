@@ -92,8 +92,8 @@ import ButtonBase from '../ButtonBase.vue';
                     <div class="preview">
                         <div>
                             <BoardCanvas 
-                            :onLoadSuccess="(img) => enableConfirm(img)"
-                            :rounded="true" 
+                            :onLoadSuccess="(img : ImageBitmap) => enableConfirm(img)"
+                            rounded="16px" 
                             :tokens="[]" 
                             :token-assets="[]" 
                             :current-scene="scene"

@@ -25,6 +25,7 @@ import type { ChatMessage } from '../../../../../model/ChatMessage.js';
 
     .system{
         border-radius: 16px;
+        margin-block: 8px;
         background-color: #303F9F;
     }
 

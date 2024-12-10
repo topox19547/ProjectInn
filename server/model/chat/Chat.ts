@@ -44,7 +44,7 @@ export class Chat implements NotificationSource{
             command : Command.CREATE,
             content : message
         })
-        this.chatHistory.concat(message);
+        this.chatHistory.push(message);
         if(!message.text.startsWith("!")){
             return;
         }

@@ -14,7 +14,7 @@
         tokens : Array<Token>
         currentScene : Scene
         tokenAssets : Array<Asset>
-        rounded : boolean
+        rounded : string
         canvasSize : WeakVector2
         onLoadError? : () => void;
         onLoadSuccess? : (img : ImageBitmap) => void;  
@@ -50,7 +50,7 @@
 </script>
 
 <template>
-    <canvas ref="board" class="canvas" :class="{ rounded: rounded }" :width="canvasSize.x" :height="canvasSize.y" >
+    <canvas ref="board" class="canvas" :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
         Game board
     </canvas>
     <ErrorWindow title="Load error" 
@@ -59,7 +59,4 @@
 </template>
 
 <style scoped>
-    .rounded{
-        border-radius: 16px;
-    }
 </style>

@@ -37,7 +37,7 @@
             :tokens="game.tokens" 
             :token-assets="game.tokenAssets" 
             :current-scene="game.currentScene" 
-            :rounded="false" 
+            rounded="0px 16px 0px 0px" 
             :canvas-size="canvasSize"></BoardCanvas>
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">

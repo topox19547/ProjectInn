@@ -11,7 +11,7 @@ export class Dice implements ChatCommand{
     }
 
     getExplanation(): string {
-        return "!d <faces faces...>    rolls one or more dice with the specified amount of faces (separated by spaces)"
+        return "!d faces faces...    rolls one or more dice with the specified amount of faces (separated by spaces)"
     }
 
     public execute(args: Array<string>, playerName : string): ChatMessage {

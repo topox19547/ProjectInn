@@ -12,8 +12,8 @@
   import ErrorWindow from './components/shared/windows/ErrorWindow.vue';
   import ButtonBase from './components/shared/ButtonBase.vue';
   import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
-import { Status } from './network/message/Status.js';
-import { Command } from './network/message/Command.js';
+  import { Status } from './network/message/Status.js';
+  import { Command } from './network/message/Command.js';
 
   const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
@@ -54,6 +54,8 @@ import { Command } from './network/message/Command.js';
 </script>
 
 <template>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <LobbyView v-if="game === undefined" 
   :lobby="lobby"
   :invalid-local-games="invalidLocalGames"></LobbyView>
@@ -69,7 +71,8 @@ import { Command } from './network/message/Command.js';
     background-color: #242424;
   }
   *{
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
   }
   body:has(.windowBackground){
     overflow: hidden;

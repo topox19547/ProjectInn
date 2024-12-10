@@ -5,9 +5,10 @@
     import PlayersIcon from '../../../assets/icons/players.svg';
     import ChatIcon from '../../../assets/icons/chat.svg';
     import TabButton from './TabButton.vue';
-    import Chat from './panels/Chat/Chat.vue';
+    import Chat from './panels/chat/Chat.vue';
     import type { Player } from '../../../model/Player.js';
     import type { ChatMessage } from '../../../model/ChatMessage.js';
+import Players from './panels/players/Players.vue';
 
     const props = defineProps<{
         currentTab : SideBarTab,
@@ -43,7 +44,8 @@
         </div>
     </div>
     <div class = "content">
-        <Chat :chat="chat" :players="players"></Chat>
+        <Chat :chat="chat" v-if="currentTab == 0" :players="players"></Chat>
+        <Players :players="players" v-if="currentTab == 1"></Players>
     </div>
 </template>
 
