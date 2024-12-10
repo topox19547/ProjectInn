@@ -13,6 +13,7 @@ export class WebSocketHandler extends ClientHandler{
         this.webSocket = webSocket;
         webSocket.addEventListener("message", (m) => this.receive(m));
         webSocket.addEventListener("close", () => this.close());
+        webSocket.addEventListener("error", () => this.close())
     }
 
     open(): void {

@@ -204,12 +204,12 @@ export class GameController implements ClientState{
                     if(playerToChange === undefined){
                         throw new ValueError("This player doesn't exist")
                     }
-                    if(content.name == this.currentGame.getOwnerName()){
+                    if(this.currentGame.getPlayer(content.name)?.isGameOwner()){
                         throw new PermissionError();
                     }
                     if(!playerToChange.hasPermission(Permission.MASTER)){
                         playerToChange.setPermission(content.permission, content.value);
-                    } else if (this.clientPlayer.getName() == this.currentGame.getOwnerName()){
+                    } else if (this.clientPlayer.isGameOwner()){
                         playerToChange.setPermission(content.permission, content.value);
                     } else {
                         throw new PermissionError();
@@ -218,9 +218,9 @@ export class GameController implements ClientState{
                         return;
                     }
                     if(content.permission == Permission.MANAGE_SCENES){
-                        this.currentGame.updateClientScenes(this.clientPlayer);
+                        this.currentGame.updateClientScenes(playerToChange);
                     } else if (content.permission == Permission.MANAGE_TOKENS){
-                        this.currentGame.updateClientTokenAssets(this.clientPlayer);
+                        this.currentGame.updateClientTokenAssets(playerToChange);
                     }
                     break;
                 }
@@ -332,8 +332,27 @@ export class GameController implements ClientState{
                     }
                     break;
                 }
+                case Status.PLAYER : {
+                    if(message.command == Command.DELETE){
+                        const content = ensureObject({
+                            name : ensureString,
+                        })(message.content);
+                        const playerToKick = this.currentGame.getPlayer(content.name);
+                        if(playerToKick === undefined || playerToKick == this.clientPlayer){
+                            throw new ValueError("invalid player");
+                        }
+                        if(!this.clientPlayer.isGameOwner() && !this.clientPlayer.hasPermission(Permission.MASTER)){
+                            throw new PermissionError();
+                        }
+                        if(!playerToKick.hasPermission(Permission.MASTER) && !this.clientPlayer.isGameOwner()){
+                            throw new PermissionError();
+                        }
+                        this.currentGame.removePlayer(playerToKick);
+                    }
+                    break;
+                }
                 case Status.GAME_END : {
-                    if(this.currentGame.getOwnerName() == this.clientPlayer.getName()){
+                    if(this.clientPlayer.isGameOwner()){
                         this.currentGame.endGame();
                     }
                     break;

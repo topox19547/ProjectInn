@@ -30,7 +30,8 @@ export class MessageHandler{
                     break;
                 }
                 case Status.JOIN_GAME:{
-                    this.game.value = content
+                    this.game.value = content.game as Game;
+                    this.game.value.localPlayer = content.player;
                 }
             }
             return;
@@ -123,6 +124,7 @@ export class MessageHandler{
                 break;
             }
             case Status.CHAT:{
+                content.receivedAt = new Date()
                 this.game.value.chat.push(content);
                 break;
             }

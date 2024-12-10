@@ -44,7 +44,7 @@ export class LobbyController implements ClientState{
                     const game = new Game(content.gameName, content.username, Scene.fromObject(content.scene));
                     game.setNotifier(new ClientNotifier());
                     game.setEndCallback(() => this.lobby.removeGame(game))
-                    const player = new Player(content.username, new Color(content.playerColor))
+                    const player = new Player(content.username, new Color(content.playerColor), true)
                     game.addPlayer(player);
                     if (content.password !== undefined){
                         if(!game.setPassword(content.password)){
@@ -56,7 +56,10 @@ export class LobbyController implements ClientState{
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
-                        content : Game.toObject(game)
+                        content : {
+                            game : Game.toObject(game),
+                            player : Player.toObject(player),
+                        }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
                     console.log(`new game created by ${content.username}: ${content.gameName}`);
@@ -79,7 +82,7 @@ export class LobbyController implements ClientState{
                     }
                     let player : Player | undefined = game.getPlayer(content.username);
                     if(!player){
-                        player = new Player(content.username, new Color(content.playerColor));
+                        player = new Player(content.username, new Color(content.playerColor), false);
                         if(!game.addPlayer(player)){
                             throw new ValueError("an error occurred while creating the player");
                         }
@@ -102,7 +105,11 @@ export class LobbyController implements ClientState{
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
-                        content : gameObject
+                        content : {
+                            game : Game.toObject(game),
+                            player : Player.toObject(player),
+                            isOwner : false
+                        }
                     });
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      
                     break;

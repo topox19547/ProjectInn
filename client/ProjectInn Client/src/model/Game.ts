@@ -8,6 +8,7 @@ export interface Game{
     name : string
     ownerName : string
     players : Array<Player>
+    localPlayer : Player
     scenes : Array<Scene>
     tokenAssets : Array<Asset>
     tokens : Array<Token>

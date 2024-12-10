@@ -15,24 +15,21 @@
     const emits = defineEmits<{
         close : void
     }>();
-    const newGameData = ref<Game>(getStartingGameData());
+    const newGameData = ref(getStartingGameData());
     const showPlayerMenu = ref(false);
     const showNewGameMenu = ref(false);
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
 
-    function getStartingGameData() : Game{
+    function getStartingGameData(){
         return {
             name : "",
-            ownerName : "",
-            players : [
-                {
+            localPlayer : {
                     name: "",
                     color : "#784cff",
                     permissions : {},
-                    connected : false
-                }
-            ],
-            scenes : [],
+                    connected : false,
+                    isOwner : false
+            },
             currentScene : {
                 asset : {
                     name : "starting scene",
@@ -45,9 +42,6 @@
                 gridType : GridType.SQUARE,
                 offset : {x : 0, y : 0}
             },
-            chat : [],
-            tokenAssets : [],
-            tokens : [],
             password : undefined
         }
     }
@@ -69,8 +63,8 @@
             status : Status.CREATE_GAME,
             command : Command.CREATE,
             content : {
-                username : newGameData.value.players[0].name,
-                playerColor : newGameData.value.players[0].color,
+                username : newGameData.value.localPlayer.name,
+                playerColor : newGameData.value.localPlayer.color,
                 gameName : newGameData.value.name,
                 password : newGameData.value.password,
                 scene : newGameData.value.currentScene
@@ -91,7 +85,7 @@
     @close = "$emit('close')"
     ></SceneEditWindow>
     <PlayerEditWindow
-    :player="newGameData.players[0]"
+    :player="newGameData.localPlayer"
     :show="showPlayerMenu"
     :on-confirm="goToGameEditor"
     @close="showPlayerMenu = false"

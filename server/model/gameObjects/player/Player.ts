@@ -10,6 +10,7 @@ export class Player implements NotificationSource{
     private readonly name : string;
     private readonly color : Color;
     private readonly permissions : Map<Permission, boolean>;
+    private readonly isOwner : boolean
     private connected : boolean;
     private notifier : ClientNotifier | undefined;
     private static readonly maxNameLength : number = 24;
@@ -17,14 +18,16 @@ export class Player implements NotificationSource{
         name : ensureString,
         color : ensureString,
         permissions : ensureMapObject(ensureBoolean),
+        isOwner : ensureBoolean,
         connected : ensureBoolean
     })
 
-    constructor(name : string, color : Color){
+    constructor(name : string, color : Color, isOwner : boolean){
         this.name = name;
         this.color = color;
         this.permissions = new Map<Permission, boolean>;
-        this.connected = false
+        this.isOwner = isOwner;
+        this.connected = false;
         let i : number = 0;
         for(const entry in Permission){
             if(typeof entry == "number"){
@@ -37,7 +40,8 @@ export class Player implements NotificationSource{
     public static fromObject(object : ReturnType<typeof this.validate>) : Player{
         const player : Player = new Player(
             object.name.slice(0,Player.maxNameLength),
-            new Color(object.color)
+            new Color(object.color),
+            object.isOwner
         );
         let i : number = 0;
         for(const key in Permission){
@@ -56,6 +60,7 @@ export class Player implements NotificationSource{
             name : player.name,
             color : player.color.getColor(),
             permissions : permissions,
+            isOwner : player.isOwner,
             connected : player.connected
         }
     }
@@ -78,6 +83,10 @@ export class Player implements NotificationSource{
 
     public isConnected() : boolean{
         return this.connected;
+    }
+
+    public isGameOwner() : boolean{
+        return this.isOwner;
     }
 
     public setConnected(connected : boolean) : void{

@@ -12,6 +12,7 @@ import Players from './panels/players/Players.vue';
 
     const props = defineProps<{
         currentTab : SideBarTab,
+        localPlayer : Player,
         players : Array<Player>,
         chat : Array<ChatMessage>
     }>();
@@ -45,7 +46,7 @@ import Players from './panels/players/Players.vue';
     </div>
     <div class = "content">
         <Chat :chat="chat" v-if="currentTab == 0" :players="players"></Chat>
-        <Players :players="players" v-if="currentTab == 1"></Players>
+        <Players :local-player="localPlayer" :players="players" v-if="currentTab == 1"></Players>
     </div>
 </template>
 

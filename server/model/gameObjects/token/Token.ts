@@ -268,7 +268,9 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                position : { coordinates : position, inDrag : true, byUser : user}
+                position : position,
+                inDrag : true,
+                byUser : user
             }
         });
         clearTimeout(this.dragLockTimer); //refresh the time limit
@@ -292,7 +294,9 @@ export class Token implements Identifiable, NotificationSource{
             command : Command.MODIFY,
             content : { 
                 id : this.getID(),
-                position : { coordinates : position, inDrag : false, byUser : undefined}
+                position : position,
+                inDrag : false,
+                byUser : undefined
             }
         });
     }

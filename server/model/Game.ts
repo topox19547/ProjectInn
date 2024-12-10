@@ -177,8 +177,13 @@ export class Game implements NotificationSource{
         if(!this.getPlayer(player.getName())){
             return false;
         }
-        player.setConnected(true)
-        this.notifier?.subscribe(handler);
+        player.setConnected(true);
+        this.chat.handleMessage({
+            sender: "ProjectInn",
+            isSystem: true,
+            text: `${player.getName()} has joined the game`
+        })
+        this.notifier?.subscribe(handler, player);
         return true
     }
 
@@ -187,6 +192,11 @@ export class Game implements NotificationSource{
             return false;
         }
         player.setConnected(false)
+        this.chat.handleMessage({
+            sender: "ProjectInn",
+            isSystem: true,
+            text: `${player.getName()} has left the game`
+        })
         this.notifier?.unsubscribe(handler);
         if(this.players.every(p => !p.isConnected())){
             this.endGame();
@@ -200,6 +210,11 @@ export class Game implements NotificationSource{
             return false;
         }
         this.players.splice(playerIndex, 1);
+        this.chat.handleMessage({
+            sender: "ProjectInn",
+            isSystem: true,
+            text: `${player.getName()} has been kicked`
+        })
         this.notifier?.notify({
             status : Status.PLAYER,
             command : Command.DELETE,

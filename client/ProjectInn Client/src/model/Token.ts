@@ -8,5 +8,7 @@ export interface Token{
     owners : Array<string>
     notes : Record<string, string>
     stats : Record<string, Stat>
-    position : { coordinates : WeakVector2, inDrag : boolean, byUser : string}
+    position : WeakVector2
+    inDrag : boolean,
+    byUser : string
 }

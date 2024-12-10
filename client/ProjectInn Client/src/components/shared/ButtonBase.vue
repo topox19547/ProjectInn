@@ -4,25 +4,40 @@
         width? : string
         height? : string
         disableShadow? : boolean
+        icon? : string
+        color? : {
+            active : string,
+            hover : string
+        }
     }>();
 </script>
 
 <template>
     <button class="button" 
-    :style="{width: width, height: height, 'box-shadow' : disableShadow ? '0px 0px 0px' : '0px 0px 3px'}">
+    :style="{
+        width: width,
+        height: height,
+        'box-shadow' : disableShadow ? '0px 0px 0px' : '0px 0px 3px',
+        '--color-active': color?.active,
+        '--color-hover': color?.hover
+    }">
+        <img class="icon" v-if="icon !== undefined" :src="icon" width="24px">
         <div class="buttonText">{{ props.text }}</div>
     </button>
 </template>
 
 <style scoped>
     .button{
+        --color-active: #303F9F;
+        --color-hover: #3F51B5;
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
         width: fit-content;
+        align-items: center;
         gap:8px;
         height: 48px;
         border-radius: 16px;
-        background-color: #303F9F;
+        background-color: var(--color-active);
         border: 0px;
         box-shadow: 0px 0px 3px;
         padding-inline: 8px;
@@ -30,8 +45,13 @@
         transition-duration: 0.5s;
     }
     .button:hover:enabled{
-        background-color: #3F51B5;
+        background-color: var(--color-hover);
         transform: scale(1.05);
+    }
+
+    .icon{
+        padding-left: 8px;
+        margin-right:-8px;
     }
 
     .button:disabled{

@@ -33,7 +33,8 @@ import PasswordInput from './windows/PasswordInput.vue';
                 name: '',
                 color : "#784cff",
                 permissions: {},
-                connected: false
+                connected: false,
+                isOwner : false
             },
             password : undefined
         }

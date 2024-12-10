@@ -42,6 +42,7 @@
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">
             <Sidebar
+            :local-player="game.localPlayer"
             :current-tab="currentTab"
             @tab-changed="changeTab"
             :players="game.players"

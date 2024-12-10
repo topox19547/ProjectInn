@@ -10,13 +10,18 @@
     import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
-import type { Game } from '../../../model/Game.js';
+    import type { Scene } from '../../../model/Scene.js';
     const passwordEnabled = ref(false);
     const emits = defineEmits<{
         close : void
     }>();
     const props = defineProps<{
-        game : Game
+        game : {
+            name : string,
+            localPlayer : Player,
+            currentScene : Scene,
+            password : undefined | string
+        }
         isNewGame : boolean
         show : boolean
         onConfirm? : () => void
