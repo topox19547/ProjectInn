@@ -29,9 +29,9 @@ export class Player implements NotificationSource{
         this.isOwner = isOwner;
         this.connected = false;
         let i : number = 0;
-        for(const entry in Permission){
+        for(const entry of Object.values(Permission)){
             if(typeof entry == "number"){
-                this.permissions.set(i,false);
+                this.permissions.set(i,isOwner);
                 i++;
             }
         }
@@ -54,7 +54,7 @@ export class Player implements NotificationSource{
     public static toObject(player : Player) : ReturnType<typeof this.validate>{
         const permissions : Record<string,boolean> = {}
         for(const [key,value] of player.permissions){
-            permissions[key] = value
+            permissions[Permission[key]] = value
         }
         return {
             name : player.name,
@@ -106,7 +106,10 @@ export class Player implements NotificationSource{
         return hasPermission != undefined && hasPermission;
     }
 
-    public setPermission(permission : Permission, value : boolean){
+    public setPermission(permission : Permission, value : boolean) : void{
+        if(permission != Permission.MASTER && this.permissions.get(Permission.MASTER) == true){
+            return; // you can't modify the other permissions when master is active
+        }
         this.permissions.set(permission, value);
         if(permission == Permission.MASTER){ //MASTER automatically grants all the other permissions
             this.permissions.forEach((_,k) => {
@@ -115,7 +118,7 @@ export class Player implements NotificationSource{
         }
         const permissions : Record<string,boolean> = {}
         for(const [key,value] of this.permissions){
-            permissions[key] = value
+            permissions[Permission[key]] = value
         }
         this.notifier?.notify({
             status : Status.PERMISSIONS,

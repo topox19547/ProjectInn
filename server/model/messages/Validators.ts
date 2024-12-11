@@ -28,6 +28,12 @@ export const ensureEnumLike = (permittedValues : Array<number>) => (object : unk
     return object;
 }
 
+export const ensureStringEnumLike = (permittedValues : Array<string>) => (object : unknown) => {
+    if (typeof object !== "string") throw new FormatError("not a number");
+    if (!permittedValues.includes(object)) throw new FormatError("not a valid enum value");
+    return object;
+}
+
 export const weakEnsureOf = <T>(ensureOtherType : ensureType<T>) => (object : unknown) => {
     try{
         return ensureOtherType(object);

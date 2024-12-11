@@ -39,11 +39,11 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="inputTitle">Player name</div>
+                        <div class="permsPlayer">Player name</div>
                         <input class="textBox" v-model="player.name" maxlength="24" type="text">
                     </div>
                     <div class="subCategory">
-                        <div class="inputTitle">Player color</div>
+                        <div class="permsPlayer">Player color</div>
                         <input type="color" v-model="player.color" class="colorPicker">
                     </div>
                 </div>
@@ -100,7 +100,7 @@
         border-color: transparent;
     }
 
-    .inputTitle{
+    .permsPlayer{
         color: #d9d9d9;
     }
 

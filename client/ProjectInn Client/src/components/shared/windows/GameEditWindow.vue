@@ -49,17 +49,17 @@
                 <div class="contentContainer">
                     <div class="editor">
                         <div class="subCategory" v-if=isNewGame>
-                            <div class="inputTitle">Game name</div>
+                            <div class="permsPlayer">Game name</div>
                             <input class="textBox" v-model="game.name" 
                             maxlength="24" type="text">
                         </div>
                         <div class="multiLineSubCategory">
                             <div class="section">
-                                <div class="inputTitle">Private game</div>
+                                <div class="permsPlayer">Private game</div>
                                 <input class="toggle" v-model="passwordEnabled" type="checkbox">
                             </div>
                             <div class="section">
-                                <div class="inputTitle">Password</div>
+                                <div class="permsPlayer">Password</div>
                                 <input 
                                 class="textBox" v-model="game.password" :disabled="!passwordEnabled"
                                  maxlength="24" type="text" title="sceneName" placeholder="Password">
@@ -161,7 +161,7 @@
         gap: 8px;
     }
 
-    .inputTitle{
+    .permsPlayer{
         color: #d9d9d9;
     }
 

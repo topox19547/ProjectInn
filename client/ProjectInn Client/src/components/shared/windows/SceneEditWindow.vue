@@ -59,11 +59,11 @@ import ButtonBase from '../ButtonBase.vue';
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="editor">
-                        <div class="inputTitle">Scene name</div>
+                        <div class="permsPlayer">Scene name</div>
                         <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text">
-                        <div class="inputTitle">Image URL</div>
+                        <div class="permsPlayer">Image URL</div>
                         <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text">
-                        <div class="inputTitle">Grid Type</div>
+                        <div class="permsPlayer">Grid Type</div>
                         <div class="gridTypeSelection">
                             <div class = "subCategory">
                                 <div class="subOption">Square</div>
@@ -74,9 +74,9 @@ import ButtonBase from '../ButtonBase.vue';
                                 <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" name="test">
                             </div>      
                         </div>
-                        <div class="inputTitle">Tile width (pixels)</div>
+                        <div class="permsPlayer">Tile width (pixels)</div>
                         <input class="textBox" type="number" v-model="tileSizeValue">
-                        <div class="inputTitle">Tile offset (pixels)</div>
+                        <div class="permsPlayer">Tile offset (pixels)</div>
                         <div class="subCategory">
                             <div class="subCategory">
                                 <div class="coordinateName">X</div>
@@ -158,7 +158,7 @@ import ButtonBase from '../ButtonBase.vue';
         width: 50%;
     }
 
-    .inputTitle{
+    .permsPlayer{
         padding-top: 16px;
         padding-left: 8px;
         padding-bottom: 4px;

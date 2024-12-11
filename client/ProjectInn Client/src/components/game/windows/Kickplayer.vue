@@ -18,7 +18,7 @@
         close : void
     }>();
     const props = defineProps<{
-        kickablePlayers : Array<Player>
+        kickablePlayers : Array<string>
         show : boolean
     }>();
     
@@ -50,10 +50,10 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="inputTitle">Player</div>
+                        <div class="permsPlayer">Player</div>
                         <select class="dropDown" v-model="toKick">
-                            <option :value="player.name" v-for="player in kickablePlayers">
-                                {{ player.name }}
+                            <option :value="player" v-for="player in kickablePlayers">
+                                {{ player }}
                             </option>
                         </select>
                     </div>
@@ -115,7 +115,7 @@
         border-color: transparent;
     }
 
-    .inputTitle{
+    .permsPlayer{
         color: #d9d9d9;
     }
 
@@ -132,7 +132,7 @@
         padding-top: 4px;
         padding-left: 4px;
         padding-bottom: 4px;
-
+        max-width: 200px;
     }
     
     .subOption{

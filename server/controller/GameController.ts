@@ -16,7 +16,7 @@ import { Lobby } from "../model/Lobby.js";
 import { Command } from "../model/messages/Command.js";
 import { Message } from "../model/messages/Message.js";
 import { Status } from "../model/messages/Status.js";
-import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean } from "../model/messages/Validators.js";
+import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean, ensureStringEnumLike } from "../model/messages/Validators.js";
 import { ClientHandler } from "./ClientHandler.js";
 import { ClientState } from "./ClientState.js";
 import { LobbyController } from "./LobbyController.js";
@@ -194,10 +194,11 @@ export class GameController implements ClientState{
                 case Status.PERMISSIONS : {
                     const content = ensureObject({
                         name : ensureString,
-                        permission : ensureEnumLike(Object.values(Permission).filter(v => typeof v == "number")),
+                        permission : ensureStringEnumLike(Object.values(Permission).filter(v => typeof v == "string")),
                         value : ensureBoolean
                     })(message.content);
-                    if(!this.clientPlayer.hasPermission(Permission.MASTER)){
+                    const permission = Permission[content.permission as keyof typeof Permission]
+                    if(!this.clientPlayer.hasPermission(Permission.MASTER) && !this.clientPlayer.isGameOwner()){
                         throw new PermissionError();
                     }
                     const playerToChange : Player | undefined = this.currentGame.getPlayer(content.name);
@@ -208,18 +209,18 @@ export class GameController implements ClientState{
                         throw new PermissionError();
                     }
                     if(!playerToChange.hasPermission(Permission.MASTER)){
-                        playerToChange.setPermission(content.permission, content.value);
+                        playerToChange.setPermission(permission, content.value);
                     } else if (this.clientPlayer.isGameOwner()){
-                        playerToChange.setPermission(content.permission, content.value);
+                        playerToChange.setPermission(permission, content.value);
                     } else {
                         throw new PermissionError();
                     }
                     if(!content.value == true){
                         return;
                     }
-                    if(content.permission == Permission.MANAGE_SCENES){
+                    if(permission == Permission.MANAGE_SCENES){
                         this.currentGame.updateClientScenes(playerToChange);
-                    } else if (content.permission == Permission.MANAGE_TOKENS){
+                    } else if (permission == Permission.MANAGE_TOKENS){
                         this.currentGame.updateClientTokenAssets(playerToChange);
                     }
                     break;

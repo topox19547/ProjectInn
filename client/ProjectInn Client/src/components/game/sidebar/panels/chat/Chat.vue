@@ -81,7 +81,7 @@ import { Command } from '../../../../../network/message/Command.js';
     .messageViewer{
         padding: 16px;
         display: block;
-        overflow-y: scroll;
+        overflow-y: auto;
         height: 100%;
     }
 

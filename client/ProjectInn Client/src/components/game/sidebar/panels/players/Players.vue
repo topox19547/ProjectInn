@@ -8,6 +8,7 @@
     import masterIcon from '../../../../../assets/icons/master.svg'
     import Kickplayer from '../../../windows/Kickplayer.vue';
     import { Permission } from '../../../../../model/Permission.js';
+import EditPermissions from '../../../windows/EditPermissions.vue';
 
     const showKickWindow = ref(false);
     const showPermissionsWindow = ref(false);
@@ -27,10 +28,19 @@
         }else{
             return [];
         }
-    }));
+    }).map(p => p.name));
     const canKickPlayers = computed(() => {
         return (props.localPlayer.permissions[Permission.MASTER] == true || props.localPlayer.isOwner) &&
         lowerPlayers.value.length > 0;
+    })
+    const playerPermissionsCopy = computed(() => {
+        const permissions : Record<string,Record<string,boolean>> = {}
+        props.players.forEach(p => {
+            const playerPerms = {};
+            Object.assign(playerPerms,p.permissions);
+            permissions[p.name] = playerPerms;
+        })
+        return permissions;
     })
 
 </script>
@@ -73,6 +83,7 @@
                 :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
                 v-if="canKickPlayers"></ButtonBase>
                 <ButtonBase
+                @click="showPermissionsWindow = true"
                 text="Edit permissions" 
                 :icon="editPermsIcon" 
                 :disable-shadow="true"
@@ -85,6 +96,12 @@
     <Kickplayer 
     :kickable-players="lowerPlayers" :show="showKickWindow" @close="showKickWindow = false">
     </Kickplayer>
+    <EditPermissions 
+    :editable-players="lowerPlayers" 
+    :show="showPermissionsWindow" 
+    :player-permissions-copy="playerPermissionsCopy"
+    @close="showPermissionsWindow = false">
+    </EditPermissions>
 </template>
 
 <style scoped>
@@ -118,6 +135,7 @@
         font-weight: 600;
         display: flex;
         justify-content: space-between;
+        overflow-wrap: anywhere;
     }
 
     .spacer{

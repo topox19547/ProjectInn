@@ -121,6 +121,9 @@ export class MessageHandler{
                     throw Error("Message refers to a token asset that doesn't exist");
                 }
                 player.permissions = content.permissions;
+                if(this.game.value.localPlayer.name == content.name){
+                    this.game.value.localPlayer.permissions = content.permissions;
+                }
                 break;
             }
             case Status.CHAT:{
