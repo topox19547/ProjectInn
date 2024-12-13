@@ -50,7 +50,7 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="permsPlayer">Player</div>
+                        <div class="inputTitle">Player</div>
                         <select class="dropDown" v-model="toKick">
                             <option :value="player" v-for="player in kickablePlayers">
                                 {{ player }}
@@ -115,7 +115,7 @@
         border-color: transparent;
     }
 
-    .permsPlayer{
+    .inputTitle{
         color: #d9d9d9;
     }
 

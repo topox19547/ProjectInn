@@ -15,7 +15,7 @@
 <style scoped>
   .tabButton{
         height: 100%;
-        width: 25%;
+        width: 64px;
         display: flex;
         justify-content: center;
         border-radius: 16px;

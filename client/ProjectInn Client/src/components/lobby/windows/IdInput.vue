@@ -39,7 +39,7 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="permsPlayer">Game id</div>
+                        <div class="inputTitle">Game id</div>
                         <input class="textBox" v-model="joinData.gameId" maxlength="24" type="number">
                     </div>
                 </div>
@@ -96,7 +96,7 @@
         border-color: transparent;
     }
 
-    .permsPlayer{
+    .inputTitle{
         color: #d9d9d9;
     }
 

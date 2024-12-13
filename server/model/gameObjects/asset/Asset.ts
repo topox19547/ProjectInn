@@ -38,7 +38,7 @@ export class Asset implements Identifiable,NotificationSource{
                 object.assetID,
                 object.name.slice(0,Asset.maxNameLength),
                 object.assetType);
-        asset.setURL(object.assetURL,asset.assetSize); //TODO: change isInUse depending on what we need here
+        asset.setURL(object.assetURL,new Vector2(object.assetSize.x, object.assetSize.y)); 
         return asset;
     }
 

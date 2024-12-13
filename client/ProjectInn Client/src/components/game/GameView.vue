@@ -6,6 +6,7 @@
     import Sidebar from './sidebar/Sidebar.vue';
     
     const currentTab = ref(SideBarTab.CHAT);
+    const previousTab = ref(SideBarTab.CHAT);
     const sidebarWidth = ref(400);
     const headerHeight = ref(64);
     const canvasSize = ref({ x : 0, y : 0});
@@ -23,6 +24,7 @@
     }
 
     function changeTab(tab : SideBarTab){
+        previousTab.value = currentTab.value;
         currentTab.value = tab;
     }
     
@@ -44,9 +46,11 @@
             <Sidebar
             :local-player="game.localPlayer"
             :current-tab="currentTab"
+            :previous-tab="previousTab"
             @tab-changed="changeTab"
             :players="game.players"
-            :chat="game.chat"></Sidebar>
+            :chat="game.chat"
+            :assets="game.tokenAssets"></Sidebar>
         </div>
     </div>
 </template>

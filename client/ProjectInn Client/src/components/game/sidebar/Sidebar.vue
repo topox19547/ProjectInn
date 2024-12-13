@@ -8,18 +8,23 @@
     import Chat from './panels/chat/Chat.vue';
     import type { Player } from '../../../model/Player.js';
     import type { ChatMessage } from '../../../model/ChatMessage.js';
-import Players from './panels/players/Players.vue';
+    import Players from './panels/players/Players.vue';
+    import Assets from './panels/assets/Assets.vue';
+import type { Asset } from '../../../model/Asset.js';
 
     const props = defineProps<{
         currentTab : SideBarTab,
+        previousTab : SideBarTab,
         localPlayer : Player,
         players : Array<Player>,
         chat : Array<ChatMessage>
+        assets : Array<Asset>
     }>();
 
     const emits = defineEmits<{
         (e : 'tabChanged', tab : SideBarTab) : void
     }>();
+
 </script>
 
 <template>
@@ -34,6 +39,7 @@ import Players from './panels/players/Players.vue';
             :id="1" :icon="PlayersIcon" 
             @click="$emit('tabChanged', 1)"></TabButton>
             <TabButton 
+            v-if="localPlayer.permissions.MANAGE_TOKENS == true"
             :is-active="currentTab == 2" 
             :id="2" :icon="AssetIcon" 
             @click="$emit('tabChanged', 2)"></TabButton>
@@ -47,6 +53,7 @@ import Players from './panels/players/Players.vue';
     <div class = "content">
         <Chat :chat="chat" v-if="currentTab == 0" :players="players"></Chat>
         <Players :local-player="localPlayer" :players="players" v-if="currentTab == 1"></Players>
+        <Assets :assets="assets" :local-player="localPlayer" v-if="currentTab == 2"></Assets>
     </div>
 </template>
 
@@ -67,7 +74,7 @@ import Players from './panels/players/Players.vue';
     }
     
     .tabs{
-        width: 45%;
+        width: fit-content;
         display: flex;
         flex-direction: row;
         margin-block: 12px;

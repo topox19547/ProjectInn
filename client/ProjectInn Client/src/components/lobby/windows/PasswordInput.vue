@@ -39,7 +39,7 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="subCategory">
-                        <div class="permsPlayer">Enter password</div>
+                        <div class="inputTitle">Enter password</div>
                         <input class="textBox" v-model="joinData.password" maxlength="24" type="text">
                     </div>
                 </div>
@@ -96,7 +96,7 @@
         border-color: transparent;
     }
 
-    .permsPlayer{
+    .inputTitle{
         color: #d9d9d9;
     }
 

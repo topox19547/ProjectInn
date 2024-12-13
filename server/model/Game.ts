@@ -231,10 +231,10 @@ export class Game implements NotificationSource{
     }
 
     public addTokenAsset(asset : Asset) : boolean{
-        if(this.tokenAssets.findIndex(a => a.getName() == asset.getName()) == -1){
+        if(this.tokenAssets.findIndex(a => a.getName() == asset.getName()) != -1){
             return false;
         }
-        this.tokenAssets.push(asset);
+        this.addToEntityArray(this.tokenAssets,asset);
         if(this.notifier !== undefined){
             asset.setNotifier(this.notifier);
         }
@@ -312,7 +312,7 @@ export class Game implements NotificationSource{
         if(this.scenes.find(s => s.getAsset().getName() == scene.getAsset().getName())){
             return false;
         }
-        this.scenes.push(scene);
+        this.addToEntityArray(this.scenes,scene);
         if(this.notifier !== undefined){
             scene.setNotifier(this.notifier);
         }

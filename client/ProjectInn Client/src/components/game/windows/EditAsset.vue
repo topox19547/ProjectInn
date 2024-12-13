@@ -1,15 +1,16 @@
 <script setup lang="ts">
     import type { Scene } from '../../../model/Scene.js';
-    import SceneIcon from '../../../assets/icons/scene.svg'
-    import WindowBase from '../WindowBase.vue';
-    import WindowTitleBar from '../WindowTitleBar.vue';
-    import CloseButton from '../CloseButton.vue';
+    import AssetIcon from '../../../assets/icons/assets.svg'
+    import WindowBase from '../../shared/WindowBase.vue';
+    import WindowTitleBar from '../../shared/WindowTitleBar.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
     import { ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../WindowBackground.vue';
+    import WindowBackground from '../../shared/WindowBackground.vue';
     import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
     import { AssetType } from '../../../model/AssetType.js';
     import { GridType } from '../../../model/GridType.js';
-import ButtonBase from '../ButtonBase.vue';
+    import ButtonBase from '../../shared/ButtonBase.vue';
+    import type { Asset } from '../../../model/Asset.js';
     const minTileSize = ref(10);
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);
@@ -19,27 +20,20 @@ import ButtonBase from '../ButtonBase.vue';
     }>();
     const props = defineProps<{
         title : string
+        actionText : string
         show : boolean
-        scene : Scene
+        asset : Asset
+        create : boolean
         onConfirm : () => void
     }>();
-    watch(tileSizeValue,(newValue) => {
-        if(newValue < minTileSize.value){
-            props.scene.tileSize = minTileSize.value;
-        } else if (newValue > maxTileSize.value){
-            props.scene.tileSize = maxTileSize.value;
-        } else {
-            props.scene.tileSize = newValue;
-        }
-    })
-    watch(props.scene.asset, (newValue, oldValue) => {
+
+    watch(props.asset, (newValue, oldValue) => {
         if(oldValue.assetURL != newValue.assetURL){
             confirmDisabled.value = true;
         }
     })
 
-    function enableConfirm(image : ImageBitmap){
-        props.scene.asset.assetSize = {x : image.width, y : image.height};
+    function enableConfirm() : void{
         confirmDisabled.value = false;
     }
 </script>
@@ -50,61 +44,30 @@ import ButtonBase from '../ButtonBase.vue';
         <WindowBackground  v-if="show" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="600px" window-width="700px"  v-if="show" >
+        <WindowBase window-height="400px" window-width="700px"  v-if="show" >
             <template v-slot:content>
-                <WindowTitleBar :title="title" :icon="SceneIcon">
+                <WindowTitleBar :title="title" :icon="AssetIcon">
                     <template v-slot:back>
                         <CloseButton @click="$emit('close')"></CloseButton>
                     </template>
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="editor">
-                        <div class="inputTitle">Scene name</div>
-                        <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text">
+                        <div class="inputTitle" v-if="create">Asset name</div>
+                        <input class="textBox" v-if="create" v-model="asset.name" maxlength="24" type="text">
                         <div class="inputTitle">Image URL</div>
-                        <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text">
-                        <div class="inputTitle">Grid Type</div>
-                        <div class="gridTypeSelection">
-                            <div class = "subCategory">
-                                <div class="subOption">Square</div>
-                                <input class="radioButton" :value="0" type="radio" v-model="scene.gridType" name="test">
-                            </div>
-                            <div class = "subCategory">
-                                <div class="subOption">Hexagonal</div>
-                                <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" name="test">
-                            </div>      
-                        </div>
-                        <div class="inputTitle">Tile width (pixels)</div>
-                        <input class="textBox" type="number" v-model="tileSizeValue">
-                        <div class="inputTitle">Tile offset (pixels)</div>
-                        <div class="subCategory">
-                            <div class="subCategory">
-                                <div class="coordinateName">X</div>
-                                <input class="textBox" v-model="scene.offset.x" type="number">
-                            </div>
-                            <div class="subCategory">
-                                <div class="coordinateName">Y</div>
-                                <input class="textBox" v-model="scene.offset.y" type="number">
-                            </div>
-                        </div>
-                       
+                        <input class="textBox" v-model="asset.assetURL" maxlength="2000" type="text">
                     </div>
                     <div class="preview">
                         <div>
-                            <BoardCanvas 
-                            :onLoadSuccess="(img : ImageBitmap) => enableConfirm(img)"
-                            rounded="16px" 
-                            :tokens="[]" 
-                            :token-assets="[]" 
-                            :current-scene="scene"
-                            :canvas-size="{ x : 256, y : 256}">
-                            </BoardCanvas>
+                            <img :src="asset.assetURL" width="128px" height="128px"
+                            @load="enableConfirm">
                             <div class="previewLabel">
-                                Interactive preview
+                                preview
                             </div>
                         </div>
                         <ButtonBase 
-                        text="Next" width="256px" height="42px" :disabled="confirmDisabled" @click="onConfirm">
+                        :text="actionText" width="256px" height="42px" :disabled="confirmDisabled" @click="onConfirm">
                         </ButtonBase>
                     </div>
                 </div>
@@ -123,7 +86,7 @@ import ButtonBase from '../ButtonBase.vue';
 
     .previewLabel{
         color: #d9d9d9;
-        padding-top: 8px;
+        padding: 8px;
         text-align: center;
     }
 
@@ -194,11 +157,14 @@ import ButtonBase from '../ButtonBase.vue';
         margin: auto;
         display: flex;
         flex-direction: column;
-        padding: 32px;
+        padding-inline: 32px;
+        padding-block: 16px;
         border-radius: 16px;
-        height: 400px;
+        gap: 16px;
+        box-sizing: border-box;
+        height: 100%;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
     }
 
     .background-enter-active,

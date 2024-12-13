@@ -2,7 +2,7 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-    import { inject, onMounted, onRenderTriggered, ref, vModelCheckbox, watch} from 'vue';
+    import { inject, onBeforeMount, onDeactivated, onMounted, onRenderTriggered, onUnmounted, onUpdated, ref, vModelCheckbox, watch} from 'vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
     import ButtonBase from '../../shared/ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
@@ -13,18 +13,19 @@
     import { Permission } from '../../../model/Permission.js';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
-    const toKick = ref("");
     const emits = defineEmits<{
         close : void
     }>();
     const props = defineProps<{
         editablePlayers : Array<string>
-        playerPermissionsCopy : Record<string,Record<string,boolean>>
+        players: Array<Player>
         show : boolean
     }>();
+    const permissionNames = new Map().set(Permission.MASTER, "DM")
+        .set(Permission.MANAGE_SCENES,"Manage Scenes")
+        .set(Permission.MANAGE_TOKENS,"Manage Tokens");
+    const permissionsCopy = ref(generatePermissionsCopy());
     let editedPermissions = generateBlankPermissions();
-
-
 
     function sendEditedPerms(){
         for(const entry of Object.entries(editedPermissions)){
@@ -43,18 +44,43 @@
         editedPermissions = generateBlankPermissions();
     }
 
-    function isCheckBoxDisabled(entry : string, key : string){
-        editedPermissions[entry[0]][key] = !entry[1][key as any]
+    function addToEdits(entry : [string, Record<string,boolean>], key : string){
+        const value : boolean = !entry[1][key];
+        const playerName : string = entry[0];
+        if(key == Permission.MASTER){
+            for(const perm in Permission){
+                permissionsCopy.value[playerName][perm] = value;
+                if(perm != Permission.MASTER){
+                    delete editedPermissions[playerName][perm]; //MASTER automatically grants all the other permissions
+                }
+            }
+        }
+        editedPermissions[playerName][key] = value;    
+        console.log(editedPermissions[playerName])
+    }
+
+    function generatePermissionsCopy() : Record<string,Record<string, boolean>>{
+        const permissions : Record<string,Record<string,boolean>> = {}
+        props.players.forEach(p => {
+            const playerPerms = {};
+            Object.assign(playerPerms,p.permissions);
+            permissions[p.name] = playerPerms;
+        })
+        return permissions;
     }
 
     function generateBlankPermissions() : Record<string,Record<string, boolean | undefined>>{
         const permissions : Record<string,Record<string,boolean | undefined>> = {}
-        for(const player of Object.keys(props.playerPermissionsCopy)){
+        for(const player of Object.keys(permissionsCopy.value)){
             permissions[player] = {}
         }
         return permissions;
     }
 
+    onUpdated(() => {
+        permissionsCopy.value = generatePermissionsCopy();
+        editedPermissions = generateBlankPermissions();
+    })
 </script>
 
 
@@ -63,11 +89,15 @@
         <WindowBackground  v-if="show" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="500px" window-width="700px"  v-if="show" >
+        <WindowBase window-height="500px" window-width="700px"  v-if="show">
             <template v-slot:content>
                 <WindowTitleBar title="Edit Permissions" :icon="editPermsIcon">
                     <template v-slot:back>
-                        <CloseButton @click="$emit('close')"></CloseButton>
+                        <CloseButton @click="() => {
+                            $emit('close')
+                            permissionsCopy = generatePermissionsCopy();
+                        }
+                        "></CloseButton>
                     </template>
                 </WindowTitleBar>
                 <div class="contentContainer">
@@ -76,18 +106,21 @@
                             <table class="permsTable">
                                 <tbody>
                                     <tr>
-                                        <th class="permsPlayer">Player</th>
+                                        <th class="inputTitle">Player</th>
                                         <th 
                                         class="permsPermission" 
-                                        v-for="key in Object.keys(Permission)">{{ key }}</th>
+                                        v-for="key in Object.keys(Permission)">{{ permissionNames.get(key) }}</th>
                                     </tr>
-                                    <tr class="playerPermissions" v-for="entry of Object.entries(playerPermissionsCopy)">
+                                    <tr class="playerPermissions" v-for="entry of Object.entries(permissionsCopy)">
                                         <td class="permsEntry">{{ entry[0] }}</td>
                                         <td class="permsEntry" v-for="key in Object.keys(Permission)">
                                             <input type="checkbox" 
-                                            :disabled="!editablePlayers.some(p => p == entry[0])"
+                                            :disabled="
+                                                !props.editablePlayers.includes(entry[0]) || 
+                                                (key != Permission.MASTER && 
+                                                permissionsCopy[entry[0]][Permission.MASTER] == true) " 
                                             v-model="entry[1][key]" 
-                                            @click="editedPermissions[entry[0]][key] = !entry[1][key]"
+                                            @click="() => addToEdits(entry,key)"
                                             class="checkbox">
                                         </td>
                                     </tr>
@@ -153,7 +186,7 @@
         border-color: transparent;
     }
 
-    .permsPlayer{
+    .inputTitle{
         color: #d9d9d9;
         height: 32px;
         text-align: left;
@@ -184,6 +217,8 @@
         background-color: #353535;
         accent-color:#303F9F;
         width: 100%;
+        padding: 0px;
+        margin: 0px;
     }
 
     .permsEntry{

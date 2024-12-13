@@ -8,7 +8,7 @@
     import masterIcon from '../../../../../assets/icons/master.svg'
     import Kickplayer from '../../../windows/Kickplayer.vue';
     import { Permission } from '../../../../../model/Permission.js';
-import EditPermissions from '../../../windows/EditPermissions.vue';
+    import EditPermissions from '../../../windows/EditPermissions.vue';
 
     const showKickWindow = ref(false);
     const showPermissionsWindow = ref(false);
@@ -32,15 +32,6 @@ import EditPermissions from '../../../windows/EditPermissions.vue';
     const canKickPlayers = computed(() => {
         return (props.localPlayer.permissions[Permission.MASTER] == true || props.localPlayer.isOwner) &&
         lowerPlayers.value.length > 0;
-    })
-    const playerPermissionsCopy = computed(() => {
-        const permissions : Record<string,Record<string,boolean>> = {}
-        props.players.forEach(p => {
-            const playerPerms = {};
-            Object.assign(playerPerms,p.permissions);
-            permissions[p.name] = playerPerms;
-        })
-        return permissions;
     })
 
 </script>
@@ -70,12 +61,13 @@ import EditPermissions from '../../../windows/EditPermissions.vue';
                         {{ player.name }}
                     </div>
                     <img :src="ownerIcon" v-if="player.isOwner" width="24px">
+                    <img :src="masterIcon" v-else-if="player.permissions[Permission.MASTER]" width="24px">
                 </div>
             </div>
             <div class="buttonBar">
                 <ButtonBase
                 @click="showKickWindow = true"
-                text="Kick user" 
+                text="Kick player" 
                 :icon="kickIcon" 
                 :disable-shadow="true"
                 width="100%" 
@@ -99,7 +91,7 @@ import EditPermissions from '../../../windows/EditPermissions.vue';
     <EditPermissions 
     :editable-players="lowerPlayers" 
     :show="showPermissionsWindow" 
-    :player-permissions-copy="playerPermissionsCopy"
+    :players="players"
     @close="showPermissionsWindow = false">
     </EditPermissions>
 </template>
@@ -118,7 +110,7 @@ import EditPermissions from '../../../windows/EditPermissions.vue';
     .playerList{
         padding: 16px;
         display: block;
-        overflow-y: scroll;
+        overflow-y: auto;
         height: 100%;
     }
 
