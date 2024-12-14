@@ -91,13 +91,13 @@ export class MessageHandler{
             case Status.ASSET_URL:
             case Status.ASSET_SIZE:{
                 let asset : any;
-                if(content.assetType == AssetType.SCENE){
+                if(content.type == AssetType.SCENE){
                     const scene = this.game.value.scenes.find(s => s.asset.assetID == content.id);
                     if (scene === undefined){
                         throw Error("Message refers to a scene asset that doesn't exist");
                     }
                     asset = scene.asset;
-                } else if (content.assetType == AssetType.TOKEN){
+                } else if (content.type == AssetType.TOKEN){
                     asset = this.game.value.tokenAssets.find(a => a.assetID == content.id);
                     if(asset == undefined){
                         throw Error("Message refers to a token asset that doesn't exist");

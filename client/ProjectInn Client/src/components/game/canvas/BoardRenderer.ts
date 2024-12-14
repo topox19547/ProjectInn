@@ -49,7 +49,6 @@ export class BoardRenderer{
         this.background = undefined;
         this.backgroundSource = undefined;
         this.spriteCache = new Map();
-        this.setMap("placeholders/background_placeholder.png",this.grid)
         canvas.addEventListener("mousedown",() => this.isMouseDown = true);
         canvas.addEventListener("mouseup", () => this.isMouseDown = false);
         canvas.addEventListener("mouseleave",() => {
@@ -90,6 +89,7 @@ export class BoardRenderer{
         this.backgroundSource = url;
         image.addEventListener("load",() =>{
             createImageBitmap(image).then((bg) => {
+                console.log(image)
                 this.background = bg;
                 this.renderView();
                 this.resetScale();
@@ -99,7 +99,12 @@ export class BoardRenderer{
                 if(onSuccess !== undefined){
                     onSuccess(bg);
                 }
-            }).catch(onFail);
+            }).catch(() => {
+                if(onFail){
+                    onFail();
+                }
+                this.setMap("placeholders/background_placeholder.png",this.grid)
+             });
         })
     }
 
@@ -145,7 +150,7 @@ export class BoardRenderer{
         const tokenOffset : Vector2 = this.grid.getTokenOffset(this.viewScale);
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
-            const vectorPosition = new Vector2(token.position.coordinates.x,token.position.coordinates.y);
+            const vectorPosition = new Vector2(token.position.x,token.position.y);
             const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
             if(spriteData === undefined || spriteData.sprite === undefined){
                 this.ctx.fillStyle = this.placeHolderSpriteColor;

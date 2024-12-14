@@ -16,10 +16,12 @@
 import { Status } from '../../../../../network/message/Status.js';
 import { Command } from '../../../../../network/message/Command.js';
 import AssetCard from './AssetCard.vue';
+import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const showEditAssetWindow = ref(false);
     const showCreateAssetWindow = ref(false);
+    const showDeleteAssetWindow = ref(false);
 
     const props = defineProps<{
         assets : Array<Asset>
@@ -27,6 +29,9 @@ import AssetCard from './AssetCard.vue';
     }>();
 
     const newAsset = ref<Asset>(createEmptyAsset());
+    const deletingAsset = ref<Asset>(createEmptyAsset());
+    let editingAsset : Asset = createEmptyAsset();
+    const editableAsset = ref<Asset>(createEmptyAsset());
 
     function createEmptyAsset(){
         return {
@@ -47,6 +52,54 @@ import AssetCard from './AssetCard.vue';
         newAsset.value = createEmptyAsset();
     }
 
+    function editAsset(asset : Asset){
+        editingAsset = asset;
+        editableAsset.value = Object.assign({},asset); //Create an editable copy
+        showEditAssetWindow.value = true
+    }
+
+    function deleteAsset(asset : Asset){
+        deletingAsset.value = asset;
+        showDeleteAssetWindow.value = true
+    }
+
+    function sendEditedAsset(){
+        if(editableAsset.value.assetURL != editingAsset.assetURL){
+            serverPublisher.send({
+                status: Status.ASSET_URL,
+                command : Command.MODIFY,
+                content : {
+                    id : editableAsset.value.assetID,
+                    type : editableAsset.value.assetType,
+                    url : editableAsset.value.assetURL,
+                    size : editableAsset.value.assetSize
+                }
+            })
+        }
+        if(editableAsset.value.name != editingAsset.name){
+            serverPublisher.send({
+                status: Status.ASSET_NAME,
+                command : Command.MODIFY,
+                content : {
+                    id : editableAsset.value.assetID,
+                    type : editableAsset.value.assetType,
+                    name : editableAsset.value.name
+                }
+            })
+        }   
+       
+    }
+
+    function sendDeletedAsset(){
+        serverPublisher.send({
+            status : Status.TOKEN_ASSET,
+            command : Command.DELETE,
+            content : {
+                id : deletingAsset.value.assetID
+            }
+        })
+    }
+
 </script>
 
 <template>
@@ -54,7 +107,9 @@ import AssetCard from './AssetCard.vue';
         <div class="container">
             <div class="assetList">
                 <div class="assets">
-                    <AssetCard :asset="asset" v-for="asset in assets"></AssetCard>
+                    <AssetCard :asset="asset" v-for="asset in assets" 
+                    @edit-asset="editAsset"
+                    @delete-asset="deleteAsset"></AssetCard>
                 </div>
             </div>
             <div class="buttonBar">
@@ -72,12 +127,24 @@ import AssetCard from './AssetCard.vue';
     title="Create Asset"
     action-text="Create"
     :asset="newAsset"
-    :create="true"
     :show="showCreateAssetWindow"
     @close="showCreateAssetWindow = false"
-    :on-confirm="sendNewAsset"
-    >
+    :on-confirm="sendNewAsset">
     </EditAsset>
+    <EditAsset
+    title="Edit Asset"
+    action-text="Save"
+    :asset="editableAsset"
+    :show="showEditAssetWindow"
+    @close="showEditAssetWindow= false"
+    :on-confirm="sendEditedAsset">
+    </EditAsset>
+    <ConfirmDelete
+    message="Are you sure? This will also delete every token that uses this asset."
+    :show="showDeleteAssetWindow"
+    @close="showDeleteAssetWindow = false"
+    :on-confirm="sendDeletedAsset">
+    </ConfirmDelete>
 </template>
 
 <style scoped>
@@ -91,8 +158,9 @@ import AssetCard from './AssetCard.vue';
     }
 
     .assetList{
-        padding-block: 16px;
+        padding-top: 16px;
         padding-inline: 8px;
+        margin-bottom: -8px;
         display: block;
         overflow-y: auto;
         height: 100%;
@@ -119,11 +187,13 @@ import AssetCard from './AssetCard.vue';
     }
 
     .assets{
+        width: 348px;
         display: flex;
         flex-wrap: wrap;
+        padding-bottom: 24px;
         row-gap: 8px;
         justify-content: start;
-        margin-left: 16px;
+        margin: auto;
 
     }
 
@@ -136,6 +206,7 @@ import AssetCard from './AssetCard.vue';
         align-items: center;
         height: 128px;
         flex : 1;
+        z-index: 1;
     }
 
     .textBox{
@@ -157,6 +228,7 @@ import AssetCard from './AssetCard.vue';
 
     .margin{
         padding-bottom: 16px;
+        padding-inline: 16px;
         overflow: hidden;
         height: 100%;
     }

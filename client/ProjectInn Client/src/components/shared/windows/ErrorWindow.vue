@@ -22,7 +22,6 @@ import WindowBase from '../WindowBase.vue';
             </div>
         </template>
     </WindowBase>
-    
 </template>
 
 <style scoped>

@@ -9,7 +9,8 @@
     import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
     import { AssetType } from '../../../model/AssetType.js';
     import { GridType } from '../../../model/GridType.js';
-import ButtonBase from '../ButtonBase.vue';
+    import ButtonBase from '../ButtonBase.vue';
+    import UploadHelp from '../UploadHelp.vue';
     const minTileSize = ref(10);
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);
@@ -61,7 +62,12 @@ import ButtonBase from '../ButtonBase.vue';
                     <div class="editor">
                         <div class="inputTitle">Scene name</div>
                         <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text">
-                        <div class="inputTitle">Image URL</div>
+                        <div class="titleWithHelp">
+                            <div class="inputTitle">
+                                Image URL
+                            </div>
+                            <UploadHelp></UploadHelp>
+                        </div>
                         <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text">
                         <div class="inputTitle">Grid Type</div>
                         <div class="gridTypeSelection">
@@ -114,6 +120,10 @@ import ButtonBase from '../ButtonBase.vue';
 </template>
 
 <style scoped>
+
+    .titleWithHelp{
+        display: flex;
+    }
 
     .subCategory{
         display: flex;

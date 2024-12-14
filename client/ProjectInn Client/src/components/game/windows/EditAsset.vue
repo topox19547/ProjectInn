@@ -11,6 +11,7 @@
     import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../../shared/ButtonBase.vue';
     import type { Asset } from '../../../model/Asset.js';
+    import UploadHelp from '../../shared/UploadHelp.vue';
     const minTileSize = ref(10);
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);
@@ -23,7 +24,6 @@
         actionText : string
         show : boolean
         asset : Asset
-        create : boolean
         onConfirm : () => void
     }>();
 
@@ -35,6 +35,11 @@
 
     function enableConfirm() : void{
         confirmDisabled.value = false;
+    }
+
+    function confirm() : void{
+        confirmDisabled.value = true;
+        props.onConfirm();
     }
 </script>
 
@@ -53,9 +58,14 @@
                 </WindowTitleBar>
                 <div class="contentContainer">
                     <div class="editor">
-                        <div class="inputTitle" v-if="create">Asset name</div>
-                        <input class="textBox" v-if="create" v-model="asset.name" maxlength="24" type="text">
-                        <div class="inputTitle">Image URL</div>
+                        <div class="inputTitle">Asset name</div>
+                        <input class="textBox" v-model="asset.name" maxlength="24" type="text">
+                        <div class="titleWithHelp">
+                            <div class="inputTitle">
+                                Image URL
+                            </div>
+                            <UploadHelp></UploadHelp>
+                        </div>
                         <input class="textBox" v-model="asset.assetURL" maxlength="2000" type="text">
                     </div>
                     <div class="preview">
@@ -67,7 +77,11 @@
                             </div>
                         </div>
                         <ButtonBase 
-                        :text="actionText" width="256px" height="42px" :disabled="confirmDisabled" @click="onConfirm">
+                        :text="actionText" width="256px" height="42px" :disabled="confirmDisabled" 
+                        @click="() => {
+                            $emit('close');
+                            confirm();
+                        }">
                         </ButtonBase>
                     </div>
                 </div>
@@ -77,6 +91,9 @@
 </template>
 
 <style scoped>
+    .titleWithHelp{
+        display: flex;
+    }
 
     .subCategory{
         display: flex;

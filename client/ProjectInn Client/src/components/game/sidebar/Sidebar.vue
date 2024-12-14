@@ -63,7 +63,7 @@ import type { Asset } from '../../../model/Asset.js';
         display: flex;
         flex-direction: column;
         width: 100%;
-        height: 100%;
+        height: calc(100% - 64px);
         overflow-y: hidden;
     }
 

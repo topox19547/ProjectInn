@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import type { Asset } from '../../../../../model/Asset.js';
     import editIcon from '../../../../../assets/icons/edit.svg';
+    import deleteIcon from '../../../../../assets/icons/delete.svg'
+    import errorImage from '../../../../../../public/placeholders/token_placeholder.png'
     import { ref } from 'vue';
 
     const hoveredOn = ref(false);
@@ -11,65 +13,97 @@
 
     const emits = defineEmits<{
         (e : 'editAsset', asset : Asset) : void
+        (e : 'deleteAsset', asset : Asset) : void
     }>();
 </script>
 
 <template>
-    <div class="container" 
+    <div class="card" 
     @mouseenter="hoveredOn = true" 
     @mouseleave="hoveredOn = false">
         <div class="hoverButton">
-            <img class="editButton" 
+            <img class="miniButton editButton" 
             :src="editIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
             @click="$emit('editAsset',asset)">
         </div>
-        <img :src="asset.assetURL" class="tokenSprite">
-        <div class="tokenName">{{ asset.name }}</div>
+        <div class="hoverButton">
+            <img class="miniButton deleteButton" 
+            :src="deleteIcon" 
+            :style="{opacity : hoveredOn ? 1 : 0}" 
+            @click="$emit('deleteAsset',asset)">
+        </div>
+        <img :src="asset.assetURL" @error="(e : any) => e.target.src = errorImage" class="tokenSprite">
+        <div class="centered">
+            <div class="tokenName">{{ asset.name }}</div>
+        </div>
     </div>
 </template>
 
 <style scoped>
-    .container{
+    .centered{
+        max-height: 25%;
+        margin: auto;
+        overflow-wrap: anywhere;
+        overflow: hidden;
+        display: block;
+    }
+
+    .card{
         position: relative;
         display: flex;
         flex-direction: column;
         background-color: #555555;
         border-radius: 16px;
-        height: 140px;
-        width: 100px;
+        height: 150px;
+        width: 100px;   
         margin: 8px;
         justify-content: space-between;
         align-items: center;
     }
 
     .tokenName{
-        height: 20%;
-        font-size: 16px;
+        max-height: 20%;
+        max-width: 90px;
+        font-size: 14px;
         font-weight: bold;
         color: #d9d9d9;
         padding-bottom:16px;
+        text-align: center;
+        text-overflow: ellipsis;
     }
 
     .tokenSprite{
         border-style: none;
         margin: 12px;
-        width: 84px;
-        height: 84px;
+        width: 80px;
+        height: 80px;
         border-radius: 16px;
+    }
+
+    .miniButton{
+        transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
+        transition-duration: 0.3s;
+        border-radius: 8px;
+        background-color: #000000b4;
+        padding: 2px;
+        backdrop-filter: blur(4px);
     }
 
     .editButton{
         position: absolute;
         top:16px;
         right:16px;
-        transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
-        transition-duration: 0.3s;
-        border-radius: 16px;
+    }
+
+    .deleteButton{
+        position: absolute;
+        top:16px;
+        left:16px;
     }
 
     .hoverButton:hover{
-        opacity: 0.5;
+        opacity: 0.75;
         transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
         transition-duration: 0.3s;
     }
