@@ -61,7 +61,7 @@ export class Game implements NotificationSource{
         this.maxTokens = Number.MAX_SAFE_INTEGER;
         this.maxTokenAssets = Number.MAX_SAFE_INTEGER;
         this.maxScenes = Number.MAX_SAFE_INTEGER;
-        this.scenes.concat(this.currentScene);
+        this.scenes.push(this.currentScene);
         this.endCallback = () => {};
     }
 
@@ -210,10 +210,15 @@ export class Game implements NotificationSource{
             return false;
         }
         this.players.splice(playerIndex, 1);
+        let messageText : string = `${player.getName()} has been kicked`;
+        if(this.password !== undefined){
+            messageText += " and the game's password has been randomized";
+            this.setPassword(this.generateRandomPassword(8));
+        }
         this.chat.handleMessage({
             sender: "ProjectInn",
             isSystem: true,
-            text: `${player.getName()} has been kicked`
+            text: messageText
         })
         this.notifier?.notify({
             status : Status.PLAYER,
@@ -460,6 +465,15 @@ export class Game implements NotificationSource{
         }
         array.push(object);
         object.setID(prevId + 1)
+    }
+
+    private generateRandomPassword(length : number){
+        const characters : string = "abcdefghijklmnopqrstuvwxyz0123456789";
+        let password : string = "";
+        for(let i = 0; i < length; i++){
+            password += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return password;
     }
 
     //TODO:ID MUST BE PRESERVED ACROSS SESSIONS, SO ADDTOKEN CAN'T ASSIGN IDs INDEPENDENTLY

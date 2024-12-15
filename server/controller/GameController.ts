@@ -243,6 +243,18 @@ export class GameController implements ClientState{
                         if(!this.currentGame.removeScene(content.id)){
                             throw new ValueError("Could not remove scene");
                         }
+                    } else if(message.command == Command.MODIFY){
+                        const content = Scene.validate(message.content);
+                        const scene : Scene = this.getSceneIfAuthorized(content.asset.assetID);
+                        scene.setGridType(content.gridType);
+                        scene.setOffset(new Vector2(content.offset.x,content.offset.y));
+                        scene.setTileSize(content.tileSize);
+                        const asset : Asset = scene.getAsset();
+                        const assetSize : Vector2 = new Vector2(
+                            content.asset.assetSize.x,
+                            content.asset.assetSize.y);
+                        asset.setName(content.asset.name);
+                        asset.setURL(content.asset.assetURL, assetSize);
                     }
                     break;
                 }
@@ -256,33 +268,6 @@ export class GameController implements ClientState{
                     if(!this.currentGame.changeScene(content.id)){
                         throw new ValueError("No scene exists with this ID");
                     }
-                    break;
-                }
-                case Status.SCENE_GRIDTYPE : {
-                    const content = ensureObject({
-                        gridType : ensureEnumLike(Object.values(GridType).filter(v => typeof v == "number")),
-                        id : ensureNumber
-                    })(message.content);
-                    const scene : Scene = this.getSceneIfAuthorized(content.id);
-                    scene.setGridType(content.gridType);
-                    break;
-                }
-                case Status.SCENE_OFFSET : {
-                    const content = ensureObject({
-                        offset : Vector2.validate,
-                        id : ensureNumber
-                    })(message.content);
-                    const scene : Scene = this.getSceneIfAuthorized(content.id);
-                    scene.setOffset(new Vector2(content.offset.x, content.offset.y));
-                    break;
-                }
-                case Status.SCENE_TILESIZE : {
-                    const content = ensureObject({
-                        tileSize : ensureNumber,
-                        id : ensureNumber
-                    })(message.content);
-                    const scene : Scene = this.getSceneIfAuthorized(content.id);
-                    scene.setTileSize(content.tileSize);
                     break;
                 }
                 case Status.TOKEN_ASSET : {
@@ -305,31 +290,15 @@ export class GameController implements ClientState{
                         if(!this.currentGame.removeTokenAsset(content.id)){
                             throw new ValueError("No token asset exists with this ID")
                         }
-                    }
-                    break;
-                }
-                case Status.ASSET_NAME : {
-                    const content = ensureObject({
-                        name : ensureString,
-                        id : ensureNumber,
-                        type : ensureEnumLike(Object.values(AssetType).filter(v => typeof v == "number"))
-                    })(message.content);
-                    const asset : Asset = this.getAssetIfAuthorized(content.id, content.type);
-                    if(!asset.setName(content.name)){
-                        throw new ValueError("The supplied name is too long")
-                    }
-                    break;
-                }
-                case Status.ASSET_URL : {
-                    const content = ensureObject({
-                        url : ensureString,
-                        size : Vector2.validate,
-                        id : ensureNumber,
-                        type : ensureEnumLike(Object.values(AssetType).filter(v => typeof v == "number"))
-                    })(message.content);
-                    const asset : Asset = this.getAssetIfAuthorized(content.id, content.type);
-                    if(!asset.setURL(content.url, new Vector2(content.size.x, content.size.y))){
-                        throw new ValueError("The given url is too long")
+                    } else if (message.command == Command.MODIFY){
+                        const content = Asset.validate(message.content);
+                        const asset : Asset = this.getAssetIfAuthorized(content.assetID, AssetType.TOKEN);
+                        if(!asset.setName(content.name)){
+                            throw new ValueError("The supplied name is too long");
+                        }
+                        if(!asset.setURL(content.assetURL, new Vector2(content.assetSize.x, content.assetSize.y))){
+                            throw new ValueError("The given url is too long")
+                        }
                     }
                     break;
                 }

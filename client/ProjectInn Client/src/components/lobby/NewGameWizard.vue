@@ -9,6 +9,7 @@
     import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
     import GameEditWindow from '../shared/windows/GameEditWindow.vue';
+    import { getStartingSceneData } from '../../model/Scene.js';
     const props = defineProps<{
         showWizard : boolean
     }>();
@@ -30,18 +31,7 @@
                     connected : false,
                     isOwner : false
             },
-            currentScene : {
-                asset : {
-                    name : "starting scene",
-                    assetID : 0,
-                    assetType : AssetType.SCENE,
-                    assetSize : {x : 0, y : 0},
-                    assetURL : undefined
-                },
-                tileSize : 25,
-                gridType : GridType.SQUARE,
-                offset : {x : 0, y : 0}
-            },
+            currentScene : getStartingSceneData(),
             password : undefined
         }
     }

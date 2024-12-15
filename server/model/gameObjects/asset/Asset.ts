@@ -87,8 +87,8 @@ export class Asset implements Identifiable,NotificationSource{
                 status : Status.ASSET_NAME,
                 command : Command.MODIFY,
                 content : {
-                    id : this.assetID,
-                    type : this.assetType,
+                    assetID : this.assetID,
+                    assetType : this.assetType,
                     name : this.name
                 }
             }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
@@ -107,9 +107,9 @@ export class Asset implements Identifiable,NotificationSource{
             status : Status.ASSET_URL,
             command : Command.MODIFY,
             content : {
-                id : this.assetID,
-                type : this.assetType,
-                url : this.assetURL
+                assetID : this.assetID,
+                assetType : this.assetType,
+                assetURL : this.assetURL
             }
         }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement));
         return true;

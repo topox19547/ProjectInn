@@ -4,6 +4,7 @@
     import type { Game } from '../../model/Game.js';
     import { SideBarTab } from './sidebar/sidebarTab.js';
     import Sidebar from './sidebar/Sidebar.vue';
+import Topbar from './topbar/Topbar.vue';
     
     const currentTab = ref(SideBarTab.CHAT);
     const previousTab = ref(SideBarTab.CHAT);
@@ -34,7 +35,12 @@
 <template>
     <div class="background">
         <div class="mainContent">
-            <div class="topbar" :style="{ height : headerHeight + 'px' }"> test </div>
+            <div class="topbar" :style="{ height : headerHeight + 'px' }">
+                <Topbar 
+                :local-player="game.localPlayer" 
+                :current-scene="game.currentScene" 
+                :scenes="game.scenes"></Topbar>
+            </div>
             <BoardCanvas 
             :tokens="game.tokens" 
             :token-assets="game.tokenAssets" 

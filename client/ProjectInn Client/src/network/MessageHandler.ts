@@ -91,14 +91,14 @@ export class MessageHandler{
             case Status.ASSET_URL:
             case Status.ASSET_SIZE:{
                 let asset : any;
-                if(content.type == AssetType.SCENE){
-                    const scene = this.game.value.scenes.find(s => s.asset.assetID == content.id);
+                if(content.assetType == AssetType.SCENE){
+                    const scene = this.game.value.scenes.find(s => s.asset.assetID == content.assetID);
                     if (scene === undefined){
                         throw Error("Message refers to a scene asset that doesn't exist");
                     }
                     asset = scene.asset;
-                } else if (content.type == AssetType.TOKEN){
-                    asset = this.game.value.tokenAssets.find(a => a.assetID == content.id);
+                } else if (content.assetType == AssetType.TOKEN){
+                    asset = this.game.value.tokenAssets.find(a => a.assetID == content.assetID);
                     if(asset == undefined){
                         throw Error("Message refers to a token asset that doesn't exist");
                     }
@@ -130,6 +130,9 @@ export class MessageHandler{
                 content.receivedAt = new Date()
                 this.game.value.chat.push(content);
                 break;
+            }
+            case Status.PASSWORD_CHANGE:{
+                this.game.value.password = content.password;
             }
             case Status.CLIENT_STATUS:{
                 const index : number = this.game.value.players.findIndex(p => p.name == content.name);

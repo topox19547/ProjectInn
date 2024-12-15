@@ -1,14 +1,15 @@
 <script setup lang="ts">
-    import type { Asset } from '../../../../../model/Asset.js';
-    import editIcon from '../../../../../assets/icons/edit.svg';
-    import deleteIcon from '../../../../../assets/icons/delete.svg'
-    import errorImage from '../../../../../../public/placeholders/token_placeholder.png'
+    import type { Asset } from '../../../model/Asset.js';
+    import editIcon from '../../../assets/icons/edit.svg';
+    import deleteIcon from '../../../assets/icons/delete.svg'
+    import ErrorImage from '../../../assets/placeholders/token_placeholder.png';
     import { ref } from 'vue';
 
     const hoveredOn = ref(false);
 
     const props = defineProps<{
         asset : Asset,
+        showDelete? : boolean
     }>();
 
     const emits = defineEmits<{
@@ -27,13 +28,13 @@
             :style="{opacity : hoveredOn ? 1 : 0}" 
             @click="$emit('editAsset',asset)">
         </div>
-        <div class="hoverButton">
+        <div class="hoverButton" v-if="showDelete === undefined || showDelete == true">
             <img class="miniButton deleteButton" 
             :src="deleteIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
             @click="$emit('deleteAsset',asset)">
         </div>
-        <img :src="asset.assetURL" @error="(e : any) => e.target.src = errorImage" class="tokenSprite">
+        <img :src="asset.assetURL" @error="(e : any) => e.target.src = ErrorImage" class="tokenSprite">
         <div class="centered">
             <div class="tokenName">{{ asset.name }}</div>
         </div>

@@ -12,10 +12,12 @@
     import ButtonBase from '../../shared/ButtonBase.vue';
     import type { Asset } from '../../../model/Asset.js';
     import UploadHelp from '../../shared/UploadHelp.vue';
+    import ErrorImage from '../../../assets/placeholders/token_placeholder.png';
     const minTileSize = ref(10);
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);
     const confirmDisabled = ref(true);
+    const errorOccurred = ref(false);
     const emits = defineEmits<{
         close : void
     }>();
@@ -27,14 +29,21 @@
         onConfirm : () => void
     }>();
 
-    watch(props.asset, (newValue, oldValue) => {
-        if(oldValue.assetURL != newValue.assetURL){
-            confirmDisabled.value = true;
-        }
-    })
-
     function enableConfirm() : void{
         confirmDisabled.value = false;
+    }
+
+    function onLoadError(e : any) : void{
+        confirmDisabled.value = true;
+        errorOccurred.value = true;
+        e.target.src = ErrorImage;
+    }
+    
+    function onLoadSuccess(e : any) : void{
+        if(!errorOccurred.value){
+            enableConfirm(); 
+        }
+        errorOccurred.value = false
     }
 
     function confirm() : void{
@@ -70,8 +79,9 @@
                     </div>
                     <div class="preview">
                         <div>
-                            <img :src="asset.assetURL" width="128px" height="128px"
-                            @load="enableConfirm">
+                            <img :src="asset.assetURL" @error="onLoadError" 
+                            width="128px" height="128px"
+                            @load="onLoadSuccess">
                             <div class="previewLabel">
                                 preview
                             </div>

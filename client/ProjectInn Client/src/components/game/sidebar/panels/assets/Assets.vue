@@ -13,10 +13,10 @@
     import EditAsset from '../../../windows/EditAsset.vue';
     import { AssetType } from '../../../../../model/AssetType.js';
     import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
-import { Status } from '../../../../../network/message/Status.js';
-import { Command } from '../../../../../network/message/Command.js';
-import AssetCard from './AssetCard.vue';
-import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
+    import { Status } from '../../../../../network/message/Status.js';
+    import { Command } from '../../../../../network/message/Command.js';
+    import AssetCard from '../../../shared/AssetCard.vue';
+    import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const showEditAssetWindow = ref(false);
@@ -32,6 +32,7 @@ import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
     const deletingAsset = ref<Asset>(createEmptyAsset());
     let editingAsset : Asset = createEmptyAsset();
     const editableAsset = ref<Asset>(createEmptyAsset());
+    const canDelete = computed(() => props.assets.length > 1);
 
     function createEmptyAsset(){
         return {
@@ -64,30 +65,12 @@ import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
     }
 
     function sendEditedAsset(){
-        if(editableAsset.value.assetURL != editingAsset.assetURL){
-            serverPublisher.send({
-                status: Status.ASSET_URL,
-                command : Command.MODIFY,
-                content : {
-                    id : editableAsset.value.assetID,
-                    type : editableAsset.value.assetType,
-                    url : editableAsset.value.assetURL,
-                    size : editableAsset.value.assetSize
-                }
-            })
-        }
-        if(editableAsset.value.name != editingAsset.name){
-            serverPublisher.send({
-                status: Status.ASSET_NAME,
-                command : Command.MODIFY,
-                content : {
-                    id : editableAsset.value.assetID,
-                    type : editableAsset.value.assetType,
-                    name : editableAsset.value.name
-                }
-            })
-        }   
-       
+        console.log(editableAsset.value);
+        serverPublisher.send({
+            status: Status.TOKEN_ASSET,
+            command : Command.MODIFY,
+            content : editableAsset.value
+        });
     }
 
     function sendDeletedAsset(){
@@ -107,7 +90,8 @@ import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
         <div class="container">
             <div class="assetList">
                 <div class="assets">
-                    <AssetCard :asset="asset" v-for="asset in assets" 
+                    <AssetCard :asset="asset" v-for="asset in assets"
+                    :show-delete="canDelete"
                     @edit-asset="editAsset"
                     @delete-asset="deleteAsset"></AssetCard>
                 </div>
@@ -160,7 +144,6 @@ import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
     .assetList{
         padding-top: 16px;
         padding-inline: 8px;
-        margin-bottom: -8px;
         display: block;
         overflow-y: auto;
         height: 100%;
@@ -202,11 +185,11 @@ import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
         flex-direction: column;
         padding-inline: 16px;
         padding-bottom: 16px;
+        padding-top:8px;
         gap: 0px;
         align-items: center;
         height: 128px;
         flex : 1;
-        z-index: 1;
     }
 
     .textBox{
