@@ -23,11 +23,14 @@ import ButtonBase from './ButtonBase.vue';
                         <div class="message">
                             ProjectInn doesn't host the actual images so you'll need to find a suitable host.<br>
                             Here are a few options that are free, easy to use, and without any time limits:<br>
-                            -<a href="https://www.imghippo.com/">Imghippo:</a> choose the "direct link" option
+                            -<a href="https://www.imghippo.com/" target=”_blank”>
+                            Imghippo:</a> choose the "direct link" option
                             after the upload and copy it here<br>
-                            -<a href="https://postimages.org/">Postimages:</a> after the upload, right click on 
+                            -<a href="https://postimages.org/" target=”_blank”>
+                            Postimages:</a> after the upload, right click on 
                             the download button and press "copy link" to get the URL for the uncompressed image<br>
-                            -<a href="https://neocities.org/">Neocities (requires an account):</a> a great way to host
+                            -<a href="https://neocities.org/" target=”_blank”>
+                            Neocities (requires an account):</a> a great way to host
                             static websites, and by extension, images too. the free account nets you 1gb of storage and 
                             plenty of bandwidth.<br>
                             -<a>Other options:</a> You can also upload your assets onto your preferred web hosting 

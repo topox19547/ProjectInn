@@ -15,28 +15,29 @@
     const emits = defineEmits<{
         (e : 'editAsset', asset : Asset) : void
         (e : 'deleteAsset', asset : Asset) : void
+        (e : 'assetClicked', asset : Asset) : void
     }>();
 </script>
 
 <template>
-    <div class="card" 
+    <div class="card" @click="$emit('assetClicked', asset)"
     @mouseenter="hoveredOn = true" 
     @mouseleave="hoveredOn = false">
         <div class="hoverButton">
             <img class="miniButton editButton" 
             :src="editIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
-            @click="$emit('editAsset',asset)">
+            @click.stop="$emit('editAsset',asset)">
         </div>
         <div class="hoverButton" v-if="showDelete === undefined || showDelete == true">
             <img class="miniButton deleteButton" 
             :src="deleteIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
-            @click="$emit('deleteAsset',asset)">
+            @click.stop="$emit('deleteAsset',asset)">
         </div>
-        <img :src="asset.assetURL" @error="(e : any) => e.target.src = ErrorImage" class="tokenSprite">
+        <img :src="asset.assetURL" @error="(e : any) => e.target.src = ErrorImage" class="sprite">
         <div class="centered">
-            <div class="tokenName">{{ asset.name }}</div>
+            <div class="name">{{ asset.name }}</div>
         </div>
     </div>
 </template>
@@ -63,7 +64,11 @@
         align-items: center;
     }
 
-    .tokenName{
+    .card:hover{
+        background-color: #555555af;
+    }
+
+    .name{
         max-height: 20%;
         max-width: 90px;
         font-size: 14px;
@@ -72,9 +77,10 @@
         padding-bottom:16px;
         text-align: center;
         text-overflow: ellipsis;
+        user-select: none;
     }
 
-    .tokenSprite{
+    .sprite{
         border-style: none;
         margin: 12px;
         width: 80px;

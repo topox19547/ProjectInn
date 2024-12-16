@@ -19,7 +19,7 @@ export function getStartingSceneData() : Scene{
             assetSize : {x : 0, y : 0},
             assetURL : undefined
         },
-        tileSize : 25,
+        tileSize : 100,
         gridType : GridType.SQUARE,
         offset : {x : 0, y : 0}
     };

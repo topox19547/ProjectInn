@@ -7,6 +7,7 @@
     import type { Player } from '../../../model/Player.js';
     import type { Scene } from '../../../model/Scene.js';
     import Scenes from '../windows/Scenes.vue';
+import { Permission } from '../../../model/Permission.js';
 
     const showSceneMenu = ref(false);
     const showGameSettings = ref(false);
@@ -26,15 +27,18 @@
             <img :src="LeaveIcon">
             <div>Leave Room</div>
         </div>
-        <div class="topbarButton">
+        <div class="topbarButton"
+        v-if="localPlayer.isOwner">
             <img :src="SaveIcon">
             <div>Save Game</div>
         </div>
-        <div class="topbarButton">
+        <div class="topbarButton"
+        v-if="localPlayer.permissions[Permission.MASTER]">
             <img :src="SettingsIcon">
             <div>Room Settings</div>
         </div>
-        <div class="topbarButton" @click="showSceneMenu = true">
+        <div class="topbarButton" @click="showSceneMenu = true" 
+        v-if="localPlayer.permissions[Permission.MANAGE_SCENES]">
             <img :src="SceneIcon">
             <div>Scenes</div>
         </div>

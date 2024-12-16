@@ -3,12 +3,7 @@
     import type { Player } from '../../../../../model/Player.js';
     import ButtonBase from '../../../../shared/ButtonBase.vue';
     import addIcon from '../../../../../assets/icons/add.svg';
-    import kickIcon from '../../../../../assets/icons/kick.svg';
-    import ownerIcon from '../../../../../assets/icons/owner.svg';
-    import masterIcon from '../../../../../assets/icons/master.svg'
-    import Kickplayer from '../../../windows/Kickplayer.vue';
-    import { Permission } from '../../../../../model/Permission.js';
-    import EditPermissions from '../../../windows/EditPermissions.vue';
+    import deleteIcon from '../../../../../assets/icons/delete_darker.svg'
     import type { Asset } from '../../../../../model/Asset.js';
     import EditAsset from '../../../windows/EditAsset.vue';
     import { AssetType } from '../../../../../model/AssetType.js';
@@ -16,7 +11,7 @@
     import { Status } from '../../../../../network/message/Status.js';
     import { Command } from '../../../../../network/message/Command.js';
     import AssetCard from '../../../shared/AssetCard.vue';
-    import ConfirmDelete from '../../../windows/ConfirmDelete.vue';
+    import ConfirmAction from '../../../windows/ConfirmAction.vue';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const showEditAssetWindow = ref(false);
@@ -82,7 +77,6 @@
             }
         })
     }
-
 </script>
 
 <template>
@@ -123,12 +117,16 @@
     @close="showEditAssetWindow= false"
     :on-confirm="sendEditedAsset">
     </EditAsset>
-    <ConfirmDelete
+    <ConfirmAction
     message="Are you sure? This will also delete every token that uses this asset."
     :show="showDeleteAssetWindow"
     @close="showDeleteAssetWindow = false"
-    :on-confirm="sendDeletedAsset">
-    </ConfirmDelete>
+    :on-confirm="sendDeletedAsset"
+    :destructive="true"
+    title="Confirm deletion"
+    :icon="deleteIcon"
+    action="Delete">
+    </ConfirmAction>
 </template>
 
 <style scoped>
@@ -146,6 +144,7 @@
         padding-inline: 8px;
         display: block;
         overflow-y: auto;
+        overflow-x: hidden;
         height: 100%;
     }
 

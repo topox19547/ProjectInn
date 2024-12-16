@@ -12,7 +12,7 @@ import { Token } from "./gameObjects/token/Token.js";
 import { Vector2 } from "./gameObjects/Vector2.js";
 import { Command } from "./messages/Command.js";
 import { Status } from "./messages/Status.js";
-import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericObject } from "./messages/Validators.js";
+import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericObject, ensureNumber } from "./messages/Validators.js";
 import { NotificationSource } from "./NotificationSource.js";
 
 
@@ -41,7 +41,7 @@ export class Game implements NotificationSource{
         scenes : ensureArrayOf(Scene.validate),
         tokenAssets : ensureArrayOf(Asset.validate),
         tokens : ensureArrayOf(Token.validate),
-        currentScene : Scene.validate,
+        currentScene : ensureNumber,
         password : weakEnsureOf(ensureString),
         chat : ensureArrayOf(ensureGenericObject) //The chat doesn't get restored whenever a save is loaded
     });
@@ -66,11 +66,17 @@ export class Game implements NotificationSource{
     }
 
     public static fromObject(object : ReturnType<typeof this.validate>) : Game | undefined{
+        const currentSceneIndex : number = 
+            object.scenes.findIndex(s => s.asset.assetID == object.currentScene);
+        if(currentSceneIndex == -1){
+            return undefined;
+        }
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
             object.ownerName,
-            Scene.fromObject(object.currentScene)
+            Scene.fromObject(object.scenes[currentSceneIndex])
         );
+        object.scenes.splice(1, currentSceneIndex); //prevent the current scene from being added in twice
         const notifier = new ClientNotifier();
         const sortById = (t1 : Identifiable,t2 : Identifiable) => {
             return t1.getID() < t2.getID() ? -1 : t1.getID() == t2.getID() ? 0 : 1
@@ -132,7 +138,7 @@ export class Game implements NotificationSource{
             scenes : game.scenes.map(s => Scene.toObject(s)),
             tokens : game.tokens.map(t => Token.toObject(t)),
             password : game.password,
-            currentScene : Scene.toObject(game.currentScene),
+            currentScene : game.currentScene.getID(),
             chat : game.chat.getChatHistory()
         };
     }

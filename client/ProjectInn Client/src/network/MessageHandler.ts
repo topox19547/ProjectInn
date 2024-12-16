@@ -7,6 +7,8 @@ import type { Token } from "../model/Token.js";
 import type { Stat } from "../model/Stat.js";
 import { AssetType } from "../model/AssetType.js";
 import type { Lobby } from "../model/Lobby.js";
+import type { Scene } from "../model/Scene.js";
+import type { Player } from "../model/Player.js";
 
 
 
@@ -31,7 +33,10 @@ export class MessageHandler{
                 }
                 case Status.JOIN_GAME:{
                     this.game.value = content.game as Game;
-                    this.game.value.localPlayer = content.player;
+                    this.game.value.currentScene = content.game.scenes.find(
+                        (s : Scene) => s.asset.assetID == content.game.currentScene);
+                    this.game.value.localPlayer = content.game.players.find(
+                        (p : Player) => content.player == p.name);
                 }
             }
             return;
@@ -67,12 +72,23 @@ export class MessageHandler{
                     throw Error("Message refers to a token that doesn't exist");
                 }
                 Object.keys(content).forEach(k  => token[k] = content[k])
+                break;
+            }
+            case Status.SCENE_CHANGE:{
+                let scene : Scene | undefined = 
+                    this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID)
+                if(scene === undefined){
+                    this.game.value.scenes.push(content);
+                    scene = content as Scene;
+                }
+                this.game.value.currentScene = scene;
+                break;
             }
             case Status.SCENE:{
                 if(message.command == Command.CREATE){
                     this.game.value.scenes.push(content);
                 } else if (message.command == Command.DELETE){
-                    const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.id);
+                    const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
                     this.game.value.scenes.splice(index,1);
                 }
                 break;
@@ -80,11 +96,11 @@ export class MessageHandler{
             case Status.SCENE_GRIDTYPE:
             case Status.SCENE_OFFSET:
             case Status.SCENE_TILESIZE:{
-                const scene : any = this.game.value.scenes.find(s => s.asset.assetID == content.id)
+                const scene : any = this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID)
                 if (scene === undefined){
                     throw Error("Message refers to a scene that doesn't exist");
                 }
-                Object.keys(content).forEach(k => scene[k] = content[k]);
+                Object.keys(content).forEach(k => scene[k] = content[k] );
                 break;
             }
             case Status.ASSET_NAME:
@@ -121,9 +137,6 @@ export class MessageHandler{
                     throw Error("Message refers to a token asset that doesn't exist");
                 }
                 player.permissions = content.permissions;
-                if(this.game.value.localPlayer.name == content.name){
-                    this.game.value.localPlayer.permissions = content.permissions;
-                }
                 break;
             }
             case Status.CHAT:{

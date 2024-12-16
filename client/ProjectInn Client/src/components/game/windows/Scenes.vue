@@ -4,6 +4,7 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import SceneIcon from '../../../assets/icons/scene.svg';
     import AddIcon from '../../../assets/icons/add.svg';
+    import deleteIcon from '../../../assets/icons/delete_darker.svg'
     import CloseButton from '../../shared/CloseButton.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import AssetCard from '../shared/AssetCard.vue';
@@ -11,8 +12,8 @@
 import SceneEditWindow from '../../shared/windows/SceneEditWindow.vue';
 import type { Asset } from '../../../model/Asset.js';
 import type { WeakVector2 } from '../../../types/Vector2.js';
-import { inject, ref } from 'vue';
-import ConfirmDelete from './ConfirmDelete.vue';
+import { computed, inject, ref } from 'vue';
+import ConfirmAction from './ConfirmAction.vue';
 import type { ServerPublisher } from '../../../network/ServerHandler.js';
 import { Status } from '../../../network/message/Status.js';
 import { Command } from '../../../network/message/Command.js';
@@ -31,31 +32,47 @@ import { Command } from '../../../network/message/Command.js';
     const showSceneEditWindow = ref(false);
     const showSceneCreateWindow = ref(false);
     const showSceneDeleteWindow = ref(false);
+    const showSceneChangeWindow = ref(false);
     const editingScene = ref(getStartingSceneData());
     let deletingSceneId = -1;
+    let changingSceneId = -1;
     const newScene = ref(getStartingSceneData());
-
+    newScene.value.asset.name = "Scene 1";
 
     function editScene(id : number){
         const scene : Scene | undefined = props.scenes.find(p => p.asset.assetID == id);
         if(scene == undefined){
             return;
         }
-        editingScene.value = scene;
+        editingScene.value = copyScene(scene);
+        showSceneEditWindow.value = true;
     }
 
     function deleteScene(id : number){
-        showSceneDeleteWindow.value = true
+        showSceneDeleteWindow.value = true;
         deletingSceneId = id;
     }
 
+    function createScene(){
+        showSceneCreateWindow.value = true;
+        newScene.value.asset.name = `Scene ${props.scenes.length}`;
+    }
+
+    function changeScene(id : number){
+        if(id == props.currentScene.asset.assetID){
+            return;
+        }
+        changingSceneId = id;
+        showSceneChangeWindow.value = true;
+    }
+
     function copyScene(scene : Scene){
-        const positionCopy : WeakVector2 = Object.assign({}, scene.offset);
+        const offsetCopy : WeakVector2 = Object.assign({}, scene.offset);
         const assetCopy : Asset = Object.assign({}, scene.asset);
         const assetSizeCopy : WeakVector2 = Object.assign({}, scene.asset.assetSize);
         const sceneCopy : Scene = Object.assign({}, scene);
         assetCopy.assetSize = assetSizeCopy;
-        sceneCopy.offset = positionCopy;
+        sceneCopy.offset = offsetCopy;
         sceneCopy.asset = assetCopy;
         return sceneCopy;
     }
@@ -67,15 +84,39 @@ import { Command } from '../../../network/message/Command.js';
             content : {
                 id : deletingSceneId
             }
-        })
+        });
     }
 
     function sendEditedScene(){
         serverPublisher.send({
             status : Status.SCENE,
             command : Command.MODIFY,
-            content : editingScene
-        })
+            content : editingScene.value
+        });
+        console.log(editingScene.value)
+        showSceneEditWindow.value = false;
+    }
+
+    function sendCreatedScene(){
+        serverPublisher.send({
+            status : Status.SCENE,
+            command : Command.CREATE,
+            content : newScene.value
+        });
+        showSceneCreateWindow.value = false;
+        newScene.value = getStartingSceneData();
+    }
+
+    function sendSceneChange(){
+        serverPublisher.send({
+            status : Status.SCENE_CHANGE,
+            command : Command.MODIFY,
+            content : {
+                id : changingSceneId
+            }
+        });
+        showSceneChangeWindow.value = false;
+        emits("close");
     }
 
 </script>
@@ -93,14 +134,17 @@ import { Command } from '../../../network/message/Command.js';
                     </template>
                 </WindowTitleBar>
                 <div class="content">
-                    <div class="assets">
-                        <AssetCard :asset="scene.asset" v-for="scene in scenes"
-                        :show
-                        @edit-asset="a => editScene(a.assetID)"
-                        @delete-asset="a => deleteScene(a.assetID)"></AssetCard>
+                    <div class="assetList">
+                        <div class="assets">
+                            <AssetCard :asset="scene.asset" v-for="scene in scenes"
+                            :show-delete="scene.asset.assetID != currentScene.asset.assetID"
+                            @edit-asset="a => editScene(a.assetID)"
+                            @delete-asset="a => deleteScene(a.assetID)"
+                            @asset-clicked="a => changeScene(a.assetID)"></AssetCard>
+                        </div>
                     </div>
                     <div class="buttonBar">
-                        <ButtonBase text="Add a new scene" :icon="AddIcon" @click=""></ButtonBase>
+                        <ButtonBase text="Add a new scene" :icon="AddIcon" @click="createScene"></ButtonBase>
                     </div>
                 </div>
             </template>
@@ -111,19 +155,35 @@ import { Command } from '../../../network/message/Command.js';
     :show="showSceneEditWindow"
     title="Edit Scene"
     :on-confirm="sendEditedScene"
+    @close="showSceneEditWindow = false"
     ></SceneEditWindow>
     <SceneEditWindow
     :scene="newScene"
     :show="showSceneCreateWindow"
     title="Create Scene"
-    :on-confirm="sendDeletedScene"
+    :on-confirm="sendCreatedScene"
+    @close="showSceneCreateWindow = false"
     ></SceneEditWindow>
-    <ConfirmDelete 
+    <ConfirmAction 
     :show = showSceneDeleteWindow
     message="Are you sure you want to delete this scene?"
     :on-confirm="sendDeletedScene"
-    @close="showSceneDeleteWindow = false">
-    </ConfirmDelete>
+    @close="showSceneDeleteWindow = false"
+    :destructive="true"
+    title="Confirm deletion"
+    :icon="deleteIcon"
+    action="Delete">
+    </ConfirmAction>
+    <ConfirmAction 
+    :show = showSceneChangeWindow
+    message="Are you sure you want to change to this scene? All token positions will be reset."
+    :on-confirm="sendSceneChange"
+    @close="showSceneChangeWindow = false"
+    :destructive="false"
+    title="Change Scene"
+    :icon="SceneIcon"
+    action="Change scene">
+    </ConfirmAction>
 </template>
 
 <style scoped>
@@ -134,6 +194,16 @@ import { Command } from '../../../network/message/Command.js';
         flex-direction: column;
     }
 
+    .assetList{
+        padding-inline: 8px;
+        display: flex;
+        overflow-y: auto;
+        justify-content: center;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+    }
+
     .assets{
         display: flex;
         flex-wrap: wrap;
@@ -141,7 +211,7 @@ import { Command } from '../../../network/message/Command.js';
         row-gap: 8px;
         justify-content: start;
         margin: auto;
-        width: 100%;
+        width: 580px;
         height: 330px;
     }
 

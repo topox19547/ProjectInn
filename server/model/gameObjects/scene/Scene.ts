@@ -16,7 +16,7 @@ export class Scene implements Identifiable, NotificationSource{
     private tileSize : number;
     private notifier : ClientNotifier | undefined;
     private static readonly maxTileSize : number = 300;
-    private static readonly minTileSize : number = 10;
+    private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
         asset : Asset.validate,
         gridType : ensureEnumLike(Object.values(GridType).filter(v => typeof v === "number")),
@@ -71,6 +71,7 @@ export class Scene implements Identifiable, NotificationSource{
 
     public setNotifier(notifier : ClientNotifier) : void{
         this.notifier = notifier;
+        this.asset.setNotifier(notifier);
     }
 
     public setGridType(gridType : GridType) : void{
@@ -79,7 +80,7 @@ export class Scene implements Identifiable, NotificationSource{
             status : Status.SCENE_GRIDTYPE,
             command : Command.MODIFY,
             content : {
-                id : this.asset.getID(),
+                asset : { assetID : this.asset.getID() },
                 gridType : gridType
             }
         })
@@ -95,7 +96,7 @@ export class Scene implements Identifiable, NotificationSource{
             status : Status.SCENE_OFFSET,
             command : Command.MODIFY,
             content : {
-                id : this.asset.getID(),
+                asset : { assetID : this.asset.getID() },
                 offset : offset
             }
         })
@@ -114,10 +115,10 @@ export class Scene implements Identifiable, NotificationSource{
             this.tileSize = tileSize;
         }
         this.notifier?.notify({
-            status : Status.SCENE_OFFSET,
+            status : Status.SCENE_TILESIZE,
             command : Command.MODIFY,
             content : {
-                id : this.asset.getID(),
+                asset : { assetID : this.asset.getID() },
                 tileSize : tileSize
             }
         })

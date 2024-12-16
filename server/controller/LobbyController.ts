@@ -41,8 +41,11 @@ export class LobbyController implements ClientState{
                         password : weakEnsureOf(ensureString),
                         scene : Scene.validate
                     })(message.content);
-                    const game = new Game(content.gameName, content.username, Scene.fromObject(content.scene));
-                    game.setNotifier(new ClientNotifier());
+                    const notifier : ClientNotifier = new ClientNotifier()
+                    const startingScene = Scene.fromObject(content.scene);
+                    startingScene.setNotifier(notifier);
+                    const game = new Game(content.gameName, content.username, startingScene);
+                    game.setNotifier(notifier);
                     game.setEndCallback(() => this.lobby.removeGame(game))
                     const player = new Player(content.username, new Color(content.playerColor), true)
                     game.addPlayer(player);
@@ -58,7 +61,7 @@ export class LobbyController implements ClientState{
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : Player.toObject(player),
+                            player : player.getName(),
                         }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
@@ -95,7 +98,7 @@ export class LobbyController implements ClientState{
                     //Hide certain elements from the player if they don't have the specific permissions
                     if(!player.hasPermission(Permission.MANAGE_SCENES)){
                         gameObject.scenes = gameObject.scenes.filter(
-                            s => s.asset.assetID == gameObject.currentScene.asset.assetID)
+                            s => s.asset.assetID == gameObject.currentScene)
                     } 
                     if(!player.hasPermission(Permission.MANAGE_TOKENS)){
                         gameObject.tokenAssets = gameObject.tokenAssets.filter(a =>
@@ -107,8 +110,7 @@ export class LobbyController implements ClientState{
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : Player.toObject(player),
-                            isOwner : false
+                            player : player.getName(),
                         }
                     });
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      

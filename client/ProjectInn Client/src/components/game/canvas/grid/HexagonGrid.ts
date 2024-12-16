@@ -39,6 +39,8 @@ export class HexagonGrid implements Grid{
         if(ctx === null){
             return;
         }
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
         const xDistBetweenCenters = this.tileWidth * 3 / 4;
         const xDistBeforeReTile = this.tileWidth + this.tileWidth / 2;
         let gridOffsetX:number = 
@@ -55,6 +57,7 @@ export class HexagonGrid implements Grid{
             newPoint.multiplyByScalar((this.tileWidth / 2) * viewScale);
             scaledPoints.push(newPoint);
         });
+        ctx.beginPath();
         for(let c:number = -3; c * (xDistBetweenCenters * viewScale) < endX; c++){
             for(let y:number = gridOffsetY; y < endY; y += this.tileHeight * viewScale){
                 const x = gridOffsetX + (this.tileWidth / 2 + ((xDistBetweenCenters) * c * 2) ) * viewScale;
@@ -66,7 +69,7 @@ export class HexagonGrid implements Grid{
                 this.drawShape(center, ctx, scaledPoints);
             }
         }
-        
+        ctx.stroke();
     }
 
     public canvasToTile(viewOffset: Vector2, position: Vector2, viewScale: number): Vector2 {
@@ -129,16 +132,12 @@ export class HexagonGrid implements Grid{
 
     private drawShape(position : Vector2, ctx : CanvasRenderingContext2D, points : Array<Vector2>){
         position.translateBy(this.hexagonPoints[0]);
-        ctx.beginPath()
         ctx.moveTo(position.getX(), position.getY());
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = this.lineWidth;
         points.forEach(p => {
             position.translateBy(p);
             ctx.lineTo(position.getX(),position.getY());
             ctx.moveTo(position.getX(),position.getY());
         });
-        ctx.stroke();
     }
 
     private getOverlappedSquareTiles(

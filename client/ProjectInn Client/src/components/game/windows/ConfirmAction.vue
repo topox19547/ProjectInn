@@ -7,7 +7,7 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-import ButtonBase from '../../shared/ButtonBase.vue';
+    import ButtonBase from '../../shared/ButtonBase.vue';
 
     const emits = defineEmits<{
         close : void
@@ -15,7 +15,11 @@ import ButtonBase from '../../shared/ButtonBase.vue';
 
     const props = defineProps<{
         show : boolean
+        title : string
+        icon : string
+        action : string
         message : string
+        destructive : boolean
         onConfirm : () => void
     }>();
 
@@ -28,14 +32,14 @@ import ButtonBase from '../../shared/ButtonBase.vue';
     <Transition name="window">
         <WindowBase window-height="200px" window-width="400px"  v-if="show" >
             <template v-slot:content>
-                <WindowTitleBar title="Confirm deletion" :icon="DeleteIcon">
+                <WindowTitleBar :title="title" :icon="icon">
                     <template v-slot:back>
                         <CloseButton @click="$emit('close')"></CloseButton>
                     </template>
                 </WindowTitleBar>
                 <div class="content">
                     <div class="message">{{ message }}</div>
-                    <ButtonBase text="Delete" :color="{ active : '#9D2C2C', hover : '#CD3A3A'}" 
+                    <ButtonBase :text="action" :color="destructive ? { active : '#9D2C2C', hover : '#CD3A3A'} : undefined" 
                     @click="() => {
                         onConfirm();
                         $emit('close');

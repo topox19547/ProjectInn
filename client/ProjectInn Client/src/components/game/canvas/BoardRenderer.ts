@@ -25,6 +25,7 @@ export class BoardRenderer{
     private tokens:Array<Token>;
     private currentScene:Scene;
     private tokenAssets:Array<Asset>;
+    private nextAnimationFrameID:number;
 
 
     constructor(
@@ -32,6 +33,7 @@ export class BoardRenderer{
         tokens:Array<Token>,
         currentScene:Scene,
         tokenAssets : Array<Asset>){
+        console.log("new boardrenderer created");
         this.tokens = tokens;
         this.currentScene = currentScene;
         this.tokenAssets = tokenAssets;
@@ -44,35 +46,13 @@ export class BoardRenderer{
         this.grid = new SquareGrid(10,new Vector2(0,0),1);
         this.placeHolderSpriteColor = "#222222"
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
+        this.ctx = canvas.getContext("2d", { alpha : false});
         this.defaultBackground = undefined;
         this.background = undefined;
         this.backgroundSource = undefined;
         this.spriteCache = new Map();
-        canvas.addEventListener("mousedown",() => this.isMouseDown = true);
-        canvas.addEventListener("mouseup", () => this.isMouseDown = false);
-        canvas.addEventListener("mouseleave",() => {
-            this.isMouseDown = false;
-            this.isMouseIn = false;
-        });
-        canvas.addEventListener("mouseover",() => this.isMouseIn = true);
-        addEventListener("mousemove", (e : MouseEvent) => {
-            const boundingRect = canvas.getBoundingClientRect();
-            this.cursorMoved(
-                new Vector2(-e.movementX,-e.movementY),
-                new Vector2(
-                    e.clientX - boundingRect.x,
-                    e.clientY - boundingRect.y));
-        });
-        addEventListener("wheel", (e : WheelEvent) => {
-            if(!this.isMouseIn){
-                return;
-            }
-            const boundingRect = canvas.getBoundingClientRect();
-            this.cursorZoomed(e.deltaY,new Vector2(e.clientX - boundingRect.x,e.clientY - boundingRect.y));
-        });
-        addEventListener("touchmove", (e : TouchEvent) => {
-        })
+        this.nextAnimationFrameID = 0;
+        this.bindEvents();
     }
 
     public setMap(
@@ -82,14 +62,15 @@ export class BoardRenderer{
         onFail? : () => void):void{
         this.grid = grid;
         if(url === undefined || this.backgroundSource === url){
-            return;//Avoid reloading the same iamge again
+            return;//Avoid reloading the same image again
         }
         const image : HTMLImageElement = new Image();
         image.src = url;
         this.backgroundSource = url;
         image.addEventListener("load",() =>{
             createImageBitmap(image).then((bg) => {
-                console.log(image)
+                window.cancelAnimationFrame(this.nextAnimationFrameID);
+                this.background?.close();
                 this.background = bg;
                 this.renderView();
                 this.resetScale();
@@ -127,12 +108,19 @@ export class BoardRenderer{
         const bottomRightTile:Vector2 = this.grid.canvasToTile(this.viewOffset, canvasSizeVector, this.viewScale);
     }
 
+    public destroy():void{
+        window.cancelAnimationFrame(this.nextAnimationFrameID);
+        this.background?.close();
+        this.unbindEvents();
+        console.log("boardrenderer destroyed");
+    }
+
     private renderView():void{
-        requestAnimationFrame(() => this.renderView());
+        this.nextAnimationFrameID = requestAnimationFrame(() => this.renderView());
         if(this.ctx === null || this.background == undefined){
             return;
         }
-        this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "#111111";
         this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
         this.ctx.drawImage(
@@ -173,6 +161,58 @@ export class BoardRenderer{
                 Math.floor(tokenSize.getY()));
         }
         
+    }
+
+    private bindEvents(){
+        this.canvas.onmousedown = () => this.onMouseDown();
+        this.canvas.onmouseup = () => this.onMouseUp();
+        this.canvas.onmouseleave = () => this.onMouseLeave();
+        this.canvas.onmouseover = () => this.onMouseOver();
+        this.canvas.onmousemove = e => this.onMouseMoved(e);
+        this.canvas.onwheel = e => this.onWheelEvent(e);
+    }
+
+    private unbindEvents(){
+        this.canvas.onmousedown = null;
+        this.canvas.onmouseup = null;
+        this.canvas.onmouseleave = null;
+        this.canvas.onmouseover = null;
+        this.canvas.onmousemove = null;
+        this.canvas.onwheel = null;
+    }
+
+    private onMouseDown() : void{
+        this.isMouseDown = true;
+    }
+
+    private onMouseUp() : void{
+        this.isMouseDown = false;
+    }
+
+    private onMouseLeave() : void{
+        this.isMouseDown = false;
+        this.isMouseIn = false;
+    }
+
+    private onMouseOver() : void{
+        this.isMouseIn = true;
+    }
+
+    private onMouseMoved(e : MouseEvent) : void{
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.cursorMoved(
+        new Vector2(-e.movementX,-e.movementY),
+        new Vector2(
+            e.clientX - boundingRect.x,
+            e.clientY - boundingRect.y));
+    }
+
+    private onWheelEvent(e : WheelEvent) : void{
+        if(!this.isMouseIn){
+            return;
+        }
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.cursorZoomed(e.deltaY,new Vector2(e.clientX - boundingRect.x,e.clientY - boundingRect.y));
     }
 
     private cursorMoved(movement:Vector2, position:Vector2):void{
@@ -236,13 +276,7 @@ export class BoardRenderer{
                 this.background.height - this.viewOffset.getY() + extraPaddingY - scaledCanvasH;
             vector.setY(limitedY);
         }
-        //if the background can be fully seen, block scrolling on that axis
-        if(this.background.width * this.viewScale < this.canvas.width){
-            vector.setX(0);
-        }
-        if(this.background.height * this.viewScale < this.canvas.height){
-            vector.setY(0);
-        }
+        //if the background can be fully seen, block scrolling on that axis       
         this.viewOffset.translateBy(vector);
         this.updateOnScreenTokens();
     }

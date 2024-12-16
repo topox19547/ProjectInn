@@ -4,16 +4,17 @@
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
     import CloseButton from '../CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
+    import { onUpdated, ref, watch, type Ref } from 'vue';
     import WindowBackground from '../WindowBackground.vue';
     import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
     import { AssetType } from '../../../model/AssetType.js';
     import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../ButtonBase.vue';
     import UploadHelp from '../UploadHelp.vue';
-    const minTileSize = ref(10);
-    const maxTileSize = ref(300);
-    const tileSizeValue = ref(35);
+    const minTileSize = 30;
+    const maxTileSize = 300;
+    const tileSizeValue = ref(100);
+    const offsetValue = ref({x : 0, y : 0})
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         close : void
@@ -24,23 +25,38 @@
         scene : Scene
         onConfirm : () => void
     }>();
+
+
     watch(tileSizeValue,(newValue) => {
-        if(newValue < minTileSize.value){
-            props.scene.tileSize = minTileSize.value;
-        } else if (newValue > maxTileSize.value){
-            props.scene.tileSize = maxTileSize.value;
+        if(newValue < minTileSize){
+            props.scene.tileSize = minTileSize;
+        } else if (newValue > maxTileSize){
+            props.scene.tileSize = maxTileSize;
         } else {
             props.scene.tileSize = newValue;
         }
     })
+
+    watch(offsetValue, (newValue) => {
+        props.scene.offset.x = typeof newValue.x !== "number" ? 0 : newValue.x;
+        props.scene.offset.y = typeof newValue.y !== "number"? 0 : newValue.y;
+    }, {deep : true})
+
     watch(props.scene.asset, (newValue, oldValue) => {
         if(oldValue.assetURL != newValue.assetURL){
             confirmDisabled.value = true;
         }
     })
 
+    onUpdated(() => {
+        tileSizeValue.value = props.scene.tileSize;
+        offsetValue.value.x = props.scene.offset.x;
+        offsetValue.value.y = props.scene.offset.y;
+    })
+
     function enableConfirm(image : ImageBitmap){
         props.scene.asset.assetSize = {x : image.width, y : image.height};
+        console.log(props.scene);
         confirmDisabled.value = false;
     }
 </script>
@@ -86,14 +102,15 @@
                         <div class="subCategory">
                             <div class="subCategory">
                                 <div class="coordinateName">X</div>
-                                <input class="textBox" v-model="scene.offset.x" type="number">
+                                <input class="textBox" v-model="offsetValue.x" 
+                                type="number">
                             </div>
                             <div class="subCategory">
                                 <div class="coordinateName">Y</div>
-                                <input class="textBox" v-model="scene.offset.y" type="number">
+                                <input class="textBox" v-model="offsetValue.y" 
+                                type="number">
                             </div>
                         </div>
-                       
                     </div>
                     <div class="preview">
                         <div>
