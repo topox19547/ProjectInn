@@ -1,23 +1,24 @@
 <script setup lang="ts">
-    import { onMounted, ref, useTemplateRef } from 'vue';
+    import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
     import BoardCanvas from './canvas/BoardCanvas.vue';
     import type { Game } from '../../model/Game.js';
     import { SideBarTab } from './sidebar/sidebarTab.js';
     import Sidebar from './sidebar/Sidebar.vue';
-import Topbar from './topbar/Topbar.vue';
+    import Topbar from './topbar/Topbar.vue';
+    import { SaveManager } from '../../filesystem/SaveManager.js';
     
     const currentTab = ref(SideBarTab.CHAT);
     const previousTab = ref(SideBarTab.CHAT);
     const sidebarWidth = ref(400);
     const headerHeight = ref(64);
     const canvasSize = ref({ x : 0, y : 0});
+    const saveManager = new SaveManager();
 
     const props = defineProps<{
         game : Game
     }>();
     setCanvasSize();
     window.addEventListener("resize", setCanvasSize);
-
 
     function setCanvasSize(){
         canvasSize.value.x = window.innerWidth - sidebarWidth.value;
@@ -28,8 +29,6 @@ import Topbar from './topbar/Topbar.vue';
         previousTab.value = currentTab.value;
         currentTab.value = tab;
     }
-    
-
 </script>
 
 <template>
@@ -37,9 +36,7 @@ import Topbar from './topbar/Topbar.vue';
         <div class="mainContent">
             <div class="topbar" :style="{ height : headerHeight + 'px' }">
                 <Topbar 
-                :local-player="game.localPlayer" 
-                :current-scene="game.currentScene" 
-                :scenes="game.scenes"></Topbar>
+                :game="props.game"></Topbar>
             </div>
             <BoardCanvas 
             :tokens="game.tokens" 

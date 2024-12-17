@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import type { Game } from "../model/Game.js";
+import { getDefaultLocalSettings, type Game } from "../model/Game.js";
 import type { Message } from "./message/Message.js";
 import { Status } from "./message/Status.js";
 import { Command } from "./message/Command.js";
@@ -9,16 +9,19 @@ import { AssetType } from "../model/AssetType.js";
 import type { Lobby } from "../model/Lobby.js";
 import type { Scene } from "../model/Scene.js";
 import type { Player } from "../model/Player.js";
+import { SaveManager } from "../filesystem/SaveManager.js";
 
 
 
 export class MessageHandler{
     private lobby : Ref<Lobby>;
     private game : Ref<Game | undefined>;
+    private saveManager : SaveManager;
 
     constructor(lobby : Ref<Lobby>, game : Ref<Game | undefined>){
         this.lobby = lobby;
         this.game = game;
+        this.saveManager = new SaveManager();
     }
 
     handleMessage(message : Message){
@@ -37,6 +40,7 @@ export class MessageHandler{
                         (s : Scene) => s.asset.assetID == content.game.currentScene);
                     this.game.value.localPlayer = content.game.players.find(
                         (p : Player) => content.player == p.name);
+                    this.game.value.localSettings = getDefaultLocalSettings(this.game.value);
                 }
             }
             return;
@@ -151,6 +155,9 @@ export class MessageHandler{
                 const index : number = this.game.value.players.findIndex(p => p.name == content.name);
                 this.game.value.players[index].connected = content.connected;
                 break;
+            }
+            case Status.SAVE_GAME:{
+                this.saveManager.SaveGame(content);
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

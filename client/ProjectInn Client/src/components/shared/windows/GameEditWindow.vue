@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import PlayerIcon from '../../../assets/icons/player.svg';
+    import SettingsIcon from '../../../assets/icons/settings.svg';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
     import CloseButton from '../CloseButton.vue';
@@ -13,17 +13,20 @@
     import type { Scene } from '../../../model/Scene.js';
     const passwordEnabled = ref(false);
     const emits = defineEmits<{
-        close : void
+        (e : 'close') : void,
     }>();
     const props = defineProps<{
         game : {
             name : string,
-            localPlayer : Player,
-            currentScene : Scene,
             password : undefined | string
+            localSettings? : {
+                autoSaveEnabled : boolean
+            }
         }
         isNewGame : boolean
+        enableSaveManagement : boolean
         show : boolean
+        confirmText : string
         onConfirm? : () => void
     }>();
     watch(passwordEnabled,(newValue) => {
@@ -31,6 +34,9 @@
             props.game.password = undefined;
         }
     });
+    watch(() => props.show, () => {
+        passwordEnabled.value = props.game.password !== undefined
+    })
 </script>
 
 
@@ -41,7 +47,7 @@
     <Transition name="window">
         <WindowBase window-height="450px" window-width="500px"  v-if="show" >
             <template v-slot:content>
-                <WindowTitleBar title="Game Settings" :icon="PlayerIcon">
+                <WindowTitleBar title="Game Settings" :icon="SettingsIcon">
                     <template v-slot:back>
                         <CloseButton @click="$emit('close')"></CloseButton>
                     </template>
@@ -65,11 +71,18 @@
                                  maxlength="24" type="text" title="sceneName" placeholder="Password">
                             </div>
                         </div>
+                        <div class="subCategory" v-if="enableSaveManagement && game.localSettings !== undefined">
+                            <div class="section">
+                                <div class="inputTitle">Enable autosave</div>
+                                <input class="toggle" 
+                                v-model="game.localSettings.autoSaveEnabled" type="checkbox">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Next" @click="onConfirm" height="42px" 
-                    :disabled="game.name.length == 0 || (passwordEnabled && !game.password)">
+                    <ButtonBase :text="confirmText" @click="onConfirm" height="42px" 
+                    :disabled="(game.name.length == 0 && isNewGame) || (passwordEnabled && !game.password)">
                     </ButtonBase>
                 </div>
             </template>
@@ -110,6 +123,7 @@
         display: flex;
         justify-content: space-between;
         accent-color:#303F9F;
+        width: 100%;
     }
 
     .coordinateName{

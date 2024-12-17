@@ -9,18 +9,20 @@
     import RemoteGameList from './gamelists/RemoteGameList.vue';
     import { inject, ref, type Ref } from 'vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
-import type { Game } from '../../model/Game.js';
-import { GridType } from '../../model/GridType.js';
-import { AssetType } from '../../model/AssetType.js';
-import GameEditWindow from '../shared/windows/GameEditWindow.vue';
-import type { ServerPublisher } from '../../network/ServerHandler.js';
-import { parseJsonSourceFileConfigFileContent } from 'typescript';
-import { Status } from '../../network/message/Status.js';
-import { Command } from '../../network/message/Command.js';
-import { Vector2 } from '../../types/Vector2.js';
-import GameInfo from './windows/GameInfo.vue';
-import NewGameWizard from './NewGameWizard.vue';
-import JoinGameWizard from './JoinGameWizard.vue';
+    import type { Game } from '../../model/Game.js';
+    import { GridType } from '../../model/GridType.js';
+    import { AssetType } from '../../model/AssetType.js';
+    import GameEditWindow from '../shared/windows/GameEditWindow.vue';
+    import type { ServerPublisher } from '../../network/ServerHandler.js';
+    import { parseJsonSourceFileConfigFileContent, server } from 'typescript';
+    import { Status } from '../../network/message/Status.js';
+    import { Command } from '../../network/message/Command.js';
+    import { Vector2 } from '../../types/Vector2.js';
+    import GameInfo from './windows/GameInfo.vue';
+    import NewGameWizard from './NewGameWizard.vue';
+    import JoinGameWizard from './JoinGameWizard.vue';
+    import ConfirmAction from '../game/windows/ConfirmAction.vue';
+    import DeleteIcon from '../../assets/icons/delete.svg';
 
       
     const failedLoadText = 
@@ -29,14 +31,21 @@ Press the button below to clear it.`;
     
     const showNewGameWizard = ref(false);
     const showJoinGameWizard = ref(false);
+    const showDeleteGame = ref(false);
     const joinID : Ref<undefined | number> = ref(undefined);
     const showGameInfo = ref(false);
     const gameInfoId = ref(-1);
+    const deletingGame = ref(-1);
     
+    const saveManager = new SaveManager();
     const serverPublisher : ServerPublisher = inject("serverPublisher") as ServerPublisher;
     const props = defineProps<{
         lobby : Lobby,
         invalidLocalGames : boolean
+    }>();
+
+    const emits = defineEmits<{
+        (e : 'deleteGame', id : number) : void,
     }>();
 
     function clearSaveData(){
@@ -59,6 +68,21 @@ Press the button below to clear it.`;
         joinID.value = undefined;
         showJoinGameWizard.value = false;
     }
+
+    function showDeleteGamePopup(id : number){
+        deletingGame.value = id;
+        console.log(deletingGame);
+        showDeleteGame.value = true
+    }
+
+    function loadGame(id : number){
+        const game = saveManager.LoadGame(id);
+        serverPublisher.send({
+            status : Status.LOAD_GAME,
+            command : Command.CREATE,
+            content : game
+        })
+    }  
 </script>
 
 <template>
@@ -86,7 +110,9 @@ Press the button below to clear it.`;
             <div class="contentContainer">  
                 <LocalGameList 
                 :local-games="props.lobby.localGames"
-                @new-game="showNewGameWizard = true"></LocalGameList>
+                @new-game="showNewGameWizard = true"
+                @delete-game-file="showDeleteGamePopup"
+                @load-game="loadGame"></LocalGameList>
                 <RemoteGameList 
                 :remote-games="props.lobby.activeGames"
                 @open-game-info="openGameInfo"
@@ -95,6 +121,17 @@ Press the button below to clear it.`;
             </div>
         </main>
     </div>
+    <ConfirmAction
+        :show="showDeleteGame"
+        action="Delete"
+        :destructive="true"
+        :icon="DeleteIcon"
+        message="Are you sure? the game will be permanently deleted."
+        title="Delete game"
+        :on-confirm="() => $emit('deleteGame', deletingGame)"
+        @close="showDeleteGame = false"
+    >
+    </ConfirmAction>
 </template>
 
 <style scoped>

@@ -5,7 +5,8 @@
     import editPermsIcon from '../../../../../assets/icons/editPerms.svg';
     import kickIcon from '../../../../../assets/icons/kick.svg';
     import ownerIcon from '../../../../../assets/icons/owner.svg';
-    import masterIcon from '../../../../../assets/icons/master.svg'
+    import masterIcon from '../../../../../assets/icons/master.svg';
+    import playerIcon from '../../../../../assets/icons/player.svg';
     import Kickplayer from '../../../windows/Kickplayer.vue';
     import { Permission } from '../../../../../model/Permission.js';
     import EditPermissions from '../../../windows/EditPermissions.vue';
@@ -48,8 +49,14 @@
                     <div>
                         {{ player.name }}
                     </div>
-                    <img :src="ownerIcon" v-if="player.isOwner" width="24px">
-                    <img :src="masterIcon" v-else-if="player.permissions[Permission.MASTER]" width="24px">
+                    <div class="playerTags" v-if="true">
+                        <img :src="playerIcon" title="You"
+                        v-if="player.name == localPlayer.name" width="24px">
+                        <img :src="ownerIcon" title="Owner"
+                        v-if="player.isOwner" width="24px">
+                        <img :src="masterIcon" title="Dungeon Master"
+                        v-else-if="player.permissions[Permission.MASTER]" width="24px">
+                    </div>
                 </div>
                 <div class="spacer"></div>
                 <div class="title" v-if="offlinePlayers.length > 0">
@@ -60,8 +67,14 @@
                     <div>
                         {{ player.name }}
                     </div>
-                    <img :src="ownerIcon" v-if="player.isOwner" width="24px">
-                    <img :src="masterIcon" v-else-if="player.permissions[Permission.MASTER]" width="24px">
+                    <div class="playerTags" v-if="true">
+                        <img :src="playerIcon" title="You" 
+                        v-if="player.name == localPlayer.name" width="24px">
+                        <img :src="ownerIcon" title="Owner"
+                         v-if="player.isOwner" width="24px">
+                        <img :src="masterIcon" title="Dungeon Master" 
+                        v-else-if="player.permissions[Permission.MASTER]" width="24px">
+                    </div>
                 </div>
             </div>
             <div class="buttonBar">
@@ -92,11 +105,18 @@
     :editable-players="lowerPlayers" 
     :show="showPermissionsWindow" 
     :players="players"
+    :local-player="localPlayer"
     @close="showPermissionsWindow = false">
     </EditPermissions>
 </template>
 
 <style scoped>
+    .playerTags{
+        display: flex;
+        justify-content: end;
+        gap: 4px;
+    }
+
     .container{
         display: flex;
         flex-direction: column;

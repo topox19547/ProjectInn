@@ -42,12 +42,11 @@ export class LobbyController implements ClientState{
                         scene : Scene.validate
                     })(message.content);
                     const notifier : ClientNotifier = new ClientNotifier()
-                    const startingScene = Scene.fromObject(content.scene);
+                    const startingScene : Scene = Scene.fromObject(content.scene);
                     startingScene.setNotifier(notifier);
-                    const game = new Game(content.gameName, content.username, startingScene);
+                    const game : Game = new Game(content.gameName, content.username, startingScene);
                     game.setNotifier(notifier);
-                    game.setEndCallback(() => this.lobby.removeGame(game))
-                    const player = new Player(content.username, new Color(content.playerColor), true)
+                    const player : Player = new Player(content.username, new Color(content.playerColor), true)
                     game.addPlayer(player);
                     if (content.password !== undefined){
                         if(!game.setPassword(content.password)){
@@ -56,6 +55,7 @@ export class LobbyController implements ClientState{
                     }
                     game.joinGame(player, this.clientHandler);
                     this.lobby.publishGame(game);
+                    game.setEndCallback(() => this.lobby.removeGame(game))
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
@@ -66,6 +66,32 @@ export class LobbyController implements ClientState{
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
                     console.log(`new game created by ${content.username}: ${content.gameName}`);
+                    break;
+                }
+                case Status.LOAD_GAME:{
+                    const content = Game.validate(message.content);
+                    const notifier : ClientNotifier = new ClientNotifier();
+                    const game : Game | undefined = Game.fromObject(content, notifier);
+                    if(game === undefined){
+                        throw new ValueError("Not a valid game file!")
+                    }
+                    const player : Player | undefined = game.getPlayer(game.getOwnerName());
+                    if(player === undefined){
+                        throw new ValueError("Not a valid game file: owner is missing from the players")
+                    }
+                    game.joinGame(player, this.clientHandler);
+                    this.lobby.publishGame(game);
+                    game.setEndCallback(() => this.lobby.removeGame(game))
+                    this.clientHandler.send({
+                        status : Status.JOIN_GAME,
+                        command : Command.CREATE,
+                        content : {
+                            game : Game.toObject(game),
+                            player : player.getName(),
+                        }
+                    })
+                    this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
+                    console.log(`new game loaded by ${content.ownerName}: ${content.name}`);
                     break;
                 }
                 case Status.JOIN_GAME:{

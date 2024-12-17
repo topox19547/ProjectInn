@@ -23,9 +23,11 @@ export enum Status{
     PASSWORD_CHANGE,
     SCENE_CHANGE,
     SCENE_PING,
+    SAVE_GAME,
     CHAT,
     PING,
     ERROR,
-    ASSET_SIZE
+    ASSET_SIZE,
+    LOAD_GAME
 }
 

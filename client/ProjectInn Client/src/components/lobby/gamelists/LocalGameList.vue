@@ -16,6 +16,7 @@
     const props = defineProps<{
         localGames : Array<GamePreview>
     }>();
+    console.log(props.localGames);
 </script>
 
 <template>
@@ -23,13 +24,13 @@
         <template v-slot:content>
             <NoGamesText v-if="localGames.length == 0">Looks like you haven't created any games yet...</NoGamesText>
             <GameEntry v-for="game in localGames" :title="game.name" :game-id="game.id" :info="game.info" 
-            @click="$emit('loadGame',game.id)">
+            @click="$emit('loadGame', game.id)">
                 <template v-slot:actions>
                     <img :src=Delete class="deleteButton" @click.stop="$emit('deleteGameFile', game.id)">
                 </template>
             </GameEntry>
+            <div class="spacer" v-if="localGames.length > 0"></div>
         </template>
-        <div class="spacer" v-if="localGames.length > 0"></div>
         <template v-slot:fab>
             <Fab text="New game" :icon=Add @click="$emit('newGame')"></Fab>
         </template>

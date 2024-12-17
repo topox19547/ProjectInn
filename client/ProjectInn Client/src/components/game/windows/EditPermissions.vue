@@ -19,6 +19,7 @@
     const props = defineProps<{
         editablePlayers : Array<string>
         players: Array<Player>
+        localPlayer : Player
         show : boolean
     }>();
     const permissionNames = new Map().set(Permission.MASTER, "DM")
@@ -42,6 +43,7 @@
             }
         }
         editedPermissions = generateBlankPermissions();
+        emits("close");
     }
 
     function addToEdits(entry : [string, Record<string,boolean>], key : string){
@@ -77,7 +79,7 @@
         return permissions;
     }
 
-    onUpdated(() => {
+    watch(() => props.show, () => {
         permissionsCopy.value = generatePermissionsCopy();
         editedPermissions = generateBlankPermissions();
     })
@@ -86,10 +88,11 @@
 
 <template>
     <Transition name="background">
-        <WindowBackground  v-if="show" ></WindowBackground>
+        <WindowBackground  v-if="show && localPlayer.permissions[Permission.MASTER]" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="500px" window-width="700px"  v-if="show">
+        <WindowBase window-height="500px" window-width="700px" 
+         v-if="show && localPlayer.permissions[Permission.MASTER]">
             <template v-slot:content>
                 <WindowTitleBar title="Edit Permissions" :icon="editPermsIcon">
                     <template v-slot:back>
@@ -131,10 +134,7 @@
                 </div>
                 <div class="buttonContainer">
                     <ButtonBase text="Save" height="42px" 
-                    @click="() => {
-                        $emit('close');
-                        sendEditedPerms()
-                    }">
+                    @click="sendEditedPerms">
                     </ButtonBase>
                 </div>
             </template>

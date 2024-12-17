@@ -43,10 +43,12 @@ export class Player implements NotificationSource{
             new Color(object.color),
             object.isOwner
         );
-        let i : number = 0;
-        for(const key in Permission){
-            player.setPermission(i, object.permissions[key] != undefined ? object.permissions[key] : false);
-            i++;
+        if(!object.isOwner){
+            let i : number = 0;
+            for(const key in Permission){
+                player.setPermission(i, object.permissions[key] != undefined ? object.permissions[key] : false);
+                i++;
+            }
         }
         return player;
     }

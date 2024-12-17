@@ -29,7 +29,7 @@ export class Scene implements Identifiable, NotificationSource{
         this.asset = asset;
         this.gridType = grid;
         this.tileSize = tileSize;
-        this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
+        this.offset = offset;
     }
     
     public static getMaxTileSize() : number{ return this.maxTileSize; }
@@ -91,7 +91,7 @@ export class Scene implements Identifiable, NotificationSource{
     }
 
     public setOffset(offset : Vector2) : void{
-        this.offset = new Vector2(this.tileSize % offset.getX(), this.tileSize % offset.getY());
+        this.offset = offset
         this.notifier?.notify({
             status : Status.SCENE_OFFSET,
             command : Command.MODIFY,

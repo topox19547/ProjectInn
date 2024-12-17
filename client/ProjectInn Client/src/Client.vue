@@ -20,15 +20,12 @@
   const saveManager : SaveManager = new SaveManager();
   let localGames : Array<GamePreview> = new Array();
   let invalidLocalGames : boolean = false;
-  try{
-    localGames = saveManager.getGameList()
-  }catch(e){
-    invalidLocalGames = true;
-  }
-  const lobby : Ref<Lobby> = ref({
+
+  const lobby = ref({
     activeGames : [],
     localGames : localGames
   });
+  refreshLocalGames();
   const messageHandler : MessageHandler = new MessageHandler(lobby,game);
   const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames,notifyNetworkError);
   provide("serverPublisher", serverPublisher);
@@ -51,6 +48,20 @@
   function reloadPage(){
     window.location.reload();
   }
+
+  function deleteLocalGame(id : number){
+    saveManager.DeleteGame(id);
+    refreshLocalGames();
+  }
+
+  function refreshLocalGames(){
+    try{
+      lobby.value.localGames = saveManager.getGameList()
+    }catch(e){
+      invalidLocalGames = true;
+    }
+  }
+
 </script>
 
 <template>
@@ -58,8 +69,11 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <LobbyView v-if="game === undefined" 
   :lobby="lobby"
-  :invalid-local-games="invalidLocalGames"></LobbyView>
-  <GameView v-if="game !== undefined" :game=game></GameView>
+  :invalid-local-games="invalidLocalGames"
+  @delete-game="deleteLocalGame"></LobbyView>
+  <Transition name="game">
+    <GameView v-if="game !== undefined" :game=game></GameView>
+  </Transition>
   <ErrorWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
     <template v-slot:button>
       <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
@@ -76,5 +90,18 @@
   }
   body:has(.windowBackground){
     overflow: hidden;
+  }
+</style>
+
+<style scoped>
+  .game-enter-active,
+  .game-leave-active{
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+
+  .game-enter-from,
+  .game-leave-to {
+      opacity: 0;
+      transform: translate(0px, 500px);
   }
 </style>

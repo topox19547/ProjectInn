@@ -10,16 +10,21 @@
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
     import GameEditWindow from '../shared/windows/GameEditWindow.vue';
     import { getStartingSceneData } from '../../model/Scene.js';
+import ErrorWindow from '../shared/windows/ErrorWindow.vue';
+import { SaveManager } from '../../filesystem/SaveManager.js';
+import ButtonBase from '../shared/ButtonBase.vue';
     const props = defineProps<{
         showWizard : boolean
     }>();
     const emits = defineEmits<{
         close : void
     }>();
+    const sameNameError = ref(false);
     const newGameData = ref(getStartingGameData());
     const showPlayerMenu = ref(false);
     const showNewGameMenu = ref(false);
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
+    const saveManager = new SaveManager();
 
     function getStartingGameData(){
         return {
@@ -47,8 +52,10 @@
     }
 
     function sendNewGameInfo(){
-        console.log(newGameData.value.password)
-        console.log("sending")
+        if(saveManager.getGameList().find(g => g.name == newGameData.value.name)){
+            sameNameError.value = true;
+            return;
+        }
         serverPublisher.send({
             status : Status.CREATE_GAME,
             command : Command.CREATE,
@@ -83,8 +90,20 @@
     <GameEditWindow
     :game="newGameData"
     :is-new-game="true"
+    :enable-save-management="false"
     :show="showNewGameMenu"
+    confirm-text="Next"
     :on-confirm="sendNewGameInfo"
     @close="showNewGameMenu = false"
     ></GameEditWindow>
+    <ErrorWindow v-if="sameNameError"
+        title="Error"
+        message="You already have a game with the same name">
+        <template v-slot:button>
+            <ButtonBase
+            text="Ok"
+            @click="() => sameNameError = false"
+            ></ButtonBase>
+        </template>
+    </ErrorWindow>
 </template>

@@ -16,7 +16,7 @@ import { Lobby } from "../model/Lobby.js";
 import { Command } from "../model/messages/Command.js";
 import { Message } from "../model/messages/Message.js";
 import { Status } from "../model/messages/Status.js";
-import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean, ensureStringEnumLike } from "../model/messages/Validators.js";
+import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean, ensureStringEnumLike, ensureType, weakEnsureOf } from "../model/messages/Validators.js";
 import { ClientHandler } from "./ClientHandler.js";
 import { ClientState } from "./ClientState.js";
 import { LobbyController } from "./LobbyController.js";
@@ -181,7 +181,7 @@ export class GameController implements ClientState{
                 }
                 case Status.PASSWORD_CHANGE : {
                     const content = ensureObject({
-                        password : ensureString
+                        password : weakEnsureOf(ensureString)
                     })(message.content);
                     if(!this.clientPlayer.hasPermission(Permission.MASTER)){
                         throw new PermissionError();
@@ -326,6 +326,17 @@ export class GameController implements ClientState{
                         this.currentGame.endGame();
                     }
                     break;
+                }
+                case Status.SAVE_GAME : {
+                    if(this.clientPlayer.isGameOwner()){
+                        const game = Game.toObject(this.currentGame);
+                        game.chat = [];
+                        this.clientHandler.send({
+                            status : Status.SAVE_GAME,
+                            command : Command.NONE,
+                            content : game
+                        });
+                    }
                 }
                 case Status.CLIENT_STATUS : {
                     if(message.command == Command.DELETE){

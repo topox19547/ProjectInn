@@ -21,7 +21,7 @@ export class SaveManager{
             }
             parsedGames.unshift({
                 game : game,
-                info : `Last played at: ${new Date().toString()}`
+                info : `Last played at: ${new Date().toLocaleString()}`
             });
             localStorage.setItem(this.gamesKey, JSON.stringify(parsedGames));
         } catch (e){
@@ -33,7 +33,7 @@ export class SaveManager{
         const games : string | null = localStorage.getItem(this.gamesKey)
         try{
             const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
-            parsedGames.splice(id)
+            parsedGames.splice(id,1)
             localStorage.setItem(this.gamesKey, JSON.stringify(parsedGames));
         } catch (e){
             this.handleSaveError(e);
@@ -42,9 +42,10 @@ export class SaveManager{
 
     public LoadGame(id : number) : Game | undefined{
         const games : string | null = localStorage.getItem(this.gamesKey)
+        console.log(id);
         try{
             const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
-            return parsedGames.length > id && id > 0 ? parsedGames[id].game : undefined;
+            return parsedGames.length > id && id >= 0 ? parsedGames[id].game : undefined;
         } catch (e){
             this.handleSaveError(e);
         }
@@ -57,7 +58,10 @@ export class SaveManager{
             const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
             let currentId : number = 0;
             for(const entry of parsedGames){
-                gamesPreview.push({name : entry.game.name, info : entry.info, id: currentId});
+                gamesPreview.push({
+                    name: entry.game.name, info: entry.info, id: currentId,
+                    private: false
+                });
                 currentId++;
             }
         } catch(e){

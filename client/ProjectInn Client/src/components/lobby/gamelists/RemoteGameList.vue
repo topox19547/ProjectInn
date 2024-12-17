@@ -27,8 +27,8 @@
                     <img :src=Info class="infoButton" @click.stop="$emit('openGameInfo', game.id)">
                 </template>
             </GameEntry>
+            <div class="spacer" v-if="remoteGames.length > 0"></div>
         </template>
-        <div class="spacer" v-if="remoteGames.length > 0"></div>
         <template v-slot:fab>
             <Fab text="Join with ID" @click="$emit('joinById')"  :icon=Join></Fab>
         </template>

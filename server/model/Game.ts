@@ -65,7 +65,7 @@ export class Game implements NotificationSource{
         this.endCallback = () => {};
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>) : Game | undefined{
+    public static fromObject(object : ReturnType<typeof this.validate>, notifier : ClientNotifier) : Game | undefined{
         const currentSceneIndex : number = 
             object.scenes.findIndex(s => s.asset.assetID == object.currentScene);
         if(currentSceneIndex == -1){
@@ -76,8 +76,7 @@ export class Game implements NotificationSource{
             object.ownerName,
             Scene.fromObject(object.scenes[currentSceneIndex])
         );
-        object.scenes.splice(1, currentSceneIndex); //prevent the current scene from being added in twice
-        const notifier = new ClientNotifier();
+        object.scenes.splice(currentSceneIndex, 1); //prevent the current scene from being added in twice
         const sortById = (t1 : Identifiable,t2 : Identifiable) => {
             return t1.getID() < t2.getID() ? -1 : t1.getID() == t2.getID() ? 0 : 1
         };
@@ -98,13 +97,17 @@ export class Game implements NotificationSource{
                     dest.push(restored)
                 }
                 dest.sort(sortById);
-                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID()))){
+                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID() && e1 != e2))){
                     return false;
                 }
                 return true;
         }
         for(const player of object.players){
+            if(player.name.length > Player.getMaxNameLength()){
+                return undefined;
+            }
             const newPlayer = Player.fromObject(player);
+            newPlayer.setConnected (false);
             newPlayer.setNotifier(notifier);
             if(!game.addPlayer(newPlayer)){
                 return undefined;
@@ -139,7 +142,7 @@ export class Game implements NotificationSource{
             tokens : game.tokens.map(t => Token.toObject(t)),
             password : game.password,
             currentScene : game.currentScene.getID(),
-            chat : game.chat.getChatHistory()
+            chat : game.getChatInstance().getChatHistory()
         };
     }
 
@@ -404,8 +407,8 @@ export class Game implements NotificationSource{
         return this.password === undefined || attempt === this.password;
     }
 
-    public setPassword(password : string) : boolean{
-        if(password.length > this.maxPasswordLength){
+    public setPassword(password : string | undefined) : boolean{
+        if( password !== undefined && password.length > this.maxPasswordLength){
             return false;
         }
         this.password = password;
