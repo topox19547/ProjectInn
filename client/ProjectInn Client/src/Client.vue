@@ -2,9 +2,9 @@
   import GameView from './components/game/GameView.vue';
   import { WebSocketHandler } from './network/WebsocketHandler.js';
   import { MessageHandler } from './network/MessageHandler.js';
-  import { provide, ref, type Ref } from 'vue';
+  import { provide, ref, watch, type Ref } from 'vue';
   import type { ServerPublisher } from './network/ServerHandler.js';
-  import type { Game } from './model/Game.js';
+  import type { Game, LocalSettings } from './model/Game.js';
   import type { Lobby } from './model/Lobby.js';
   import LobbyView from './components/lobby/LobbyView.vue';
   import { SaveManager } from './filesystem/SaveManager.js';
@@ -17,6 +17,7 @@
 
   const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
+  const localSettings : Ref<LocalSettings | undefined> = ref(undefined);
   const saveManager : SaveManager = new SaveManager();
   let localGames : Array<GamePreview> = new Array();
   let invalidLocalGames : boolean = false;
@@ -26,7 +27,7 @@
     localGames : localGames
   });
   refreshLocalGames();
-  const messageHandler : MessageHandler = new MessageHandler(lobby,game);
+  const messageHandler : MessageHandler = new MessageHandler(lobby,game,localSettings);
   const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames,notifyNetworkError);
   provide("serverPublisher", serverPublisher);
 
@@ -54,6 +55,10 @@
     refreshLocalGames();
   }
 
+  function loadGameSettings(settings : LocalSettings){
+    localSettings.value = settings;
+  }
+
   function refreshLocalGames(){
     try{
       lobby.value.localGames = saveManager.getGameList()
@@ -61,6 +66,10 @@
       invalidLocalGames = true;
     }
   }
+
+  watch(game, () => {
+    refreshLocalGames();
+  })
 
 </script>
 
@@ -70,7 +79,8 @@
   <LobbyView v-if="game === undefined" 
   :lobby="lobby"
   :invalid-local-games="invalidLocalGames"
-  @delete-game="deleteLocalGame"></LobbyView>
+  @delete-game="deleteLocalGame"
+  @load-game-settings="loadGameSettings"></LobbyView>
   <Transition name="game">
     <GameView v-if="game !== undefined" :game=game></GameView>
   </Transition>

@@ -1,5 +1,6 @@
-import type { Game } from "../model/Game.js";
+import type { Game, LocalSettings } from "../model/Game.js";
 import type { GamePreview } from "../model/gamePreview.js";
+import type { SavedGame } from "../model/SavedGame.js";
 
 export class SaveManager{
     private readonly gamesKey : string;
@@ -11,17 +12,18 @@ export class SaveManager{
         }
     }
 
-    public SaveGame(game : Game) : void{
+    public SaveGame(game : Game, localSettings : LocalSettings) : void{
         const games : string | null = localStorage.getItem(this.gamesKey)
         try{
-            const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
+            const parsedGames : Array<SavedGame> = JSON.parse(games!);
             const index = parsedGames.findIndex(g => g.game.name == game.name);
             if(index != -1){
                 parsedGames.splice(index,1);
             }
             parsedGames.unshift({
                 game : game,
-                info : `Last played at: ${new Date().toLocaleString()}`
+                info : `Last played at: ${new Date().toLocaleString()}`,
+                localSettings : localSettings
             });
             localStorage.setItem(this.gamesKey, JSON.stringify(parsedGames));
         } catch (e){
@@ -32,7 +34,7 @@ export class SaveManager{
     public DeleteGame(id : number) : void{
         const games : string | null = localStorage.getItem(this.gamesKey)
         try{
-            const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
+            const parsedGames : Array<SavedGame> = JSON.parse(games!);
             parsedGames.splice(id,1)
             localStorage.setItem(this.gamesKey, JSON.stringify(parsedGames));
         } catch (e){
@@ -40,12 +42,12 @@ export class SaveManager{
         }
     }
 
-    public LoadGame(id : number) : Game | undefined{
+    public LoadGame(id : number) : SavedGame | undefined{
         const games : string | null = localStorage.getItem(this.gamesKey)
         console.log(id);
         try{
-            const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
-            return parsedGames.length > id && id >= 0 ? parsedGames[id].game : undefined;
+            const parsedGames : Array<SavedGame> = JSON.parse(games!);
+            return parsedGames.length > id && id >= 0 ? parsedGames[id] : undefined;
         } catch (e){
             this.handleSaveError(e);
         }
@@ -55,7 +57,7 @@ export class SaveManager{
         const gamesPreview : Array<GamePreview> = new Array();
         const games : string | null = localStorage.getItem(this.gamesKey);
         try{    
-            const parsedGames : Array<{game : Game, info : string}> = JSON.parse(games!);
+            const parsedGames : Array<SavedGame> = JSON.parse(games!);
             let currentId : number = 0;
             for(const entry of parsedGames){
                 gamesPreview.push({

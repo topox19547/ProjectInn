@@ -1,4 +1,4 @@
-import type { WeakVector2 } from "../types/Vector2.js"
+import type { Vector2, WeakVector2 } from "../types/Vector2.js"
 import type { Stat } from "./Stat.js"
 
 export interface Token{
@@ -10,5 +10,6 @@ export interface Token{
     stats : Record<string, Stat>
     position : WeakVector2
     inDrag : boolean,
-    byUser : string
+    byUser : string,
+    virtualPosition : undefined | Vector2
 }

@@ -17,7 +17,8 @@
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);
     const confirmDisabled = ref(true);
-    const errorOccurred = ref(false);
+    let imageValid = false;
+    let errorOccurred = false;
     const emits = defineEmits<{
         close : void
     }>();
@@ -30,26 +31,31 @@
     }>();
 
     function enableConfirm() : void{
-        confirmDisabled.value = false;
+        confirmDisabled.value = !(imageValid && props.asset.name.length > 0);
     }
 
     function onLoadError(e : any) : void{
         confirmDisabled.value = true;
-        errorOccurred.value = true;
+        errorOccurred= true;
         e.target.src = ErrorImage;
     }
     
-    function onLoadSuccess(e : any) : void{
-        if(!errorOccurred.value){
+    function onLoadSuccess() : void{
+        if(!errorOccurred){
+            imageValid = true
             enableConfirm(); 
         }
-        errorOccurred.value = false
+        errorOccurred = false
     }
 
     function confirm() : void{
         confirmDisabled.value = true;
         props.onConfirm();
     }
+
+    watch(() => props.asset.assetURL, () => {
+        imageValid = false;
+    })
 </script>
 
 
@@ -68,7 +74,7 @@
                 <div class="contentContainer">
                     <div class="editor">
                         <div class="inputTitle">Asset name</div>
-                        <input class="textBox" v-model="asset.name" maxlength="24" type="text">
+                        <input class="textBox" @input="enableConfirm" v-model="asset.name" maxlength="24" type="text">
                         <div class="titleWithHelp">
                             <div class="inputTitle">
                                 Image URL

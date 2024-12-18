@@ -27,7 +27,7 @@
     const deletingAsset = ref<Asset>(createEmptyAsset());
     let editingAsset : Asset = createEmptyAsset();
     const editableAsset = ref<Asset>(createEmptyAsset());
-    const canDelete = computed(() => props.assets.length > 1);
+    const canDelete = computed(() => props.assets.length >= 0);
 
     function createEmptyAsset(){
         return {

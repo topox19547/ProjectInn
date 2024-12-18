@@ -17,10 +17,21 @@
         (e : 'deleteAsset', asset : Asset) : void
         (e : 'assetClicked', asset : Asset) : void
     }>();
+
+    function onDragStart(e : DragEvent){
+        console.log("drag started");
+        if(e.dataTransfer === null){
+            return;
+        }
+        e.dataTransfer.dropEffect="move";
+        e.dataTransfer.effectAllowed="move";
+        e.dataTransfer.setData("id", props.asset.assetID.toString());
+        e.dataTransfer.setData("name", props.asset.name);
+    }
 </script>
 
 <template>
-    <div class="card" @click="$emit('assetClicked', asset)"
+    <div class="card" @drop="console.log('aa')" draggable @click="$emit('assetClicked', asset)" @dragstart="onDragStart" @dragend="console.log('e')"
     @mouseenter="hoveredOn = true" 
     @mouseleave="hoveredOn = false">
         <div class="hoverButton">
@@ -62,6 +73,7 @@
         margin: 8px;
         justify-content: space-between;
         align-items: center;
+        user-select: none;
     }
 
     .card:hover{
@@ -77,7 +89,6 @@
         padding-bottom:16px;
         text-align: center;
         text-overflow: ellipsis;
-        user-select: none;
     }
 
     .sprite{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+    import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
     import { Vector2, type WeakVector2 } from '../../../types/Vector2.js';
     import type { Token } from '../../../model/Token.js';
     import type { Scene } from '../../../model/Scene.js';
@@ -10,17 +10,24 @@
     import type { Grid } from './grid/Grid.js';
     import { HexagonGrid } from './grid/HexagonGrid.js';
     import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
+    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+import type { Player } from '../../../model/Player.js';
     const props = defineProps<{
         tokens : Array<Token>
         currentScene : Scene
         tokenAssets : Array<Asset>
+        localPlayer : Player
+        players : Array<Player>
         rounded : string
         canvasSize : WeakVector2
         onLoadError? : () => void;
         onLoadSuccess? : (img : ImageBitmap) => void;  
     }>();
+
+
     const loadError = ref(false);
     const canvas = useTemplateRef("board");
+    const serverPublisher = inject("serverPublisher") as ServerPublisher;
     let renderer: BoardRenderer;
 
     function changeScene(newScene : Scene, renderer : BoardRenderer){
@@ -38,14 +45,16 @@
     onMounted(() => {
         if(canvas.value !== null){
             renderer = 
-                new BoardRenderer(canvas.value, props.tokens, props.currentScene, props.tokenAssets);
+                new BoardRenderer(canvas.value, props.tokens, props.currentScene, props.tokenAssets, serverPublisher);
         }
         watch(() => props.tokenAssets, (newAssets) => {
+            renderer.startCacheUpdate();
             newAssets.forEach(a => {
                 if(a.assetURL !== undefined){
                     renderer.updateSpriteCache(a.assetID, a.assetURL);
                 }
             })
+            renderer.clearUnusedSprites();
         }, {deep : true, immediate : true})
         watch(() => props.currentScene, (newScene) => {
             console.log("aaaaa");
@@ -59,7 +68,8 @@
 </script>
 
 <template>
-    <canvas ref="board" class="canvas" :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
+    <canvas @dragover.prevent @dragenter.prevent
+    ref="board" class="canvas" :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
         Game board
     </canvas>
     <ErrorWindow title="Load error" 

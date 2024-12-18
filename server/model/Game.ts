@@ -206,7 +206,7 @@ export class Game implements NotificationSource{
             isSystem: true,
             text: `${player.getName()} has left the game`
         })
-        this.notifier?.unsubscribe(handler);
+        this.notifier?.removeClientsIf(p => p.getName() == player.getName());
         if(this.players.every(p => !p.isConnected())){
             this.endGame();
         }
@@ -263,6 +263,12 @@ export class Game implements NotificationSource{
         const assetIndex : number = this.tokenAssets.findIndex(a => a.getID() == id);
         if(!(this.tokenAssets.splice(assetIndex, 1).length >= 1)){
             return false
+        }
+        for(let i =  this.tokens.length - 1; i >= 0; i--){
+            const token = this.tokens[i];
+            if(token.getAsset().getID() == id){
+                this.removeToken(token.getID());
+            }
         }
         this.notifier?.notify({
             status : Status.TOKEN_ASSET,

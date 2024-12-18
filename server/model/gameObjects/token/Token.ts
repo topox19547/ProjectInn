@@ -51,7 +51,7 @@ export class Token implements Identifiable, NotificationSource{
     }
 
     public static fromObject(object: ReturnType<typeof this.validate>, gameContext : Game): Token | undefined {
-        const asset : Asset | undefined = gameContext.getTokenAsset(object.id);
+        const asset : Asset | undefined = gameContext.getTokenAsset(object.assetID);
         if(asset == undefined){
             return undefined
         }
@@ -243,11 +243,14 @@ export class Token implements Identifiable, NotificationSource{
     }
 
     public acquireDragLock(username : string) : boolean{
+        if(this.dragLockOwner == username){
+            return true;
+        }
         if(this.dragLockOwner !== undefined){
             return false;
         }
         this.dragLockOwner = username;
-        this.dragLockTimer = setTimeout(this.timeoutDrag, 30)
+        this.dragLockTimer = setTimeout(() => this.timeoutDrag(), 30000)
         return true;
     }
     
@@ -274,7 +277,7 @@ export class Token implements Identifiable, NotificationSource{
             }
         });
         clearTimeout(this.dragLockTimer); //refresh the time limit
-        this.dragLockTimer = setTimeout(this.timeoutDrag, 30);
+        this.dragLockTimer = setTimeout(() => this.timeoutDrag(), 30000);
     }
 
     public endDrag(position : Vector2, user : string) : void{

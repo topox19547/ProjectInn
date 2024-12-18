@@ -18,7 +18,8 @@
     const showSceneMenu = ref(false);
     const showGameSettings = ref(false);
     const showSaveGamePopUp = ref(false);
-    const showLeaveRoomPopup = ref(false);
+    const showLeaveGamePopup = ref(false);
+    const saveOnLeave = ref(true);
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const autosaveTimeInterval = 60000; //save every minute
     let autosaveInterval = -1;
@@ -56,7 +57,23 @@
             status : Status.SAVE_GAME,
             command : Command.NONE,
             content : {}
-        })
+        });
+    }
+
+    function leaveGame(){
+        if(saveOnLeave.value == true){
+            requestGameSave();
+        }
+        serverPublisher.send({
+            status : Status.CLIENT_STATUS,
+            command : Command.DELETE,
+            content : {}
+        });
+    }
+
+    function closeLeaveGame(){
+        showLeaveGamePopup.value = false;
+        saveOnLeave.value = true
     }
 
     watch(() => props.game.localSettings.autoSaveEnabled,(autosaveEnabled) => {
@@ -76,7 +93,7 @@
 
 <template>
     <div class="topbarContent">
-        <div class="topbarButton">
+        <div class="topbarButton" @click="showLeaveGamePopup = true">
             <img :src="LeaveIcon">
             <div>Leave Room</div>
         </div>
@@ -88,7 +105,7 @@
         <div class="topbarButton" @click="showGameSettings = true"
         v-if="game.localPlayer.permissions[Permission.MASTER]">
             <img :src="SettingsIcon">
-            <div>Room Settings</div>
+            <div>Game Settings</div>
         </div>
         <div class="topbarButton" @click="showSceneMenu = true" 
         v-if="game.localPlayer.permissions[Permission.MANAGE_SCENES]">
@@ -120,6 +137,22 @@
     :show="showSaveGamePopUp"
     :on-confirm="() => showSaveGamePopUp = false">
     </ConfirmAction>
+    <ConfirmAction
+    action="Leave"
+    :destructive="false"
+    :icon="LeaveIcon"
+    message="Are you sure you want to leave the game?"
+    title="Leave"
+    :show="showLeaveGamePopup"
+    :on-confirm="leaveGame"
+    @close="closeLeaveGame">
+        <template v-slot:additionalContent>
+            <div class="section" v-if="game.localPlayer.isOwner">
+                <div class="inputTitle">Save the game before leaving:</div>
+                <input class="toggle" v-model="saveOnLeave" type="checkbox">
+            </div>
+        </template>
+    </ConfirmAction>
 </template>
 
 <style scoped>
@@ -144,4 +177,15 @@
     .topbarButton:hover{
         opacity: 0.75;
     }
+
+    .section{
+        display: flex;
+        justify-content: space-between;
+        accent-color:#303F9F;
+        padding-inline: 16px;
+        padding-top: 8px;
+        gap:8px;
+        font-weight: bold;
+    }
+
 </style>

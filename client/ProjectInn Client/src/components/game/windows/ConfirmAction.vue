@@ -30,7 +30,7 @@
         <WindowBackground  v-if="show" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="200px" window-width="400px"  v-if="show" >
+        <WindowBase window-height="fit-content" window-width="400px"  v-if="show" >
             <template v-slot:content>
                 <WindowTitleBar :title="title" :icon="icon">
                     <template v-slot:back>
@@ -39,12 +39,17 @@
                 </WindowTitleBar>
                 <div class="content">
                     <div class="message">{{ message }}</div>
-                    <ButtonBase :text="action" :color="destructive ? { active : '#9D2C2C', hover : '#CD3A3A'} : undefined" 
-                    @click="() => {
-                        onConfirm();
-                        $emit('close');
-                        }">
-                    </ButtonBase>
+                    <slot name="additionalContent">
+
+                    </slot>
+                    <div class="buttonContainer">
+                        <ButtonBase :text="action" :color="destructive ? { active : '#9D2C2C', hover : '#CD3A3A'} : undefined" 
+                        @click="() => {
+                            onConfirm();
+                            $emit('close');
+                            }">
+                        </ButtonBase>
+                    </div>
                 </div>
             </template>
         </WindowBase>
@@ -70,6 +75,11 @@
         padding-inline: 32px;
         white-space: pre-wrap;
         text-align: center;
+        padding-top:16px
+    }
+
+    .buttonContainer{
+        padding-top: 48px;
     }
 
     .background-enter-active,

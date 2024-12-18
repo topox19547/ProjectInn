@@ -9,7 +9,7 @@
     import RemoteGameList from './gamelists/RemoteGameList.vue';
     import { inject, ref, type Ref } from 'vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
-    import type { Game } from '../../model/Game.js';
+    import type { Game, LocalSettings } from '../../model/Game.js';
     import { GridType } from '../../model/GridType.js';
     import { AssetType } from '../../model/AssetType.js';
     import GameEditWindow from '../shared/windows/GameEditWindow.vue';
@@ -23,6 +23,7 @@
     import JoinGameWizard from './JoinGameWizard.vue';
     import ConfirmAction from '../game/windows/ConfirmAction.vue';
     import DeleteIcon from '../../assets/icons/delete.svg';
+import type { SavedGame } from '../../model/SavedGame.js';
 
       
     const failedLoadText = 
@@ -46,6 +47,7 @@ Press the button below to clear it.`;
 
     const emits = defineEmits<{
         (e : 'deleteGame', id : number) : void,
+        (e : 'loadGameSettings', settings : LocalSettings) : void
     }>();
 
     function clearSaveData(){
@@ -76,13 +78,14 @@ Press the button below to clear it.`;
     }
 
     function loadGame(id : number){
-        const game = saveManager.LoadGame(id);
+        const savedGame : SavedGame | undefined = saveManager.LoadGame(id);
+        emits('loadGameSettings', savedGame?.localSettings);
         serverPublisher.send({
             status : Status.LOAD_GAME,
             command : Command.CREATE,
-            content : game
-        })
-    }  
+            content : savedGame?.game
+        });
+    }
 </script>
 
 <template>

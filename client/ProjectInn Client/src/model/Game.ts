@@ -15,9 +15,11 @@ export interface Game{
     currentScene : Scene 
     password : string | undefined
     chat : Array<ChatMessage>
-    localSettings : {
-        autoSaveEnabled : boolean
-    }
+    localSettings : LocalSettings
+}
+
+export interface LocalSettings{
+    autoSaveEnabled : boolean
 }
 
 export function getDefaultLocalSettings(game : Game){

@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import { getDefaultLocalSettings, type Game } from "../model/Game.js";
+import { getDefaultLocalSettings, type Game, type LocalSettings } from "../model/Game.js";
 import type { Message } from "./message/Message.js";
 import { Status } from "./message/Status.js";
 import { Command } from "./message/Command.js";
@@ -16,11 +16,13 @@ import { SaveManager } from "../filesystem/SaveManager.js";
 export class MessageHandler{
     private lobby : Ref<Lobby>;
     private game : Ref<Game | undefined>;
+    private localSettings : Ref<LocalSettings | undefined>
     private saveManager : SaveManager;
 
-    constructor(lobby : Ref<Lobby>, game : Ref<Game | undefined>){
+    constructor(lobby : Ref<Lobby>, game : Ref<Game | undefined>, localSettings : Ref<LocalSettings | undefined>){
         this.lobby = lobby;
         this.game = game;
+        this.localSettings = localSettings;
         this.saveManager = new SaveManager();
     }
 
@@ -40,7 +42,11 @@ export class MessageHandler{
                         (s : Scene) => s.asset.assetID == content.game.currentScene);
                     this.game.value.localPlayer = content.game.players.find(
                         (p : Player) => content.player == p.name);
-                    this.game.value.localSettings = getDefaultLocalSettings(this.game.value);
+                    if(this.localSettings.value !== undefined){
+                        this.game.value.localSettings = this.localSettings.value
+                    } else {
+                        this.game.value.localSettings = getDefaultLocalSettings(this.game.value);
+                    }
                 }
             }
             return;
@@ -152,12 +158,17 @@ export class MessageHandler{
                 this.game.value.password = content.password;
             }
             case Status.CLIENT_STATUS:{
+                if(content.name == this.game.value.localPlayer.name){
+                    this.game.value = undefined;
+                    this.localSettings.value = undefined;
+                    return;
+                }
                 const index : number = this.game.value.players.findIndex(p => p.name == content.name);
                 this.game.value.players[index].connected = content.connected;
                 break;
             }
             case Status.SAVE_GAME:{
-                this.saveManager.SaveGame(content);
+                this.saveManager.SaveGame(content, this.game.value.localSettings);
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

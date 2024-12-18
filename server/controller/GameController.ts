@@ -54,7 +54,9 @@ export class GameController implements ClientState{
                         throw new ValueError("Invalid position sent by client");
                     }
                     if(message.status == Status.TOKEN_MOVING){
-                        token.drag(position, this.clientPlayer.getName());
+                        if(token.acquireDragLock(this.clientPlayer.getName())){
+                            token.drag(position, this.clientPlayer.getName());
+                        }
                     }else{
                         token.endDrag(position, this.clientPlayer.getName());
                     }
@@ -337,6 +339,7 @@ export class GameController implements ClientState{
                             content : game
                         });
                     }
+                    break;
                 }
                 case Status.CLIENT_STATUS : {
                     if(message.command == Command.DELETE){

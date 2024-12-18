@@ -17,6 +17,7 @@
     const props = defineProps<{
         game : Game
     }>();
+
     setCanvasSize();
     window.addEventListener("resize", setCanvasSize);
 

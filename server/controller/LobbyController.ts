@@ -46,6 +46,9 @@ export class LobbyController implements ClientState{
                     startingScene.setNotifier(notifier);
                     const game : Game = new Game(content.gameName, content.username, startingScene);
                     game.setNotifier(notifier);
+                    if(content.username.length > Player.getMaxNameLength()){
+                        throw new ValueError("The player's name is too long");
+                    }
                     const player : Player = new Player(content.username, new Color(content.playerColor), true)
                     game.addPlayer(player);
                     if (content.password !== undefined){
@@ -61,7 +64,7 @@ export class LobbyController implements ClientState{
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : player.getName(),
+                            player : player.getName()
                         }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
@@ -87,7 +90,7 @@ export class LobbyController implements ClientState{
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : player.getName(),
+                            player : player.getName()
                         }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
@@ -108,6 +111,9 @@ export class LobbyController implements ClientState{
                     }
                     if(!game.checkPassword(content.password)){
                         throw new ValueError("Wrong password")
+                    }
+                    if(content.username.length > Player.getMaxNameLength()){
+                        throw new ValueError("The player's name is too long");
                     }
                     let player : Player | undefined = game.getPlayer(content.username);
                     if(!player){

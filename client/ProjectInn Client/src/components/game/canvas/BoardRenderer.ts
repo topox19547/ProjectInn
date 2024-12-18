@@ -5,6 +5,10 @@ import type { Ref } from "vue";
 import type { Asset } from "../../../model/Asset.js";
 import type { Scene } from "../../../model/Scene.js";
 import { SquareGrid } from "./grid/SquareGrid.js";
+import type { ServerPublisher } from "../../../network/ServerHandler.js";
+import { Status } from "../../../network/message/Status.js";
+import { Command } from "../../../network/message/Command.js";
+import type { Player } from "../../../model/Player.js";
 
 export class BoardRenderer{
     //the offset of the view as the coordinates of its top left corner
@@ -15,24 +19,31 @@ export class BoardRenderer{
     private grid:Grid;
     private readonly maxScale:number;
     private readonly scrollWheelMultiplier;
-    private isMouseDown:boolean;
-    private isMouseIn:boolean;
+    private isCursorDown:boolean;
+    private isCursorIn:boolean;
+    private draggedToken : Token | undefined;
     private background:ImageBitmap | undefined;
     private backgroundSource : string | undefined;
     private defaultBackground:ImageBitmap | undefined;
     private placeHolderSpriteColor:string;
-    private spriteCache:Map<number,{url : string, sprite : ImageBitmap | undefined}>;
+    private spriteCache:Map<number,{
+        url : string | undefined, 
+        sprite : ImageBitmap | undefined,
+        unused : boolean}>;
     private tokens:Array<Token>;
     private currentScene:Scene;
     private tokenAssets:Array<Asset>;
     private nextAnimationFrameID:number;
+    private serverPublisher : ServerPublisher;
 
 
     constructor(
         canvas:HTMLCanvasElement,
         tokens:Array<Token>,
+        localPlayer:Player,
         currentScene:Scene,
-        tokenAssets : Array<Asset>){
+        tokenAssets : Array<Asset>,
+        serverPublisher : ServerPublisher){
         console.log("new boardrenderer created");
         this.tokens = tokens;
         this.currentScene = currentScene;
@@ -40,8 +51,9 @@ export class BoardRenderer{
         this.viewScale = 1;
         this.maxScale = 1.75;
         this.scrollWheelMultiplier = 1 / 2000;
-        this.isMouseDown = false;
-        this.isMouseIn = false;
+        this.isCursorDown = false;
+        this.isCursorIn = false;
+        this.draggedToken = undefined;
         this.viewOffset = new Vector2(0,0);
         this.grid = new SquareGrid(10,new Vector2(0,0),1);
         this.placeHolderSpriteColor = "#222222"
@@ -52,6 +64,7 @@ export class BoardRenderer{
         this.backgroundSource = undefined;
         this.spriteCache = new Map();
         this.nextAnimationFrameID = 0;
+        this.serverPublisher = serverPublisher;
         this.bindEvents();
     }
 
@@ -89,18 +102,42 @@ export class BoardRenderer{
         })
     }
 
+
+    public startCacheUpdate():void{
+        this.spriteCache.forEach((v, k) => v.unused = true);
+    }
+
     public updateSpriteCache(id:number, url:string):void{
-        if(!(this.spriteCache.get(id)?.url == url)){
+        let spriteEntry = this.spriteCache.get(id); 
+        if(spriteEntry == undefined){
+            spriteEntry = {
+                url : undefined,
+                sprite : undefined,
+                unused : false
+            };
+            this.spriteCache.set(id, spriteEntry);
+        }
+        spriteEntry.unused = false;
+        if(spriteEntry.url != url){
             const image : HTMLImageElement = new Image();
             image.src = url;
             createImageBitmap(image).then(s => {
-                this.spriteCache.set(id, {url : url, sprite : s});
+                spriteEntry.sprite = s;
             }).catch( 
-                () => this.spriteCache.set(id, {url : url, sprite : undefined})
-            )
+                () => {
+                    spriteEntry.sprite = undefined;
+            });
         }
+        spriteEntry.url = url;
     }
 
+    public clearUnusedSprites():void{
+        this.spriteCache.forEach((v,k) => {
+            if(v.unused == true){
+                this.spriteCache.delete(k);
+            }
+        });
+    }
 
     public updateOnScreenTokens():void {
         const topLeftTile:Vector2 = this.grid.canvasToTile(this.viewOffset, new Vector2(0,0), this.viewScale);
@@ -151,25 +188,29 @@ export class BoardRenderer{
                     2 * Math.PI
                 )
                 this.ctx.fill();
-                return;
+            
+            }else{
+                this.ctx.drawImage(
+                    spriteData.sprite,
+                    tokenPosition.getX() + tokenOffset.getX(),
+                    tokenPosition.getY() + tokenOffset.getY(),
+                    Math.floor(tokenSize.getX()),
+                    Math.floor(tokenSize.getY()));
             }
-            this.ctx.drawImage(
-                spriteData.sprite,
-                tokenPosition.getX() + tokenOffset.getX(),
-                tokenPosition.getY() + tokenOffset.getY(),
-                Math.floor(tokenSize.getX()),
-                Math.floor(tokenSize.getY()));
         }
         
     }
 
     private bindEvents(){
-        this.canvas.onmousedown = () => this.onMouseDown();
-        this.canvas.onmouseup = () => this.onMouseUp();
-        this.canvas.onmouseleave = () => this.onMouseLeave();
-        this.canvas.onmouseover = () => this.onMouseOver();
+        this.canvas.onmousedown = () => this.onCursorDown();
+        this.canvas.onmouseup = () => this.onCursorUp();
+        this.canvas.onmouseleave = () => this.onCursorLeave();
+        this.canvas.onmouseover = () => this.onCursorOver();
         this.canvas.onmousemove = e => this.onMouseMoved(e);
         this.canvas.onwheel = e => this.onWheelEvent(e);
+        this.canvas.ondragenter = e => e.preventDefault();
+        this.canvas.ondragover = e => e.preventDefault();
+        this.canvas.ondrop = e => this.onDrop(e);
     }
 
     private unbindEvents(){
@@ -179,23 +220,43 @@ export class BoardRenderer{
         this.canvas.onmouseover = null;
         this.canvas.onmousemove = null;
         this.canvas.onwheel = null;
+        this.canvas.ondragover = null;
+        this.canvas.ondragenter = null;
+        this.canvas.ondrop = null;
     }
 
-    private onMouseDown() : void{
-        this.isMouseDown = true;
+    private onCursorDown() : void{
+        this.isCursorDown = true;
     }
 
-    private onMouseUp() : void{
-        this.isMouseDown = false;
+    private onCursorUp() : void{
+        this.isCursorDown = false;
+        if(this.draggedToken !== undefined){
+            if(this.draggedToken.virtualPosition !== undefined){
+                this.serverPublisher.send({
+                    status : Status.TOKEN_MOVED,
+                    command : Command.MODIFY,
+                    content : {
+                        id : this.draggedToken.id,
+                        position : this.grid.canvasToTile(
+                            this.viewOffset,
+                            this.draggedToken.virtualPosition,
+                            this.viewScale)
+                    }
+                });
+            }
+            this.draggedToken.virtualPosition = undefined
+            this.draggedToken = undefined;
+        }
     }
 
-    private onMouseLeave() : void{
-        this.isMouseDown = false;
-        this.isMouseIn = false;
+    private onCursorLeave() : void{
+        this.isCursorDown = false;
+        this.isCursorIn = false;
     }
 
-    private onMouseOver() : void{
-        this.isMouseIn = true;
+    private onCursorOver() : void{
+        this.isCursorIn = true;
     }
 
     private onMouseMoved(e : MouseEvent) : void{
@@ -208,27 +269,69 @@ export class BoardRenderer{
     }
 
     private onWheelEvent(e : WheelEvent) : void{
-        if(!this.isMouseIn){
+        if(!this.isCursorIn){
             return;
         }
         const boundingRect = this.canvas.getBoundingClientRect();
         this.cursorZoomed(e.deltaY,new Vector2(e.clientX - boundingRect.x,e.clientY - boundingRect.y));
     }
 
-    private cursorMoved(movement:Vector2, position:Vector2):void{
-        let overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
-        //console.log(position);
-        //console.log(overlappedTile);
-        if(!this.isMouseDown){
+    private onDrop(e : DragEvent){
+        if(e.dataTransfer?.getData("id") == undefined || e.dataTransfer.getData("name") == undefined){
             return;
         }
-        //let overlappedToken:ImageBitmap = this.onScreenTokens.get(overlappedTile);
-        //console.log(overlappedToken);
-        //if(overlappedToken == undefined){
-            
-        //}
+        const boundingRect = this.canvas.getBoundingClientRect();
+        const mousePosition : Vector2 = new Vector2(e.clientX - boundingRect.x, e.clientY - boundingRect.y);
+        const tilePosition : Vector2 = this.grid.canvasToTile(this.viewOffset,mousePosition,this.viewScale);
+        this.sendNewToken(
+            parseInt(e.dataTransfer?.getData("id")),
+            e.dataTransfer?.getData("name"),
+            tilePosition);
+    }
+
+    private sendNewToken(id : number, name : string, position : Vector2){
+        this.serverPublisher.send({
+            status : Status.TOKEN,
+            command : Command.CREATE,
+            content : {
+                name : name,
+                id : -1,
+                assetID : id,
+                owners : [],
+                notes : {},
+                stats : {},
+                position : position
+            }
+        })
+    }
+
+    private cursorMoved(movement:Vector2, position:Vector2):void{
+        if(!this.isCursorDown){
+            return;
+        }   
+        const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
+        if(this.draggedToken !== undefined){
+            this.draggedToken.virtualPosition = position;
+            const previousTile:Vector2 = this.grid.canvasToTile(
+                this.viewOffset, this.draggedToken.virtualPosition, this.viewScale);
+            if(overlappedTile != previousTile)
+                this.serverPublisher.send({
+                    status : Status.TOKEN_MOVING,
+                    command : Command.MODIFY,
+                    content : {
+                        id : this.draggedToken.id,
+                        position : overlappedTile
+                    }
+                });
+            return;
+        }
+        const overlappedToken:Token | undefined = 
+            this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
+        if(overlappedToken !== undefined){
+            this.draggedToken = overlappedToken;
+            return;
+        }
         this.translateView(movement);
-        
     }
 
     private cursorZoomed(deltaY:number,cursorPos:Vector2):void{
