@@ -50,14 +50,17 @@ export class GameController implements ClientState{
                     })(message.content);
                     const token : Token = this.getTokenIfAuthorized(content.id, false);
                     const position : Vector2 = new Vector2(content.position.x, content.position.y)
-                    if(!this.currentGame.getCurrentScene().isValidPosition(position)){
-                        throw new ValueError("Invalid position sent by client");
-                    }
                     if(message.status == Status.TOKEN_MOVING){
+                        if(!this.currentGame.getCurrentScene().isValidPosition(position)){
+                            throw new ValueError("Invalid position sent by client");
+                        }
                         if(token.acquireDragLock(this.clientPlayer.getName())){
                             token.drag(position, this.clientPlayer.getName());
                         }
                     }else{
+                        if(!this.currentGame.getCurrentScene().isValidPosition(position)){
+                            token.endDrag(token.getPosition(), this.clientPlayer.getName());
+                        }
                         token.endDrag(position, this.clientPlayer.getName());
                     }
                     break;
@@ -220,9 +223,10 @@ export class GameController implements ClientState{
                     if(!content.value == true){
                         return;
                     }
-                    if(permission == Permission.MANAGE_SCENES){
+                    if(playerToChange.hasPermission(Permission.MANAGE_SCENES)){
                         this.currentGame.updateClientScenes(playerToChange);
-                    } else if (permission == Permission.MANAGE_TOKENS){
+                    }
+                    if (playerToChange.hasPermission(Permission.MANAGE_TOKENS)){
                         this.currentGame.updateClientTokenAssets(playerToChange);
                     }
                     break;
@@ -251,12 +255,25 @@ export class GameController implements ClientState{
                         scene.setGridType(content.gridType);
                         scene.setOffset(new Vector2(content.offset.x,content.offset.y));
                         scene.setTileSize(content.tileSize);
-                        const asset : Asset = scene.getAsset();
                         const assetSize : Vector2 = new Vector2(
                             content.asset.assetSize.x,
                             content.asset.assetSize.y);
-                        asset.setName(content.asset.name);
-                        asset.setURL(content.asset.assetURL, assetSize);
+                        const minPermission : Permission | undefined = 
+                            this.currentGame.getCurrentScene() == scene ?
+                            undefined : 
+                            Permission.MANAGE_SCENES;
+                        if(!scene.setName(content.asset.name, minPermission)){
+                            throw new ValueError("The supplied name is too long");
+                        }
+                        if(!scene.setURL( 
+                            content.asset.assetURL, 
+                            new Vector2(content.asset.assetSize.x, content.asset.assetSize.y),
+                            minPermission)){
+                            throw new ValueError("The given url is too long")
+                        }
+                        if(this.currentGame.getCurrentScene() == scene){
+                            this.currentGame.adjustTokenPositions(false);
+                        }
                     }
                     break;
                 }
@@ -294,7 +311,11 @@ export class GameController implements ClientState{
                         }
                     } else if (message.command == Command.MODIFY){
                         const content = Asset.validate(message.content);
-                        const asset : Asset = this.getAssetIfAuthorized(content.assetID, AssetType.TOKEN);
+                        const asset : Asset = this.getTokenAssetIfAuthorized(content.assetID);
+                        const minPermission : Permission | undefined = 
+                            this.currentGame.isTokenAssetInUse(asset.getID()) ?
+                            undefined : 
+                            Permission.MANAGE_TOKENS;
                         if(!asset.setName(content.name)){
                             throw new ValueError("The supplied name is too long");
                         }
@@ -312,6 +333,9 @@ export class GameController implements ClientState{
                         const playerToKick = this.currentGame.getPlayer(content.name);
                         if(playerToKick === undefined || playerToKick == this.clientPlayer){
                             throw new ValueError("invalid player");
+                        }
+                        if(playerToKick?.isGameOwner()){
+                            throw new ValueError("the owner cannot be kicked");
                         }
                         if(!this.clientPlayer.isGameOwner() && !this.clientPlayer.hasPermission(Permission.MASTER)){
                             throw new PermissionError();
@@ -388,18 +412,11 @@ export class GameController implements ClientState{
         return scene;
     }
 
-    private getAssetIfAuthorized(id : number, type : AssetType) : Asset{
+    private getTokenAssetIfAuthorized(id : number) : Asset{
         let asset : Asset | undefined;
         let requiredPermission : Permission
-        if(type == AssetType.TOKEN){
-            requiredPermission = Permission.MANAGE_TOKENS;
-            asset = this.currentGame.getTokenAsset(id);
-        }else if(type == AssetType.SCENE){
-            requiredPermission = Permission.MANAGE_SCENES;
-            asset = this.currentGame.getScene(id)?.getAsset();
-        }else{
-            throw new ValueError("Undefined content type");
-        }
+        requiredPermission = Permission.MANAGE_TOKENS;
+        asset = this.currentGame.getTokenAsset(id);
         if(!this.clientPlayer.hasPermission(requiredPermission)){
             throw new PermissionError();
         }

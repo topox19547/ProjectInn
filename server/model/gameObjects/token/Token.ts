@@ -276,6 +276,7 @@ export class Token implements Identifiable, NotificationSource{
                 byUser : user
             }
         });
+        this.position.setTo(position);
         clearTimeout(this.dragLockTimer); //refresh the time limit
         this.dragLockTimer = setTimeout(() => this.timeoutDrag(), 30000);
     }

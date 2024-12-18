@@ -32,7 +32,7 @@ export class Lobby implements NotificationSource{
         this.notifier?.unsubscribe(handler)
     }
 
-    public publishGame(game : Game) : void{
+    public publishGame(game : Game) : number{
         let id = 1;
         while(this.games.has(id)){
             id++;
@@ -42,6 +42,7 @@ export class Lobby implements NotificationSource{
         }
         this.games.set(id, game);
         this.notifier?.notify(this.buildMatchListMessage());
+        return id;
     }
 
     public removeGame(game : Game) : void{

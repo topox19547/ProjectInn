@@ -31,16 +31,18 @@
 </script>
 
 <template>
-    <div class="card" @drop="console.log('aa')" draggable @click="$emit('assetClicked', asset)" @dragstart="onDragStart" @dragend="console.log('e')"
+    <div class="card" @drop="console.log('aa')" draggable @click="$emit('assetClicked', asset)" 
+    @dragstart="onDragStart"
     @mouseenter="hoveredOn = true" 
     @mouseleave="hoveredOn = false">
-        <div class="hoverButton">
+        <div @dragstart="(e) => e.preventDefault()" class="hoverButton">
             <img class="miniButton editButton" 
             :src="editIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
             @click.stop="$emit('editAsset',asset)">
         </div>
-        <div class="hoverButton" v-if="showDelete === undefined || showDelete == true">
+        <div @dragstart="(e) => e.preventDefault()" class="hoverButton" 
+        v-if="showDelete === undefined || showDelete == true">
             <img class="miniButton deleteButton" 
             :src="deleteIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 

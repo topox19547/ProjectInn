@@ -42,9 +42,14 @@
             <BoardCanvas 
             :tokens="game.tokens" 
             :token-assets="game.tokenAssets" 
-            :current-scene="game.currentScene" 
+            :current-scene="game.currentScene"
+            :local-player="game.localPlayer"
+            :players="game.players"
             rounded="0px 16px 0px 0px" 
             :canvas-size="canvasSize"></BoardCanvas>
+            <div class="gameId">
+                ProjectInn Beta, Game id : {{ game.id }}
+            </div>
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">
             <Sidebar
@@ -84,5 +89,18 @@
         flex-direction: column;
         max-height: 100%;
         overflow-y: hidden;
+    }
+
+    .gameId{
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        color: #FFFFFF;
+        pointer-events: none;
+        font-weight: bold;
+        background: #24242480;
+        backdrop-filter: blur(4px);
+        padding: 8px;
+        border-radius: 8px;
     }
 </style>

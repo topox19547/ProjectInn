@@ -5,6 +5,7 @@ import type { Asset } from "./Asset.js"
 import type { ChatMessage } from "./ChatMessage.js"
 
 export interface Game{
+    id : number
     name : string
     ownerName : string
     players : Array<Player>

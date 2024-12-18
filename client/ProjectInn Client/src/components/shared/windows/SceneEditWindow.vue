@@ -11,6 +11,7 @@
     import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../ButtonBase.vue';
     import UploadHelp from '../UploadHelp.vue';
+import { getStartingPlayerData } from '../../../model/Player.js';
     const minTileSize = 30;
     const maxTileSize = 300;
     const tileSizeValue = ref(100);
@@ -120,6 +121,8 @@
                             :tokens="[]" 
                             :token-assets="[]" 
                             :current-scene="scene"
+                            :local-player="getStartingPlayerData()"
+                            :players="[]"
                             :canvas-size="{ x : 256, y : 256}">
                             </BoardCanvas>
                             <div class="previewLabel">

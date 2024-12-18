@@ -4,14 +4,14 @@
     import type { Token } from '../../../model/Token.js';
     import type { Scene } from '../../../model/Scene.js';
     import type { Asset } from '../../../model/Asset.js';
-    import { BoardRenderer } from './BoardRenderer.js';
+    import { BoardView } from './BoardView.js';
     import { GridType } from '../../../model/GridType.js';
     import { SquareGrid } from './grid/SquareGrid.js';
     import type { Grid } from './grid/Grid.js';
     import { HexagonGrid } from './grid/HexagonGrid.js';
     import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
     import type { ServerPublisher } from '../../../network/ServerHandler.js';
-import type { Player } from '../../../model/Player.js';
+    import type { Player } from '../../../model/Player.js';
     const props = defineProps<{
         tokens : Array<Token>
         currentScene : Scene
@@ -28,9 +28,9 @@ import type { Player } from '../../../model/Player.js';
     const loadError = ref(false);
     const canvas = useTemplateRef("board");
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
-    let renderer: BoardRenderer;
+    let renderer: BoardView;
 
-    function changeScene(newScene : Scene, renderer : BoardRenderer){
+    function changeScene(newScene : Scene, renderer : BoardView){
         let grid : Grid;
         const offset : Vector2 = new Vector2(newScene.offset.x,newScene.offset.y);
         if(newScene.gridType == GridType.SQUARE){
@@ -40,12 +40,20 @@ import type { Player } from '../../../model/Player.js';
         }
         renderer.setMap(newScene.asset.assetURL,grid, props.onLoadSuccess, props.onLoadError);
     }
-    
 
     onMounted(() => {
         if(canvas.value !== null){
+            const gameContext = {
+                tokens : props.tokens,
+                currentScene : props.currentScene,
+                localPlayer : props.localPlayer,
+                players : props.players
+            }
             renderer = 
-                new BoardRenderer(canvas.value, props.tokens, props.currentScene, props.tokenAssets, serverPublisher);
+                new BoardView(
+                    canvas.value,
+                    gameContext,
+                    serverPublisher);
         }
         watch(() => props.tokenAssets, (newAssets) => {
             renderer.startCacheUpdate();

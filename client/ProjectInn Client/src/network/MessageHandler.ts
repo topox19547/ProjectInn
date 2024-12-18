@@ -10,6 +10,7 @@ import type { Lobby } from "../model/Lobby.js";
 import type { Scene } from "../model/Scene.js";
 import type { Player } from "../model/Player.js";
 import { SaveManager } from "../filesystem/SaveManager.js";
+import { tokenToString } from "typescript";
 
 
 
@@ -38,6 +39,7 @@ export class MessageHandler{
                 }
                 case Status.JOIN_GAME:{
                     this.game.value = content.game as Game;
+                    this.game.value.id = content.id
                     this.game.value.currentScene = content.game.scenes.find(
                         (s : Scene) => s.asset.assetID == content.game.currentScene);
                     this.game.value.localPlayer = content.game.players.find(
@@ -55,6 +57,7 @@ export class MessageHandler{
         switch(message.status){
             case Status.TOKEN:{
                 if(message.command == Command.CREATE){
+                    const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
                     this.game.value.tokens.push(content);
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
@@ -64,7 +67,12 @@ export class MessageHandler{
             }
             case Status.TOKEN_ASSET:{
                 if(message.command == Command.CREATE){
-                    this.game.value.tokenAssets.push(content);
+                    const assetIndex = this.game.value.tokenAssets.findIndex(t => t.assetID == content.assetID);
+                    if(assetIndex == -1){
+                        this.game.value.tokenAssets.push(content);
+                    }else{
+                        this.game.value.tokenAssets[assetIndex] = content;
+                    }
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokenAssets.findIndex(t => t.assetID == content.id);
                     this.game.value.tokenAssets.splice(index,1);
@@ -86,7 +94,7 @@ export class MessageHandler{
             }
             case Status.SCENE_CHANGE:{
                 let scene : Scene | undefined = 
-                    this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID)
+                    this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID);
                 if(scene === undefined){
                     this.game.value.scenes.push(content);
                     scene = content as Scene;
@@ -96,7 +104,12 @@ export class MessageHandler{
             }
             case Status.SCENE:{
                 if(message.command == Command.CREATE){
-                    this.game.value.scenes.push(content);
+                    const sceneIndex = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
+                    if(sceneIndex == -1){
+                        this.game.value.scenes.push(content);
+                    }else{
+                        this.game.value.scenes[sceneIndex] = content;
+                    }
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
                     this.game.value.scenes.splice(index,1);

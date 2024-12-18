@@ -57,14 +57,15 @@ export class LobbyController implements ClientState{
                         }
                     }
                     game.joinGame(player, this.clientHandler);
-                    this.lobby.publishGame(game);
+                    const id : number = this.lobby.publishGame(game);
                     game.setEndCallback(() => this.lobby.removeGame(game))
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : player.getName()
+                            player : player.getName(),
+                            id : id
                         }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
@@ -83,14 +84,15 @@ export class LobbyController implements ClientState{
                         throw new ValueError("Not a valid game file: owner is missing from the players")
                     }
                     game.joinGame(player, this.clientHandler);
-                    this.lobby.publishGame(game);
+                    const id : number = this.lobby.publishGame(game);
                     game.setEndCallback(() => this.lobby.removeGame(game))
                     this.clientHandler.send({
                         status : Status.JOIN_GAME,
                         command : Command.CREATE,
                         content : {
                             game : Game.toObject(game),
-                            player : player.getName()
+                            player : player.getName(),
+                            id : id
                         }
                     })
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));
@@ -143,6 +145,7 @@ export class LobbyController implements ClientState{
                         content : {
                             game : Game.toObject(game),
                             player : player.getName(),
+                            id : content.gameId
                         }
                     });
                     this.clientHandler.changeState(new GameController(this.lobby, game, player, this.clientHandler));      

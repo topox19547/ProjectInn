@@ -9,8 +9,10 @@ import type { ServerPublisher } from "../../../network/ServerHandler.js";
 import { Status } from "../../../network/message/Status.js";
 import { Command } from "../../../network/message/Command.js";
 import type { Player } from "../../../model/Player.js";
+import PlaceholderSprite from "../../../assets/placeholders/token_placeholder.png"
+import PlaceholderBackground from "../../../assets/placeholders/background_placeholder.png"
 
-export class BoardRenderer{
+export class BoardView{
     //the offset of the view as the coordinates of its top left corner
     private viewOffset:Vector2;
     private viewScale:number;
@@ -19,40 +21,48 @@ export class BoardRenderer{
     private grid:Grid;
     private readonly maxScale:number;
     private readonly scrollWheelMultiplier;
+    private readonly draggedSizeMultiplier;
     private isCursorDown:boolean;
     private isCursorIn:boolean;
+    private cursorPosition : Vector2;
     private draggedToken : Token | undefined;
     private background:ImageBitmap | undefined;
     private backgroundSource : string | undefined;
     private defaultBackground:ImageBitmap | undefined;
     private placeHolderSpriteColor:string;
+    private noSprite : ImageBitmap | undefined;
     private spriteCache:Map<number,{
         url : string | undefined, 
         sprite : ImageBitmap | undefined,
         unused : boolean}>;
     private tokens:Array<Token>;
     private currentScene:Scene;
-    private tokenAssets:Array<Asset>;
+    private localPlayer:Player;
+    private players:Array<Player>;
     private nextAnimationFrameID:number;
     private serverPublisher : ServerPublisher;
 
 
     constructor(
         canvas:HTMLCanvasElement,
-        tokens:Array<Token>,
-        localPlayer:Player,
-        currentScene:Scene,
-        tokenAssets : Array<Asset>,
+        gameContext : {
+            tokens:Array<Token>,
+            localPlayer:Player,
+            players:Array<Player>,
+            currentScene:Scene,
+        },
         serverPublisher : ServerPublisher){
         console.log("new boardrenderer created");
-        this.tokens = tokens;
-        this.currentScene = currentScene;
-        this.tokenAssets = tokenAssets;
+        this.tokens = gameContext.tokens;
+        this.currentScene = gameContext.currentScene;
+        this.localPlayer = gameContext.localPlayer;
+        this.players = gameContext.players
         this.viewScale = 1;
         this.maxScale = 1.75;
         this.scrollWheelMultiplier = 1 / 2000;
         this.isCursorDown = false;
         this.isCursorIn = false;
+        this.cursorPosition = new Vector2(0,0);
         this.draggedToken = undefined;
         this.viewOffset = new Vector2(0,0);
         this.grid = new SquareGrid(10,new Vector2(0,0),1);
@@ -65,7 +75,17 @@ export class BoardRenderer{
         this.spriteCache = new Map();
         this.nextAnimationFrameID = 0;
         this.serverPublisher = serverPublisher;
+        this.draggedSizeMultiplier = 8 / 7;
         this.bindEvents();
+        const image : HTMLImageElement = new Image();
+        image.src = PlaceholderSprite;
+        this.noSprite = undefined;
+        image.addEventListener("load",() =>{
+            createImageBitmap(image).then((placeholder) => {
+                this.noSprite = placeholder;
+                console.log(PlaceholderSprite)
+            }).catch(() => console.log(PlaceholderSprite));
+        });
     }
 
     public setMap(
@@ -97,7 +117,7 @@ export class BoardRenderer{
                 if(onFail){
                     onFail();
                 }
-                this.setMap("placeholders/background_placeholder.png",this.grid)
+                this.setMap(PlaceholderBackground,this.grid)
              });
         })
     }
@@ -109,6 +129,7 @@ export class BoardRenderer{
 
     public updateSpriteCache(id:number, url:string):void{
         let spriteEntry = this.spriteCache.get(id); 
+        console.log(this.spriteCache);
         if(spriteEntry == undefined){
             spriteEntry = {
                 url : undefined,
@@ -121,12 +142,19 @@ export class BoardRenderer{
         if(spriteEntry.url != url){
             const image : HTMLImageElement = new Image();
             image.src = url;
-            createImageBitmap(image).then(s => {
-                spriteEntry.sprite = s;
-            }).catch( 
-                () => {
-                    spriteEntry.sprite = undefined;
-            });
+            image.addEventListener("error", () => {
+                spriteEntry.url = PlaceholderSprite;
+                spriteEntry.sprite = this.noSprite;
+            })
+            image.addEventListener("load", () =>{
+                createImageBitmap(image).then(s => {
+                    spriteEntry.sprite = s;
+                }).catch( 
+                    () => {
+                        spriteEntry.url = PlaceholderSprite;
+                        spriteEntry.sprite = this.noSprite;
+                });
+            })
         }
         spriteEntry.url = url;
     }
@@ -139,7 +167,7 @@ export class BoardRenderer{
         });
     }
 
-    public updateOnScreenTokens():void {
+    public updateOnScreenTokens():void { //marked as useless, pending removal
         const topLeftTile:Vector2 = this.grid.canvasToTile(this.viewOffset, new Vector2(0,0), this.viewScale);
         const canvasSizeVector:Vector2 = new Vector2(this.canvas.width, this.canvas.height);
         const bottomRightTile:Vector2 = this.grid.canvasToTile(this.viewOffset, canvasSizeVector, this.viewScale);
@@ -178,18 +206,10 @@ export class BoardRenderer{
             const vectorPosition = new Vector2(token.position.x,token.position.y);
             const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
             if(spriteData === undefined || spriteData.sprite === undefined){
-                this.ctx.fillStyle = this.placeHolderSpriteColor;
-                this.ctx.beginPath()
-                this.ctx.arc(
-                    tokenPosition.getX() + tokenOffset.getX(),
-                    tokenPosition.getY() + tokenOffset.getY(),
-                    Math.floor(tokenSize.getX()),
-                    0,
-                    2 * Math.PI
-                )
-                this.ctx.fill();
-            
-            }else{
+                continue;
+            }
+            //Draw the "real token"
+            if(!token.inDrag){
                 this.ctx.drawImage(
                     spriteData.sprite,
                     tokenPosition.getX() + tokenOffset.getX(),
@@ -198,8 +218,66 @@ export class BoardRenderer{
                     Math.floor(tokenSize.getY()));
             }
         }
-        
+        for(const token of this.tokens){
+            const spriteData = this.spriteCache.get(token.assetID);
+            const vectorPosition = new Vector2(token.position.x,token.position.y);
+            const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
+            if(spriteData === undefined || spriteData.sprite === undefined){
+                continue;
+            }
+            //Draw the "real token"
+            if(token.inDrag){
+                this.ctx.globalAlpha = 0.6;
+                this.ctx.drawImage(
+                    spriteData.sprite,
+                    tokenPosition.getX() + tokenOffset.getX(),
+                    tokenPosition.getY() + tokenOffset.getY(),
+                    Math.floor(tokenSize.getX()),
+                    Math.floor(tokenSize.getY()));
+                this.ctx.globalAlpha = 1;
+                if(token.byUser !== this.localPlayer.name){
+                    const player : Player | undefined = this.players.find(p => p.name == token.byUser);
+                    if(player === undefined){
+                        continue;
+                    }
+                    this.ctx.fillStyle = player.color;
+                    const measurements : TextMetrics = this.ctx.measureText(player.name);
+                    const textHeight : number = tokenSize.getY() / 4;
+                    const padding : number = textHeight / 2;
+                    this.ctx.beginPath();
+                    this.ctx.roundRect(tokenPosition.getX() - padding / 2, tokenPosition.getY() - padding / 2,
+                         measurements.width + padding, textHeight + padding, 8);
+                    this.ctx.fill();
+                    this.ctx.textBaseline = "top";
+                    this.ctx
+                    this.ctx.fillStyle = "#FFFFFF";
+                    this.ctx.font = `${textHeight}px Inter`
+                    this.ctx.fillText(token.byUser,tokenPosition.getX(), tokenPosition.getY())
+                }
+            }
+            
+        }
+        this.ctx.globalAlpha = 1;
+        if(this.draggedToken === undefined){
+            return;
+        }
+        for(const token of this.tokens){
+            //Draw the token that follows the cursor
+            const spriteData = this.spriteCache.get(token.assetID);
+            if(spriteData === undefined || spriteData.sprite === undefined){
+                continue;
+            }
+            if(token.inDrag == true && token.byUser == this.localPlayer.name){
+                this.ctx.drawImage(
+                    spriteData.sprite,
+                    this.cursorPosition.getX() - tokenSize.getX() / 2,
+                    this.cursorPosition.getY() - tokenSize.getY() / 2,
+                    Math.floor(tokenSize.getX() * this.draggedSizeMultiplier),
+                    Math.floor(tokenSize.getY() * this.draggedSizeMultiplier));
+            }
+        }
     }
+
 
     private bindEvents(){
         this.canvas.onmousedown = () => this.onCursorDown();
@@ -251,7 +329,7 @@ export class BoardRenderer{
     }
 
     private onCursorLeave() : void{
-        this.isCursorDown = false;
+        this.onCursorUp();
         this.isCursorIn = false;
     }
 
@@ -308,7 +386,8 @@ export class BoardRenderer{
     private cursorMoved(movement:Vector2, position:Vector2):void{
         if(!this.isCursorDown){
             return;
-        }   
+        }
+        this.cursorPosition = position;
         const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
         if(this.draggedToken !== undefined){
             this.draggedToken.virtualPosition = position;
@@ -328,8 +407,12 @@ export class BoardRenderer{
         const overlappedToken:Token | undefined = 
             this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
         if(overlappedToken !== undefined){
-            this.draggedToken = overlappedToken;
-            return;
+            const isTokenOwner : boolean = overlappedToken.owners.find(o => o == this.localPlayer.name) !== undefined;
+            const hasTokenPermissions : boolean = this.localPlayer.permissions.MANAGE_TOKENS == true;
+            if(isTokenOwner || hasTokenPermissions){
+                this.draggedToken = overlappedToken;
+                return;
+            }
         }
         this.translateView(movement);
     }

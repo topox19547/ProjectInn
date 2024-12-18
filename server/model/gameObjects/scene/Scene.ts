@@ -5,6 +5,7 @@ import { ensureObject, ensureEnumLike, ensureNumber } from "../../messages/Valid
 import { NotificationSource } from "../../NotificationSource.js";
 import { Asset } from "../asset/Asset.js";
 import { Identifiable } from "../Identifiable.js";
+import { Permission } from "../player/Permission.js";
 import { Vector2 } from "../Vector2.js";
 import { GridType } from "./GridType.js";
 
@@ -15,6 +16,7 @@ export class Scene implements Identifiable, NotificationSource{
     private offset : Vector2;
     private tileSize : number;
     private notifier : ClientNotifier | undefined;
+    private sceneSize : Vector2;
     private static readonly maxTileSize : number = 300;
     private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
@@ -30,6 +32,8 @@ export class Scene implements Identifiable, NotificationSource{
         this.gridType = grid;
         this.tileSize = tileSize;
         this.offset = offset;
+        this.sceneSize = new Vector2(0,0);
+        this.recalculateSceneSize();
     }
     
     public static getMaxTileSize() : number{ return this.maxTileSize; }
@@ -61,8 +65,20 @@ export class Scene implements Identifiable, NotificationSource{
         this.asset.setID(id);
     }
 
-    public getAsset() : Asset{
-        return this.asset;
+    public getName() : string{
+        return this.asset.getName()
+    }
+
+    public setName(name : string, permissionRequirement? : Permission) : boolean{
+        return this.asset.setName(name, permissionRequirement);
+    }
+
+    public setURL(url : string, assetSize : Vector2, permissionRequirement? : Permission) : boolean{
+        const status : boolean = this.asset.setURL(url, assetSize, permissionRequirement);
+        if(status){
+            this.recalculateSceneSize();
+        }
+        return status;
     }
 
     public getGridType() : GridType{
@@ -84,6 +100,7 @@ export class Scene implements Identifiable, NotificationSource{
                 gridType : gridType
             }
         })
+        this.recalculateSceneSize();
     }
 
     public getOffset() :Vector2{
@@ -100,6 +117,7 @@ export class Scene implements Identifiable, NotificationSource{
                 offset : offset
             }
         })
+        this.recalculateSceneSize();
     }
 
     public getTileSize() : number{
@@ -114,6 +132,7 @@ export class Scene implements Identifiable, NotificationSource{
         } else {
             this.tileSize = tileSize;
         }
+        this.recalculateSceneSize();
         this.notifier?.notify({
             status : Status.SCENE_TILESIZE,
             command : Command.MODIFY,
@@ -125,9 +144,33 @@ export class Scene implements Identifiable, NotificationSource{
     }
 
     public isValidPosition(position : Vector2) : boolean{
-        const mapSize : Vector2 | undefined = this.asset.getSize();
-        return mapSize != undefined &&
-            Math.ceil(mapSize.getX() + this.offset.getX() / this.tileSize) >= position.getX() &&
-            Math.ceil(mapSize.getY() + this.offset.getY() / this.tileSize) >= position.getY();
+        return this.sceneSize != undefined &&
+            position.getX() >= 0 &&
+            position.getY() >= 0 &&
+            position.getX() < this.sceneSize.getX() &&
+            position.getY() < this.sceneSize.getY();
+    }
+
+    private recalculateSceneSize() : void{
+        this.sceneSize = new Vector2(0,0);
+        const assetSize : Vector2 | undefined = this.asset.getSize();
+        if(assetSize === undefined){
+            return;
+        }
+        let realTileSize : Vector2;
+        let realOffset : Vector2;
+        if(this.gridType == GridType.SQUARE){
+            realTileSize = new Vector2(this.tileSize, this.tileSize);
+            realOffset = new Vector2(this.offset.getX() % this.tileSize,this.offset.getY() % this.tileSize);
+        } else if (this.gridType == GridType.HEXAGONAL){
+            realTileSize = new Vector2(this.tileSize * 3 / 4, this.tileSize * Math.sqrt(3) / 2);
+            realOffset = new Vector2(this.offset.getX() % this.tileSize * 3,this.offset.getY() % realTileSize.getY());
+        } else {
+            realTileSize = new Vector2(0,0);
+        }
+        this.sceneSize = new Vector2(
+            Math.ceil((assetSize.getX() + this.offset.getX()) / realTileSize.getX()),
+            Math.ceil((assetSize.getY() + this.offset.getY()) / realTileSize.getY())
+        )
     }
 }

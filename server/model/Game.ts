@@ -71,10 +71,12 @@ export class Game implements NotificationSource{
         if(currentSceneIndex == -1){
             return undefined;
         }
+        const startingScene : Scene = Scene.fromObject(object.scenes[currentSceneIndex]);
+        startingScene.setNotifier(notifier);
         const game : Game = new Game(
             object.name.slice(0,Game.maxNameLength),
             object.ownerName,
-            Scene.fromObject(object.scenes[currentSceneIndex])
+            startingScene
         );
         object.scenes.splice(currentSceneIndex, 1); //prevent the current scene from being added in twice
         const sortById = (t1 : Identifiable,t2 : Identifiable) => {
@@ -281,6 +283,10 @@ export class Game implements NotificationSource{
         return this.tokenAssets.find(a => a.getID() == id);
     }
 
+    public isTokenAssetInUse(id : number) : boolean{
+        return this.tokens.find(t => t.getAsset().getID() == id) !== undefined;
+    }
+
     public updateClientTokenAssets(player : Player) : void{
         this.tokenAssets.forEach(a => {
             this.notifier?.notifyIf({
@@ -294,6 +300,13 @@ export class Game implements NotificationSource{
     public addToken(token : Token) : boolean{
         if(this.tokens.length >= this.maxTokens){
             return false;
+        }
+        if(this.tokens.find(t => t.getAsset() == token.getAsset()) == undefined){
+            this.notifier?.notify({
+                status : Status.TOKEN_ASSET,
+                command : Command.CREATE,
+                content : Asset.toObject(token.getAsset())
+            });
         }
         this.addToEntityArray(this.tokens, token);
         if(this.notifier !== undefined){
@@ -329,7 +342,7 @@ export class Game implements NotificationSource{
     }
 
     public addScene(scene : Scene) : boolean{
-        if(this.scenes.find(s => s.getAsset().getName() == scene.getAsset().getName())){
+        if(this.scenes.find(s => s.getName() == scene.getName())){
             return false;
         }
         this.addToEntityArray(this.scenes,scene);
@@ -382,21 +395,28 @@ export class Game implements NotificationSource{
             command : Command.SAFE_MODIFY,
             content : Scene.toObject(scene)
         });
-        const newPosition : Vector2 = new Vector2(0,0)
+        this.adjustTokenPositions(true);
+        return true;
+    }
+
+    public adjustTokenPositions(hardReset : boolean){
         //reset token positions by putting all of them next to
         //each other starting from the top left corner
+        const newPosition : Vector2 = new Vector2(0,0)
         for(const token of this.tokens){
+            if(!hardReset && this.currentScene.isValidPosition(token.getPosition())){
+                continue;
+            }
             token.setPosition(newPosition);
             newPosition.translateX(1); //try moving along the x axis
             if(!this.currentScene.isValidPosition(newPosition)){
-                newPosition.translateX(-1);
+                newPosition.setX(0);
                 newPosition.translateY(1); //try moving along the y axis
             }
             if(!this.currentScene.isValidPosition){
                 newPosition.translateY(-1); //if no tiles are available, stack on the last tile
             }
         }
-        return true;
     }
 
     public updateClientScenes(player : Player) : void{

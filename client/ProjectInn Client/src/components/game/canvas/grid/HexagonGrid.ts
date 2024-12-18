@@ -99,9 +99,8 @@ export class HexagonGrid implements Grid{
 
     public tileToCanvas(viewOffset: Vector2, tile: Vector2, viewScale: number): Vector2 {
         let x : number = (tile.getX() * this.tileWidth * 3 / 4);
-        let y : number = (tile.getY() * this.tileHeight);
-        x = Math.floor(x); 
-        y = x % 2 == 0 ? y : y + this.tileHeight / 2;
+        let y : number = (tile.getY() * this.tileHeight); 
+        y = tile.getX() % 2 == 0 ? y : y + this.tileHeight / 2;
         x -= viewOffset.getX() + this.tileOffset.getX();
         y -= viewOffset.getY() + this.tileOffset.getY();
         //x += this.tileWidth / 2;

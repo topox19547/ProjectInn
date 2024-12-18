@@ -13,6 +13,7 @@
 import ErrorWindow from '../shared/windows/ErrorWindow.vue';
 import { SaveManager } from '../../filesystem/SaveManager.js';
 import ButtonBase from '../shared/ButtonBase.vue';
+import { getStartingPlayerData } from '../../model/Player.js';
     const props = defineProps<{
         showWizard : boolean
     }>();
@@ -29,13 +30,7 @@ import ButtonBase from '../shared/ButtonBase.vue';
     function getStartingGameData(){
         return {
             name : "",
-            localPlayer : {
-                    name: "",
-                    color : "#784cff",
-                    permissions : {},
-                    connected : false,
-                    isOwner : false
-            },
+            localPlayer : getStartingPlayerData(),
             currentScene : getStartingSceneData(),
             password : undefined
         }
