@@ -109,6 +109,9 @@ export class MessageHandler{
                         this.game.value.scenes.push(content);
                     }else{
                         this.game.value.scenes[sceneIndex] = content;
+                        if(content.asset.assetID == this.game.value.currentScene.asset.assetID){
+                            this.game.value.currentScene = content;
+                        }
                     }
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
