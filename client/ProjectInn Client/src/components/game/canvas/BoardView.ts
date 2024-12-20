@@ -24,6 +24,7 @@ export class BoardView{
     private readonly draggedSizeMultiplier;
     private isCursorDown:boolean;
     private isCursorIn:boolean;
+    private draggingView : boolean;
     private cursorPosition : Vector2;
     private draggedToken : Token | undefined;
     private background:ImageBitmap | undefined;
@@ -62,6 +63,7 @@ export class BoardView{
         this.scrollWheelMultiplier = 1 / 2000;
         this.isCursorDown = false;
         this.isCursorIn = false;
+        this.draggingView = false;
         this.cursorPosition = new Vector2(0,0);
         this.draggedToken = undefined;
         this.viewOffset = new Vector2(0,0);
@@ -185,6 +187,7 @@ export class BoardView{
         if(this.ctx === null || this.background == undefined){
             return;
         }
+        //Clear the canvas and draw the grid
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "#111111";
         this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
@@ -199,6 +202,7 @@ export class BoardView{
             this.canvas.width,
             this.canvas.height);
         this.grid.drawGrid(this.canvas,this.viewOffset,this.viewScale);
+        //Draw the tokens that aren't being moved first
         const tokenSize : Vector2 = this.grid.getTokenSize(this.viewScale);
         const tokenOffset : Vector2 = this.grid.getTokenOffset(this.viewScale);
         for(const token of this.tokens){
@@ -208,7 +212,6 @@ export class BoardView{
             if(spriteData === undefined || spriteData.sprite === undefined){
                 continue;
             }
-            //Draw the "real token"
             if(!token.inDrag){
                 this.ctx.drawImage(
                     spriteData.sprite,
@@ -218,6 +221,7 @@ export class BoardView{
                     Math.floor(tokenSize.getY()));
             }
         }
+        //Draw the tokens that are being moved
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
             const vectorPosition = new Vector2(token.position.x,token.position.y);
@@ -225,7 +229,6 @@ export class BoardView{
             if(spriteData === undefined || spriteData.sprite === undefined){
                 continue;
             }
-            //Draw the "real token"
             if(token.inDrag){
                 this.ctx.globalAlpha = 0.6;
                 this.ctx.drawImage(
@@ -234,6 +237,17 @@ export class BoardView{
                     tokenPosition.getY() + tokenOffset.getY(),
                     Math.floor(tokenSize.getX()),
                     Math.floor(tokenSize.getY()));
+                const isOverlappingToken : boolean = this.tokens.find(t => t != token && 
+                    t.position.x == token.position.x && t.position.y == token.position.y) !== undefined;
+                if(isOverlappingToken && this.draggedToken == token){
+                    this.ctx.globalAlpha = 0.5;
+                    this.ctx.fillStyle = "#9D2C2C";
+                    this.ctx.fillRect(
+                        tokenPosition.getX() + tokenOffset.getX(),
+                        tokenPosition.getY() + tokenOffset.getY(),
+                        Math.floor(tokenSize.getX()),
+                        Math.floor(tokenSize.getY()));
+                }
                 this.ctx.globalAlpha = 1;
                 if(token.byUser !== this.localPlayer.name){
                     const player : Player | undefined = this.players.find(p => p.name == token.byUser);
@@ -257,12 +271,11 @@ export class BoardView{
             }
             
         }
-        this.ctx.globalAlpha = 1;
+        //Draw the token that follows the cursor
         if(this.draggedToken === undefined){
             return;
         }
         for(const token of this.tokens){
-            //Draw the token that follows the cursor
             const spriteData = this.spriteCache.get(token.assetID);
             if(spriteData === undefined || spriteData.sprite === undefined){
                 continue;
@@ -309,6 +322,7 @@ export class BoardView{
 
     private onCursorUp() : void{
         this.isCursorDown = false;
+        this.draggingView = false;
         if(this.draggedToken !== undefined){
             if(this.draggedToken.virtualPosition !== undefined){
                 this.serverPublisher.send({
@@ -316,10 +330,7 @@ export class BoardView{
                     command : Command.MODIFY,
                     content : {
                         id : this.draggedToken.id,
-                        position : this.grid.canvasToTile(
-                            this.viewOffset,
-                            this.draggedToken.virtualPosition,
-                            this.viewScale)
+                        position : this.draggedToken.virtualPosition
                     }
                 });
             }
@@ -389,11 +400,8 @@ export class BoardView{
         }
         this.cursorPosition = position;
         const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
-        if(this.draggedToken !== undefined){
-            this.draggedToken.virtualPosition = position;
-            const previousTile:Vector2 = this.grid.canvasToTile(
-                this.viewOffset, this.draggedToken.virtualPosition, this.viewScale);
-            if(overlappedTile != previousTile)
+        if(this.draggedToken !== undefined && this.draggedToken.virtualPosition !== undefined && !this.draggingView){
+            if(!overlappedTile.equals(this.draggedToken.virtualPosition))
                 this.serverPublisher.send({
                     status : Status.TOKEN_MOVING,
                     command : Command.MODIFY,
@@ -402,19 +410,30 @@ export class BoardView{
                         position : overlappedTile
                     }
                 });
+            this.draggedToken.virtualPosition = overlappedTile;
             return;
         }
         const overlappedToken:Token | undefined = 
             this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
-        if(overlappedToken !== undefined){
+        if(overlappedToken !== undefined && !this.draggingView){
             const isTokenOwner : boolean = overlappedToken.owners.find(o => o == this.localPlayer.name) !== undefined;
             const hasTokenPermissions : boolean = this.localPlayer.permissions.MANAGE_TOKENS == true;
             if(isTokenOwner || hasTokenPermissions){
                 this.draggedToken = overlappedToken;
+                this.draggedToken.virtualPosition = overlappedTile;
+                this.serverPublisher.send({
+                    status : Status.TOKEN_MOVING,
+                    command : Command.MODIFY,
+                    content : {
+                        id : this.draggedToken.id,
+                        position : overlappedTile
+                    }
+                });
                 return;
             }
         }
         this.translateView(movement);
+        this.draggingView = true;
     }
 
     private cursorZoomed(deltaY:number,cursorPos:Vector2):void{

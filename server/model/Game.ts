@@ -287,6 +287,10 @@ export class Game implements NotificationSource{
         return this.tokens.find(t => t.getAsset().getID() == id) !== undefined;
     }
 
+    public getTokenInPosition(position : Vector2) : Token | undefined{
+        return this.tokens.find(t => t.getPosition().equals(position));
+    }
+
     public updateClientTokenAssets(player : Player) : void{
         this.tokenAssets.forEach(a => {
             this.notifier?.notifyIf({
@@ -407,15 +411,20 @@ export class Game implements NotificationSource{
             if(!hardReset && this.currentScene.isValidPosition(token.getPosition())){
                 continue;
             }
+            let tokenInPosition : Token | undefined = this.getTokenInPosition(newPosition);
+            while(tokenInPosition !== undefined && tokenInPosition != token){
+                newPosition.translateX(1); //try moving along the x axis
+                if(!this.currentScene.isValidPosition(newPosition)){
+                    newPosition.setX(0);
+                    newPosition.translateY(1); //try moving along the y axis
+                }
+                if(!this.currentScene.isValidPosition(newPosition)){
+                    newPosition.translateY(-1); //if no tiles are available, stack on the last tile
+                    break;
+                }
+                tokenInPosition = this.getTokenInPosition(newPosition);
+            }
             token.setPosition(newPosition);
-            newPosition.translateX(1); //try moving along the x axis
-            if(!this.currentScene.isValidPosition(newPosition)){
-                newPosition.setX(0);
-                newPosition.translateY(1); //try moving along the y axis
-            }
-            if(!this.currentScene.isValidPosition){
-                newPosition.translateY(-1); //if no tiles are available, stack on the last tile
-            }
         }
     }
 

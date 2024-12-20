@@ -49,16 +49,21 @@ export class GameController implements ClientState{
                         id : ensureNumber,
                     })(message.content);
                     const token : Token = this.getTokenIfAuthorized(content.id, false);
-                    const position : Vector2 = new Vector2(content.position.x, content.position.y)
+                    const position : Vector2 = new Vector2(content.position.x, content.position.y);
+                    const tokenInPosition : Token | undefined = this.currentGame.getTokenInPosition(position);
+                    const isPositionFree : boolean = tokenInPosition === undefined || tokenInPosition == token;
                     if(message.status == Status.TOKEN_MOVING){
                         if(!this.currentGame.getCurrentScene().isValidPosition(position)){
-                            throw new ValueError("Invalid position sent by client");
+                            break;
                         }
                         if(token.acquireDragLock(this.clientPlayer.getName())){
-                            token.drag(position, this.clientPlayer.getName());
+                            token.drag(position, this.clientPlayer.getName(), isPositionFree);
                         }
                     }else{
                         if(!this.currentGame.getCurrentScene().isValidPosition(position)){
+                            token.endDrag(token.getPosition(), this.clientPlayer.getName());
+                        }
+                        if(!isPositionFree){
                             token.endDrag(token.getPosition(), this.clientPlayer.getName());
                         }
                         token.endDrag(position, this.clientPlayer.getName());

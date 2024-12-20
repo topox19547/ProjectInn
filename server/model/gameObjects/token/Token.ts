@@ -262,7 +262,7 @@ export class Token implements Identifiable, NotificationSource{
 
     //TODO: Debug drag interaction: dragging could theoretically cause a few bugs
     //if a client enters the game while something is being dragged
-    public drag(position : Vector2, user : string) : void{
+    public drag(position : Vector2, user : string, updateRealPosition : boolean) : void{
         if(user != this.dragLockOwner){
             return;
         }
@@ -276,7 +276,9 @@ export class Token implements Identifiable, NotificationSource{
                 byUser : user
             }
         });
-        this.position.setTo(position);
+        if(updateRealPosition == true){
+            this.position.setTo(position);
+        }
         clearTimeout(this.dragLockTimer); //refresh the time limit
         this.dragLockTimer = setTimeout(() => this.timeoutDrag(), 30000);
     }
