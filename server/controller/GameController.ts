@@ -114,6 +114,8 @@ export class GameController implements ClientState{
                         if(token === undefined){
                             throw new ValueError("Invalid token parameters detected");
                         }
+                        const tokenPosition : Vector2 = token.getPosition();
+                        token.setPosition(this.getClosestFreePosition(tokenPosition));
                         if(!this.currentGame.addToken(token)){
                             throw new ValueError("Unable to add any more tokens");
                         }
@@ -429,6 +431,31 @@ export class GameController implements ClientState{
             throw new ValueError("There is no asset with the supplied type and ID");
         }
         return asset;
+    }
+
+    private getClosestFreePosition(tokenPosition : Vector2) : Vector2{
+        let position : Vector2 | undefined = undefined;
+        let radius : number = 0;
+        let isValidRadius : boolean =  true;
+        while(isValidRadius && !position){
+            isValidRadius = false;
+            for(let x : number = -radius; x <= radius && !position; x++){
+                for(let y : number = -radius; y <= radius && !position; y++){
+                    const newPosition : Vector2 = new Vector2(
+                        tokenPosition.getX() + x, tokenPosition.getY() + y)
+                    if(this.currentGame.getCurrentScene().isValidPosition(newPosition)){
+                        isValidRadius = true;
+                    } else {
+                        continue;
+                    }
+                    if(!this.currentGame.getTokenInPosition(newPosition)){
+                        position = newPosition;
+                    }
+                }
+            }
+            radius++;
+        }
+        return position !== undefined ? position : new Vector2(0,0);
     }
 
 }
