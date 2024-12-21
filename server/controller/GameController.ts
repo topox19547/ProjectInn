@@ -188,7 +188,9 @@ export class GameController implements ClientState{
                     const content = ensureObject({
                         position : Vector2.validate
                     })(message.content)
-                    this.currentGame.pingMap(new Vector2(content.position.x, content.position.y))
+                    this.currentGame.pingMap(
+                        new Vector2(content.position.x, content.position.y),
+                        this.clientPlayer.getName())
                     break;
                 }
                 case Status.PASSWORD_CHANGE : {

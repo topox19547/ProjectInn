@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import { getDefaultLocalSettings, type Game, type LocalSettings } from "../model/Game.js";
+import { getDefaultLocalSettings, getInitializedViewData, type Game, type LocalSettings } from "../model/Game.js";
 import type { Message } from "./message/Message.js";
 import { Status } from "./message/Status.js";
 import { Command } from "./message/Command.js";
@@ -49,6 +49,7 @@ export class MessageHandler{
                     } else {
                         this.game.value.localSettings = getDefaultLocalSettings(this.game.value);
                     }
+                    this.game.value.viewData = getInitializedViewData();
                 }
             }
             return;

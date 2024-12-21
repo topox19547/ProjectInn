@@ -12,12 +12,14 @@
     import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
     import type { ServerPublisher } from '../../../network/ServerHandler.js';
     import type { Player } from '../../../model/Player.js';
+    import type { ViewData } from '../../../model/Game.js';
     const props = defineProps<{
         tokens : Array<Token>
         currentScene : Scene
         tokenAssets : Array<Asset>
         localPlayer : Player
         players : Array<Player>
+        viewData : ViewData
         rounded : string
         canvasSize : WeakVector2
         onLoadError? : () => void;
@@ -47,7 +49,8 @@
                 tokens : props.tokens,
                 currentScene : props.currentScene,
                 localPlayer : props.localPlayer,
-                players : props.players
+                players : props.players,
+                viewData : props.viewData
             }
             renderer = 
                 new BoardView(

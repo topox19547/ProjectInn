@@ -10,7 +10,9 @@
     import type { ChatMessage } from '../../../model/ChatMessage.js';
     import Players from './panels/players/Players.vue';
     import Assets from './panels/assets/Assets.vue';
-import type { Asset } from '../../../model/Asset.js';
+    import Tokens from './panels/tokens/Tokens.vue';
+    import type { Asset } from '../../../model/Asset.js';
+    import type { ViewData } from '../../../model/Game.js';
 
     const props = defineProps<{
         currentTab : SideBarTab,
@@ -19,6 +21,7 @@ import type { Asset } from '../../../model/Asset.js';
         players : Array<Player>,
         chat : Array<ChatMessage>
         assets : Array<Asset>
+        viewData : ViewData
     }>();
 
     const emits = defineEmits<{
@@ -51,9 +54,14 @@ import type { Asset } from '../../../model/Asset.js';
         </div>
     </div>
     <div class = "content">
-        <Chat :chat="chat" v-if="currentTab == 0" :players="players"></Chat>
-        <Players :local-player="localPlayer" :players="players" v-if="currentTab == 1"></Players>
-        <Assets :assets="assets" :local-player="localPlayer" v-if="currentTab == 2"></Assets>
+        <Chat :chat="chat" :players="players"
+        v-if="currentTab == 0"></Chat>
+        <Players :local-player="localPlayer" :players="players" 
+        v-if="currentTab == 1"></Players>
+        <Assets :assets="assets" :local-player="localPlayer" 
+        v-if="currentTab == 2"></Assets>
+        <Tokens 
+        v-if="currentTab == 3"></Tokens>
     </div>
 </template>
 

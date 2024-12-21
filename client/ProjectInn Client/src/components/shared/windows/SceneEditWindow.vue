@@ -12,6 +12,7 @@
     import ButtonBase from '../ButtonBase.vue';
     import UploadHelp from '../UploadHelp.vue';
 import { getStartingPlayerData } from '../../../model/Player.js';
+import { getInitializedViewData } from '../../../model/Game.js';
     const minTileSize = 30;
     const maxTileSize = 300;
     const tileSizeValue = ref(100);
@@ -123,6 +124,7 @@ import { getStartingPlayerData } from '../../../model/Player.js';
                             :current-scene="scene"
                             :local-player="getStartingPlayerData()"
                             :players="[]"
+                            :view-data="getInitializedViewData()"
                             :canvas-size="{ x : 256, y : 256}">
                             </BoardCanvas>
                             <div class="previewLabel">

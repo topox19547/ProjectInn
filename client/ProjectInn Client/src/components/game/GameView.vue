@@ -30,6 +30,14 @@
         previousTab.value = currentTab.value;
         currentTab.value = tab;
     }
+
+    watch(() => props.game.viewData.selectedToken,(newToken, oldToken) => {
+        if(newToken !== undefined && oldToken === undefined){
+            changeTab(SideBarTab.TOKENS);
+        } else if(newToken === undefined) {
+            changeTab(previousTab.value);
+        }
+    })
 </script>
 
 <template>
@@ -45,6 +53,7 @@
             :current-scene="game.currentScene"
             :local-player="game.localPlayer"
             :players="game.players"
+            :view-data="game.viewData"
             rounded="0px 16px 0px 0px" 
             :canvas-size="canvasSize"></BoardCanvas>
             <div class="gameId">
@@ -59,7 +68,8 @@
             @tab-changed="changeTab"
             :players="game.players"
             :chat="game.chat"
-            :assets="game.tokenAssets"></Sidebar>
+            :assets="game.tokenAssets"
+            :view-data="game.viewData"></Sidebar>
         </div>
     </div>
 </template>

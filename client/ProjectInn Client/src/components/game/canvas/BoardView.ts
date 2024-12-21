@@ -11,6 +11,7 @@ import { Command } from "../../../network/message/Command.js";
 import type { Player } from "../../../model/Player.js";
 import PlaceholderSprite from "../../../assets/placeholders/token_placeholder.png"
 import PlaceholderBackground from "../../../assets/placeholders/background_placeholder.png"
+import type { ViewData } from "../../../model/Game.js";
 
 export class BoardView{
     //the offset of the view as the coordinates of its top left corner
@@ -40,6 +41,7 @@ export class BoardView{
     private currentScene:Scene;
     private localPlayer:Player;
     private players:Array<Player>;
+    private viewData:ViewData;
     private nextAnimationFrameID:number;
     private serverPublisher : ServerPublisher;
 
@@ -51,13 +53,15 @@ export class BoardView{
             localPlayer:Player,
             players:Array<Player>,
             currentScene:Scene,
+            viewData : ViewData
         },
         serverPublisher : ServerPublisher){
         console.log("new boardrenderer created");
         this.tokens = gameContext.tokens;
         this.currentScene = gameContext.currentScene;
         this.localPlayer = gameContext.localPlayer;
-        this.players = gameContext.players
+        this.players = gameContext.players;
+        this.viewData=  gameContext.viewData;
         this.viewScale = 1;
         this.maxScale = 1.75;
         this.scrollWheelMultiplier = 1 / 2000;
@@ -219,6 +223,19 @@ export class BoardView{
                     tokenPosition.getY() + tokenOffset.getY(),
                     Math.floor(tokenSize.getX()),
                     Math.floor(tokenSize.getY()));
+                if(this.viewData.selectedToken == token){
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = "#D9D9D9"
+                    this.ctx.lineWidth = 2;
+                    this.ctx.roundRect(
+                        tokenPosition.getX() + tokenOffset.getX(),
+                        tokenPosition.getY() + tokenOffset.getY(),
+                        Math.floor(tokenSize.getX()),
+                        Math.floor(tokenSize.getY()),
+                        8
+                    );
+                    this.ctx.stroke();
+                }
             }
         }
         //Draw the tokens that are being moved
@@ -292,19 +309,20 @@ export class BoardView{
     }
 
 
-    private bindEvents(){
+    private bindEvents() : void{
         this.canvas.onmousedown = () => this.onCursorDown();
         this.canvas.onmouseup = () => this.onCursorUp();
         this.canvas.onmouseleave = () => this.onCursorLeave();
         this.canvas.onmouseover = () => this.onCursorOver();
         this.canvas.onmousemove = e => this.onMouseMoved(e);
+        this.canvas.onclick = e => this.onClick(e);
         this.canvas.onwheel = e => this.onWheelEvent(e);
         this.canvas.ondragenter = e => e.preventDefault();
         this.canvas.ondragover = e => e.preventDefault();
         this.canvas.ondrop = e => this.onDrop(e);
     }
 
-    private unbindEvents(){
+    private unbindEvents() : void{
         this.canvas.onmousedown = null;
         this.canvas.onmouseup = null;
         this.canvas.onmouseleave = null;
@@ -314,6 +332,33 @@ export class BoardView{
         this.canvas.ondragover = null;
         this.canvas.ondragenter = null;
         this.canvas.ondrop = null;
+    }
+
+    private onClick(e : MouseEvent) : void{
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.onSelect(
+            new Vector2(
+                e.clientX - boundingRect.x,
+                e.clientY - boundingRect.y
+            )
+        );
+    }
+
+    private onMouseMoved(e : MouseEvent) : void{
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.cursorMoved(
+        new Vector2(-e.movementX,-e.movementY),
+        new Vector2(
+            e.clientX - boundingRect.x,
+            e.clientY - boundingRect.y));
+    }
+
+    private onWheelEvent(e : WheelEvent) : void{
+        if(!this.isCursorIn){
+            return;
+        }
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.cursorZoomed(e.deltaY,new Vector2(e.clientX - boundingRect.x,e.clientY - boundingRect.y));
     }
 
     private onCursorDown() : void{
@@ -348,22 +393,6 @@ export class BoardView{
         this.isCursorIn = true;
     }
 
-    private onMouseMoved(e : MouseEvent) : void{
-        const boundingRect = this.canvas.getBoundingClientRect();
-        this.cursorMoved(
-        new Vector2(-e.movementX,-e.movementY),
-        new Vector2(
-            e.clientX - boundingRect.x,
-            e.clientY - boundingRect.y));
-    }
-
-    private onWheelEvent(e : WheelEvent) : void{
-        if(!this.isCursorIn){
-            return;
-        }
-        const boundingRect = this.canvas.getBoundingClientRect();
-        this.cursorZoomed(e.deltaY,new Vector2(e.clientX - boundingRect.x,e.clientY - boundingRect.y));
-    }
 
     private onDrop(e : DragEvent){
         if(e.dataTransfer?.getData("id") == undefined || e.dataTransfer.getData("name") == undefined){
@@ -376,6 +405,13 @@ export class BoardView{
             parseInt(e.dataTransfer?.getData("id")),
             e.dataTransfer?.getData("name"),
             tilePosition);
+    }
+
+    private onSelect(position : Vector2){
+        const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
+        const overlappedToken:Token | undefined = 
+            this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
+        this.viewData.selectedToken = overlappedToken;
     }
 
     private sendNewToken(id : number, name : string, position : Vector2){

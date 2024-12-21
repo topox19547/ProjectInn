@@ -485,12 +485,13 @@ export class Game implements NotificationSource{
         return this.chat;
     }
 
-    public pingMap(position : Vector2) : void{
+    public pingMap(position : Vector2, playerName : string) : void{
         this.notifier?.notify({
             status : Status.PING,
             command : Command.CREATE,
             content : {
-                position : position
+                position : position,
+                player : playerName
             }
         })
     }
