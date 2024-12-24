@@ -1,6 +1,6 @@
 <script setup lang="ts">
     const props = defineProps<{
-        text : string
+        text? : string
         width? : string
         height? : string
         disableShadow? : boolean
@@ -21,8 +21,10 @@
         '--color-active': color?.active,
         '--color-hover': color?.hover
     }">
-        <img class="icon" v-if="icon !== undefined" :src="icon" width="24px">
-        <div class="buttonText">{{ props.text }}</div>
+        <img class="icon" v-if="icon !== undefined" 
+        :style="{ 'padding-right' : text ? '0px' : '8px' }" 
+        :src="icon" width="24px">
+        <div class="buttonText" v-if="text !== undefined" >{{ props.text }}</div>
     </button>
 </template>
 
@@ -34,7 +36,6 @@
         justify-content: center;
         width: fit-content;
         align-items: center;
-        gap:8px;
         height: 48px;
         border-radius: 16px;
         background-color: var(--color-active);
@@ -50,8 +51,7 @@
     }
 
     .icon{
-        padding-left: 8px;
-        margin-right:-8px;
+        padding-inline: 8px;
     }
 
     .button:disabled{
@@ -62,7 +62,7 @@
         margin-top: auto;
         margin-bottom: auto;
         font-size: 16px;
-        margin-inline: 8px;
+        padding-inline: 8px;
         color: white;
         font-weight: 500;
     }

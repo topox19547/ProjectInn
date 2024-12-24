@@ -149,6 +149,9 @@ export class BoardView{
             const image : HTMLImageElement = new Image();
             image.src = url;
             image.addEventListener("error", () => {
+                if(this.noSprite == undefined){
+                    return;
+                }
                 spriteEntry.url = PlaceholderSprite;
                 spriteEntry.sprite = this.noSprite;
             })
@@ -157,6 +160,9 @@ export class BoardView{
                     spriteEntry.sprite = s;
                 }).catch( 
                     () => {
+                        if(this.noSprite == undefined){
+                            return;
+                        }
                         spriteEntry.url = PlaceholderSprite;
                         spriteEntry.sprite = this.noSprite;
                 });
@@ -311,11 +317,10 @@ export class BoardView{
 
     private bindEvents() : void{
         this.canvas.onmousedown = () => this.onCursorDown();
-        this.canvas.onmouseup = () => this.onCursorUp();
+        this.canvas.onmouseup = e => this.onMouseUp(e);
         this.canvas.onmouseleave = () => this.onCursorLeave();
         this.canvas.onmouseover = () => this.onCursorOver();
         this.canvas.onmousemove = e => this.onMouseMoved(e);
-        this.canvas.onclick = e => this.onClick(e);
         this.canvas.onwheel = e => this.onWheelEvent(e);
         this.canvas.ondragenter = e => e.preventDefault();
         this.canvas.ondragover = e => e.preventDefault();
@@ -334,7 +339,7 @@ export class BoardView{
         this.canvas.ondrop = null;
     }
 
-    private onClick(e : MouseEvent) : void{
+    private onMouseUp(e : MouseEvent) : void{
         const boundingRect = this.canvas.getBoundingClientRect();
         this.onSelect(
             new Vector2(
@@ -342,6 +347,7 @@ export class BoardView{
                 e.clientY - boundingRect.y
             )
         );
+        this.onCursorUp();
     }
 
     private onMouseMoved(e : MouseEvent) : void{
@@ -408,10 +414,13 @@ export class BoardView{
     }
 
     private onSelect(position : Vector2){
+        if(this.draggingView || this.draggedToken !== undefined){
+            return;
+        }
         const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
         const overlappedToken:Token | undefined = 
             this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
-        this.viewData.selectedToken = overlappedToken;
+        this.viewData.selectedToken = overlappedToken != this.viewData.selectedToken ? overlappedToken : undefined;
     }
 
     private sendNewToken(id : number, name : string, position : Vector2){
@@ -432,6 +441,11 @@ export class BoardView{
 
     private cursorMoved(movement:Vector2, position:Vector2):void{
         if(!this.isCursorDown){
+            return;
+        }
+        const dragDistance : number = movement.distanceTo(new Vector2(0,0));
+        const minDragDistance : number = 1.1;
+        if(this.draggedToken === undefined && !this.draggingView && dragDistance < minDragDistance){
             return;
         }
         this.cursorPosition = position;

@@ -39,7 +39,7 @@
             <img class="miniButton editButton" 
             :src="editIcon" 
             :style="{opacity : hoveredOn ? 1 : 0}" 
-            @click.stop="$emit('editAsset',asset)">
+            @click.stop="$emit('editAsset', asset)">
         </div>
         <div @dragstart="(e) => e.preventDefault()" class="hoverButton" 
         v-if="showDelete === undefined || showDelete == true">

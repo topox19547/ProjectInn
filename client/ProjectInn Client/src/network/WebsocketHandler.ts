@@ -34,5 +34,5 @@ export class WebSocketHandler implements ServerPublisher{
     public send(message: Message): void {
         this.socket.send(JSON.stringify(message));
     }
-    
+    //TODO: ADD REMOVE BUTTON, WORK ON STATS
 }

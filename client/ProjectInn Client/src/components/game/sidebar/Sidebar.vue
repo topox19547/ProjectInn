@@ -54,13 +54,13 @@
         </div>
     </div>
     <div class = "content">
-        <Chat :chat="chat" :players="players"
+        <Chat :chat="chat" :players="players" :local-player="localPlayer"
         v-if="currentTab == 0"></Chat>
         <Players :local-player="localPlayer" :players="players" 
         v-if="currentTab == 1"></Players>
         <Assets :assets="assets" :local-player="localPlayer" 
         v-if="currentTab == 2"></Assets>
-        <Tokens 
+        <Tokens :selected-token="viewData.selectedToken" :players="players" :local-player="localPlayer"
         v-if="currentTab == 3"></Tokens>
     </div>
 </template>

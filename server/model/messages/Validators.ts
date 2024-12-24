@@ -67,8 +67,8 @@ export const ensureMapObject = <V>(ensureValueType : ensureType<V>) =>
     (object : unknown) : Record<string,V> => {
         if (typeof object !== "object" || object === null) throw new FormatError("not a map / object is null");
         const toReturn : Record<string,V> = {} as any;
-        for (const key in object){
-            toReturn.key = ensureValueType((object as any)[key])
+        for (const key of Object.keys(object)){
+            toReturn[key] = ensureValueType((object as any)[key])
         }
         return toReturn;
 }

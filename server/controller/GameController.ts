@@ -71,7 +71,7 @@ export class GameController implements ClientState{
                     break;
                 }
                 case Status.TOKEN_STAT:{
-                    if(message.command == Command.SAFE_MODIFY){
+                    if(message.command == Command.MODIFY){
                         const content = ensureObject({
                             id : ensureNumber,
                             name : ensureString,
@@ -150,7 +150,7 @@ export class GameController implements ClientState{
                     break;
                 }
                 case Status.TOKEN_NOTE : {
-                    if(message.command == Command.SAFE_MODIFY){
+                    if(message.command == Command.MODIFY){
                         const content = ensureObject({
                             id : ensureNumber,
                             title : ensureString,
@@ -166,7 +166,7 @@ export class GameController implements ClientState{
                             title : ensureString,
                         })(message.content);
                         const token : Token = this.getTokenIfAuthorized(content.id, false);
-                        if(!token.removeStat(content.title )){
+                        if(!token.removeNote(content.title )){
                             throw new ValueError(`Note ${content.title} doesn't exist`);
                         }
                     }

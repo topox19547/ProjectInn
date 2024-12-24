@@ -8,12 +8,14 @@ import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
 import { Status } from '../../../../../network/message/Status.js';
 import { Command } from '../../../../../network/message/Command.js';
 
+    const scrolledToBottom = ref(true);
     const chatMessage = ref("");
     const chatBottom = useTemplateRef("bottom");
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const props = defineProps<{
         chat : Array<ChatMessage>,
-        players : Array<Player>
+        players : Array<Player>,
+        localPlayer : Player
     }>();
 
     function getPlayerColor(name : string) : string | undefined{
@@ -38,8 +40,27 @@ import { Command } from '../../../../../network/message/Command.js';
         chatMessage.value = "";
     }
 
-    watch(props.chat, () => {
-        nextTick(() => chatBottom.value?.scrollIntoView())
+    function updateScrollToBottom(target : any){
+        scrolledToBottom.value = target.scrollTop + target.clientHeight >= target.scrollHeight;
+        console.log(scrolledToBottom.value);
+    }
+
+    function scrollToBottom(){
+        nextTick(() => {
+            chatBottom.value?.scrollIntoView({ block: 'nearest', inline: 'end' });
+        })
+    }
+
+    watch(props.chat, (newChat) => {
+        const lastMessage : ChatMessage = newChat[newChat.length - 1];
+        const messageBeforeLast : ChatMessage = newChat[newChat.length - 2];
+        if(scrolledToBottom.value){
+            scrollToBottom();
+        } else if(lastMessage.sender == props.localPlayer.name){
+            scrollToBottom();
+        } else if ((lastMessage.isSystem == true && messageBeforeLast.sender == props.localPlayer.name)){
+            scrollToBottom();
+        }
     });
 
 </script>
@@ -47,12 +68,12 @@ import { Command } from '../../../../../network/message/Command.js';
 <template>
     <div class="margin">
         <div class="container">
-            <div class="messageViewer">
+            <div class="messageViewer" @scrollend="e => updateScrollToBottom(e.target)">
                 <MessageView v-for="message in chat" 
                 @vue-before-update="console.log('aaa')"
                 :message="message"
                 :player-color="message.isSystem ? undefined : getPlayerColor(message.sender)" ></MessageView>
-                <div ref="bottom"></div>
+                <div ref="bottom" class="bottom"></div>
             </div>
             <div class="chatBar">
                 <input type="text" v-model="chatMessage" maxlength="512" @keyup.enter="sendMessage()" class="textBox">
@@ -79,7 +100,8 @@ import { Command } from '../../../../../network/message/Command.js';
     }
 
     .messageViewer{
-        padding: 16px;
+        padding-top: 16px;
+        padding-inline: 16px;
         display: block;
         overflow-y: auto;
         height: 100%;
@@ -118,4 +140,9 @@ import { Command } from '../../../../../network/message/Command.js';
         height: 100%;
     }
     
+    .bottom{
+        height: 24px;
+        padding: 0px;
+        margin: 0px;
+    }
 </style>

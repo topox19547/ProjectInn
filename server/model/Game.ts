@@ -221,6 +221,7 @@ export class Game implements NotificationSource{
             return false;
         }
         this.players.splice(playerIndex, 1);
+        this.tokens.forEach(t => t.removeOwner(player.getName())); //clear token ownerships
         let messageText : string = `${player.getName()} has been kicked`;
         if(this.password !== undefined){
             messageText += " and the game's password has been randomized";

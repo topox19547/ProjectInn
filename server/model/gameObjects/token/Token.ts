@@ -46,7 +46,7 @@ export class Token implements Identifiable, NotificationSource{
         this.notes = new Map<string,string>;
         this.stats = new Map<string,Stat>;
         this.position = new Vector2(0,0);
-        this.maxNoteLength = 128;
+        this.maxNoteLength = 512;
         this.maxNameLength = 24;
     }
 
@@ -59,18 +59,18 @@ export class Token implements Identifiable, NotificationSource{
         if (!token.setName(object.name)){
             return undefined
         }
-        for (const owner in object.owners){
+        for (const owner of object.owners){
             if(!token.addOwner(owner) || gameContext.getPlayer(owner) === undefined){
                 return undefined
             }
         }
-        for (const key in object.notes){
+        for (const key of Object.keys(object.notes)){
             const value = object.notes.key
             if(!token.setNote(key,value)){
                 return undefined
             }
         }
-        for (const key in object.stats){
+        for (const key of Object.keys(object.stats)){
             const value = object.stats.key
             if(!token.setStat(key,new Stat(value.value, value.min, value.max))){
                 return undefined
@@ -141,7 +141,7 @@ export class Token implements Identifiable, NotificationSource{
         if(this.owners.indexOf(name) != -1){
             return false;
         }
-        this.owners.concat(name);
+        this.owners.push(name);
         this.notifier?.notify({
             status : Status.TOKEN_OWNERSHIP,
             command : Command.MODIFY,
@@ -155,7 +155,7 @@ export class Token implements Identifiable, NotificationSource{
 
     public removeOwner(name : string) : boolean{
         const indexToRemove : number = this.owners.indexOf(name); 
-        if(indexToRemove != -1){
+        if(indexToRemove == -1){
             return false;
         }
         this.owners.splice(indexToRemove, 1);
