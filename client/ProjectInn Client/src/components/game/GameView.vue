@@ -34,6 +34,8 @@
     watch(() => props.game.viewData.selectedToken,(newToken, oldToken) => {
         if(newToken !== undefined && oldToken === undefined){
             changeTab(SideBarTab.TOKENS);
+        } else if (newToken !== undefined && newToken !== oldToken){
+            currentTab.value = SideBarTab.TOKENS;
         } else if(newToken === undefined) {
             changeTab(previousTab.value);
         }

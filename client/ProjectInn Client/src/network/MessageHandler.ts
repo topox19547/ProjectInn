@@ -62,6 +62,9 @@ export class MessageHandler{
                     this.game.value.tokens.push(content);
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
+                    if(index !== -1 && this.game.value.tokens[index] == this.game.value.viewData.selectedToken){
+                        this.game.value.viewData.selectedToken = undefined;
+                    }
                     this.game.value.tokens.splice(index,1);
                 }
                 break;

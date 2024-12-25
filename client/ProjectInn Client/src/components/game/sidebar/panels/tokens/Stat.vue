@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { Stat } from '../../../../../model/Stat.js';
+    const isEditing = ref(false);
+
     const props = defineProps<{
         stat : Stat
         name : string
@@ -16,20 +18,25 @@ import type { Stat } from '../../../../../model/Stat.js';
 
 <template>
     <div class="stat">
-        <div class=" anchor progressBar" v-if="props.stat.max !== undefined && props.stat.min !== undefined">
-            <div class="progressFill" 
-            :style="{width: props.stat.value / (props.stat.max - props.stat.min) * 100 + '%' }"></div>
-            <div class="progressText">{{ name }}: {{stat.value}} / {{stat.max}}</div>
-        </div>
-        <div class="anchor noProgress" v-if="props.stat.max !== undefined && props.stat.min === undefined">
-            <div class="progressText">
-                {{ name }}: {{stat.value}} / {{stat.max}}
-             </div>
-        </div>
-        <div class="anchor noProgress"  v-if="props.stat.max === undefined">
-            <div class="progressText">
-                {{ name }}: {{stat.value}}
+        <div class="static" v-if="!isEditing">
+            <div class=" anchor progressBar" v-if="props.stat.max !== undefined && props.stat.min !== undefined">
+                <div class="progressFill" 
+                :style="{width: props.stat.value / (props.stat.max - props.stat.min) * 100 + '%' }"></div>
+                <div class="progressText">{{ name }}: {{stat.value}} / {{stat.max}}</div>
             </div>
+            <div class="anchor noProgress" v-if="props.stat.max !== undefined && props.stat.min === undefined">
+                <div class="progressText">
+                    {{ name }}: {{stat.value}} / {{stat.max}}
+                </div>
+            </div>
+            <div class="anchor noProgress"  v-if="props.stat.max === undefined">
+                <div class="progressText">
+                    {{ name }}: {{stat.value}}
+                </div>
+            </div>
+        </div>
+        <div class="editable" v-if="isEditing">
+            
         </div>
     </div>
 </template>

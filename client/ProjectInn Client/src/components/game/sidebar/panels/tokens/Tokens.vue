@@ -2,8 +2,9 @@
     import type { Player } from '../../../../../model/Player.js';
     import type { Token } from '../../../../../model/Token.js';
     import AddIcon from '../../../../../assets/icons/add-alt.svg';
-    import RemoveIcon from '../../../../../assets/icons/close.svg'
-    import { computed, inject, ref, watch } from 'vue';
+    import RemoveIcon from '../../../../../assets/icons/close.svg';
+    import DeleteIcon from '../../../../../assets/icons/delete.svg';
+    import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
     import EditableText from './EditableText.vue';
     import { Permission } from '../../../../../model/Permission.js';
     import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
@@ -22,6 +23,7 @@
     const editLock = ref(false);
     const addingPlayer = ref("");
     const showNewNoteCard = ref(false);
+    const newNoteCard = useTemplateRef("newNoteScroll");
     const serverPublisher : ServerPublisher = inject("serverPublisher") as ServerPublisher;
 
     const canEdit = computed(() => {
@@ -43,6 +45,14 @@
     function changeNewNoteStatus(status : boolean){
         showNewNoteCard.value = status;
         editLock.value = status;
+        if(status == true){
+            nextTick(() => {
+                console.log(newNoteCard);
+                setTimeout(() => {
+                    newNoteCard.value?.scrollIntoView({ behavior:'smooth', block: 'center', inline: 'end' })
+                },300)
+            })
+        }
     }
 
     function sendNewTokenName(name : string) : void{
@@ -93,6 +103,16 @@
         console.log(title);
     }
 
+    function deleteToken(){
+        serverPublisher.send({
+            status : Status.TOKEN,
+            command : Command.DELETE,
+            content : {
+                id : props.selectedToken?.id
+            }
+        });
+    }
+
     watch(() => props.selectedToken?.id, () => {
         addingPlayer.value = "";
     });
@@ -121,7 +141,7 @@
                 </div>
                 <div class="section">
                     <div class="title"> Notes </div>
-                    <div class="hoverButton" v-if="canEdit" @click="changeNewNoteStatus">
+                    <div class="hoverButton" v-if="canEdit" @click="() => changeNewNoteStatus(true)">
                         <img class="miniButton" 
                         :src="AddIcon">
                     </div>
@@ -145,11 +165,11 @@
                         :current-token-id="selectedToken.id"
                         :taken-titles="Object.keys(selectedToken.notes)"
                         :can-edit="canEdit"
-                        @cancel="changeNewNoteStatus"
+                        @cancel="() => changeNewNoteStatus(false)"
                         @edited-note="sendEditedNote"
                         @set-edit-lock="(v : boolean) => editLock = v"
                         key=""></Note>
-                        <div class="spacer" 
+                        <div class="spacer" ref="newNoteScroll"
                         key="" v-if="Object.entries(selectedToken.notes).length > 0 || showNewNoteCard"></div>
                     </TransitionGroup>  
                 </div>
@@ -181,6 +201,17 @@
                     <div class="spacer" v-if="canEditStrict || selectedToken.owners.length > 0"></div>
                 </div>
             </div>
+            <div class="buttons">
+                <ButtonBase
+                    @click="deleteToken"
+                    text="Delete token" 
+                    :icon="DeleteIcon" 
+                    :disable-shadow="true"
+                    width="100%" 
+                    height="42px"
+                    :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
+                v-if="canEdit"></ButtonBase>
+            </div>
         </div>
     </div>
 </template>
@@ -199,8 +230,8 @@
         background-color: #353535;
         border-radius: 16px;
         height: 100%;
-        overflow: auto;
         padding-bottom: 16px;
+        justify-content: space-between;
     }
 
     .noSelection{
@@ -234,6 +265,10 @@
         height: 16px;
     }
 
+    .buttons{
+        padding-inline: 16px;
+    }
+
     .section{
         position: relative;
         display: flex;
@@ -251,6 +286,9 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+        overflow: auto;
+        padding-top: 16px;
+        padding-bottom: 16px;
     }
 
     .miniButton{

@@ -115,7 +115,6 @@ export class BoardView{
                 this.resetScale();
                 this.viewOffset.setX(0);
                 this.viewOffset.setY(0);
-                this.updateOnScreenTokens();
                 if(onSuccess !== undefined){
                     onSuccess(bg);
                 }
@@ -177,12 +176,6 @@ export class BoardView{
                 this.spriteCache.delete(k);
             }
         });
-    }
-
-    public updateOnScreenTokens():void { //marked as useless, pending removal
-        const topLeftTile:Vector2 = this.grid.canvasToTile(this.viewOffset, new Vector2(0,0), this.viewScale);
-        const canvasSizeVector:Vector2 = new Vector2(this.canvas.width, this.canvas.height);
-        const bottomRightTile:Vector2 = this.grid.canvasToTile(this.viewOffset, canvasSizeVector, this.viewScale);
     }
 
     public destroy():void{
@@ -533,7 +526,6 @@ export class BoardView{
         }
         //if the background can be fully seen, block scrolling on that axis       
         this.viewOffset.translateBy(vector);
-        this.updateOnScreenTokens();
     }
 
     private changeViewScale(amount:number,cursorPos:Vector2):void{
