@@ -41,7 +41,7 @@ import WindowBase from '../WindowBase.vue';
         font-size: 20px;
     }
     .message{
-        padding: 8px;
+        padding: 16px;
         white-space: pre-wrap;
         text-align: center;
     }

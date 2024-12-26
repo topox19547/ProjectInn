@@ -488,7 +488,7 @@ export class Game implements NotificationSource{
 
     public pingMap(position : Vector2, playerName : string) : void{
         this.notifier?.notify({
-            status : Status.PING,
+            status : Status.SCENE_PING,
             command : Command.CREATE,
             content : {
                 position : position,

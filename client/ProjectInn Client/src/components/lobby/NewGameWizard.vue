@@ -10,10 +10,10 @@
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
     import GameEditWindow from '../shared/windows/GameEditWindow.vue';
     import { getStartingSceneData } from '../../model/Scene.js';
-import ErrorWindow from '../shared/windows/ErrorWindow.vue';
-import { SaveManager } from '../../filesystem/SaveManager.js';
-import ButtonBase from '../shared/ButtonBase.vue';
-import { getStartingPlayerData } from '../../model/Player.js';
+    import ErrorWindow from '../shared/windows/MessageWindow.vue';
+    import { SaveManager } from '../../filesystem/SaveManager.js';
+    import ButtonBase from '../shared/ButtonBase.vue';
+    import { getStartingPlayerData } from '../../model/Player.js';
     const props = defineProps<{
         showWizard : boolean
     }>();

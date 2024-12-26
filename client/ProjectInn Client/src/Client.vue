@@ -9,7 +9,7 @@
   import LobbyView from './components/lobby/LobbyView.vue';
   import { SaveManager } from './filesystem/SaveManager.js';
   import type { GamePreview } from './model/gamePreview.js';
-  import ErrorWindow from './components/shared/windows/ErrorWindow.vue';
+  import MessageWindow from './components/shared/windows/MessageWindow.vue';
   import ButtonBase from './components/shared/ButtonBase.vue';
   import SceneEditWindow from './components/shared/windows/SceneEditWindow.vue';
   import { Status } from './network/message/Status.js';
@@ -17,6 +17,7 @@
 
   const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
+  const serverMessageBuffer : Ref<Array<{title : string, text :string}>> = ref([]);
   const localSettings : Ref<LocalSettings | undefined> = ref(undefined);
   const saveManager : SaveManager = new SaveManager();
   let localGames : Array<GamePreview> = new Array();
@@ -27,8 +28,8 @@
     localGames : localGames
   });
   refreshLocalGames();
-  const messageHandler : MessageHandler = new MessageHandler(lobby,game,localSettings);
-  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler,requestGames,notifyNetworkError);
+  const messageHandler : MessageHandler = new MessageHandler(lobby, game, localSettings, serverMessageBuffer);
+  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler, requestGames, notifyNetworkError);
   provide("serverPublisher", serverPublisher);
 
   function requestGames(){
@@ -84,11 +85,18 @@
   <Transition name="game">
     <GameView v-if="game !== undefined" :game=game></GameView>
   </Transition>
-  <ErrorWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
+  <MessageWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
     <template v-slot:button>
       <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
     </template>
-  </ErrorWindow>
+  </MessageWindow>
+  <MessageWindow v-if="serverMessageBuffer.length > 0" 
+    :title="serverMessageBuffer[0].title" 
+    :message="serverMessageBuffer[0].text">
+    <template v-slot:button>
+      <ButtonBase text="Ok" @click="() => serverMessageBuffer.shift()"></ButtonBase>
+    </template>
+  </MessageWindow>
 </template>
 <style>
   body{

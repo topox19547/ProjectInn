@@ -9,7 +9,7 @@
     import { SquareGrid } from './grid/SquareGrid.js';
     import type { Grid } from './grid/Grid.js';
     import { HexagonGrid } from './grid/HexagonGrid.js';
-    import ErrorWindow from '../../shared/windows/ErrorWindow.vue';
+    import ErrorWindow from '../../shared/windows/MessageWindow.vue';
     import type { ServerPublisher } from '../../../network/ServerHandler.js';
     import type { Player } from '../../../model/Player.js';
     import type { ViewData } from '../../../model/Game.js';

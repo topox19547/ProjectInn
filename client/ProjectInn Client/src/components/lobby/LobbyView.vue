@@ -2,7 +2,7 @@
     import { SaveManager } from '../../filesystem/SaveManager.js';
     import type { Lobby } from '../../model/Lobby.js';
     import WindowBase from '../shared/WindowBase.vue';
-    import ErrorWindow from '../shared/windows/ErrorWindow.vue';
+    import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
     import ButtonBase from '../shared/ButtonBase.vue';
     import LocalGameList from './gamelists/LocalGameList.vue';
@@ -79,7 +79,9 @@ Press the button below to clear it.`;
 
     function loadGame(id : number){
         const savedGame : SavedGame | undefined = saveManager.LoadGame(id);
-        emits('loadGameSettings', savedGame?.localSettings);
+        if(savedGame?.localSettings !== undefined){
+            emits("loadGameSettings", savedGame.localSettings);
+        }
         serverPublisher.send({
             status : Status.LOAD_GAME,
             command : Command.CREATE,

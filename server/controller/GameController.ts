@@ -20,6 +20,7 @@ import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean
 import { ClientHandler } from "./ClientHandler.js";
 import { ClientState } from "./ClientState.js";
 import { LobbyController } from "./LobbyController.js";
+import { FormatError } from "../errors/FormatError.js";
 
 
 export class GameController implements ClientState{
@@ -106,7 +107,7 @@ export class GameController implements ClientState{
                 }
                 case Status.TOKEN:{
                     if(!this.clientPlayer.hasPermission(Permission.MANAGE_TOKENS)){
-                        new PermissionError();
+                        throw new PermissionError();
                     }
                     if(message.command == Command.CREATE){
                         const content = Token.validate(message.content);
@@ -363,13 +364,19 @@ export class GameController implements ClientState{
                     break;
                 }
                 case Status.SAVE_GAME : {
+                    const content = ensureObject({
+                        show : ensureBoolean,
+                    })(message.content);
                     if(this.clientPlayer.isGameOwner()){
                         const game = Game.toObject(this.currentGame);
                         game.chat = [];
                         this.clientHandler.send({
                             status : Status.SAVE_GAME,
                             command : Command.NONE,
-                            content : game
+                            content : {
+                                show : content.show,
+                                game : game
+                            }
                         });
                     }
                     break;
@@ -383,15 +390,26 @@ export class GameController implements ClientState{
             }
         }
         catch (e){
-            if(e instanceof PermissionError || e instanceof ValueError){
+            if(e instanceof PermissionError || e instanceof ValueError || e instanceof FormatError){
                 this.clientHandler.send({
                     status : Status.ERROR,
                     command : Command.NONE,
                     content : {
-                        error : e.message
+                        text : e.message
                     }
                 });
-            }
+            } else if (e instanceof SyntaxError || e instanceof FormatError){
+                console.log(e);
+                console.log(`Message parse error: message of type ${message.status} is malformed`);
+                this.clientHandler.send({
+                    status : Status.ERROR,
+                    command : Command.NONE,
+                    content : {
+                        text : "wrong message format."
+                    }
+                });
+            }   
+
         }
     }
 

@@ -238,7 +238,7 @@
                     <div class="title"> Assigned to </div>
                     <TransitionGroup name="subElement">
                         <div class="player" :key="owner" v-for="owner in selectedToken.owners">
-                            <div>
+                            <div class="playerText">
                                 {{ owner }}
                             </div>
                             <div class="fixedButton" v-if="canEditStrict" 
@@ -262,7 +262,7 @@
                     <div class="spacer" v-if="canEditStrict || selectedToken.owners.length > 0"></div>
                 </div>
             </div>
-            <div class="buttons">
+            <div class="buttons" v-if="selectedToken !== undefined">
                 <Transition name="fade">
                     <ButtonBase
                     @click="deleteToken"
@@ -272,7 +272,7 @@
                     width="100%" 
                     height="42px"
                     :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
-                    v-if="canEdit"></ButtonBase>
+                    v-if="canEditStrict"></ButtonBase>
                 </Transition>
             </div>
         </div>
@@ -293,7 +293,6 @@
         background-color: #353535;
         border-radius: 16px;
         height: 100%;
-        padding-bottom: 16px;
         justify-content: space-between;
     }
 
@@ -324,12 +323,17 @@
         margin-block: 2px;
     }
 
+    .playerText{
+        margin-block: auto;
+    }
+
     .spacer{
         height: 16px;
     }
 
     .buttons{
         padding-inline: 16px;
+        padding-bottom: 16px;
     }
 
     .section{

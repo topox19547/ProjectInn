@@ -52,17 +52,19 @@
         };
     }
 
-    function requestGameSave(){
+    function requestGameSave(notifyUser : boolean){
         serverPublisher.send({
             status : Status.SAVE_GAME,
             command : Command.NONE,
-            content : {}
+            content : {
+                show : notifyUser
+            }
         });
     }
 
     function leaveGame(){
         if(saveOnLeave.value == true){
-            requestGameSave();
+            requestGameSave(false);
         }
         serverPublisher.send({
             status : Status.CLIENT_STATUS,
@@ -73,13 +75,13 @@
 
     function closeLeaveGame(){
         showLeaveGamePopup.value = false;
-        saveOnLeave.value = true
+        saveOnLeave.value = true;
     }
 
     watch(() => props.game.localSettings.autoSaveEnabled,(autosaveEnabled) => {
         if(autosaveEnabled){
-            requestGameSave();
-            autosaveInterval = setInterval(requestGameSave, autosaveTimeInterval);
+            requestGameSave(false);
+            autosaveInterval = setInterval(() => requestGameSave(false), autosaveTimeInterval);
         } else {
             clearInterval(autosaveInterval);
         }
@@ -98,7 +100,7 @@
             <div>Leave Room</div>
         </div>
         <div class="topbarButton"
-        v-if="game.localPlayer.isOwner" @click="requestGameSave()">
+        v-if="game.localPlayer.isOwner" @click="() => requestGameSave(true)">
             <img :src="SaveIcon">
             <div>Save Game</div>
         </div>

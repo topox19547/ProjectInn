@@ -17,14 +17,22 @@ import { tokenToString } from "typescript";
 export class MessageHandler{
     private lobby : Ref<Lobby>;
     private game : Ref<Game | undefined>;
-    private localSettings : Ref<LocalSettings | undefined>
+    private serverMessageBuffer : Ref<Array<{title : string, text :string}>>;
+    private localSettings : Ref<LocalSettings | undefined>;
     private saveManager : SaveManager;
+    private readonly pingDuration : number;
 
-    constructor(lobby : Ref<Lobby>, game : Ref<Game | undefined>, localSettings : Ref<LocalSettings | undefined>){
+    constructor(
+        lobby : Ref<Lobby>,
+        game : Ref<Game | undefined>,
+        localSettings : Ref<LocalSettings | undefined>,
+        serverMessageBuffer : Ref<Array<{title : string, text :string}>>){
         this.lobby = lobby;
         this.game = game;
         this.localSettings = localSettings;
+        this.serverMessageBuffer = serverMessageBuffer;
         this.saveManager = new SaveManager();
+        this.pingDuration = 2000; //2 seconds
     }
 
     handleMessage(message : Message){
@@ -50,6 +58,14 @@ export class MessageHandler{
                         this.game.value.localSettings = getDefaultLocalSettings(this.game.value);
                     }
                     this.game.value.viewData = getInitializedViewData();
+                    break;
+                }
+                case Status.ERROR:{
+                    this.serverMessageBuffer.value.push({
+                        title : "Error",
+                        text : content.text
+                    });
+                    break;
                 }
             }
             return;
@@ -176,6 +192,7 @@ export class MessageHandler{
             }
             case Status.PASSWORD_CHANGE:{
                 this.game.value.password = content.password;
+                break;
             }
             case Status.CLIENT_STATUS:{
                 if(content.name == this.game.value.localPlayer.name){
@@ -188,7 +205,35 @@ export class MessageHandler{
                 break;
             }
             case Status.SAVE_GAME:{
-                this.saveManager.SaveGame(content, this.game.value.localSettings);
+                this.saveManager.SaveGame(content.game, this.game.value.localSettings);
+                if(content.show == true){
+                    this.serverMessageBuffer.value.push({
+                        title : "Game saved",
+                        text : "The game has been saved successfully"
+                    });
+                }
+                break;
+            }
+            case Status.SCENE_PING:{
+                const olderPingIndex : number = 
+                    this.game.value.viewData.pingBuffer.findIndex(p => p.player == content.player);
+                this.game.value.viewData.pingBuffer.splice(olderPingIndex, 1);
+                this.game.value.viewData.pingBuffer.push(content);
+                setTimeout(() => {
+                    const deletePingIndex : number | undefined = 
+                        this.game.value?.viewData.pingBuffer.indexOf(content);
+                    if(deletePingIndex !== -1 && deletePingIndex !== undefined){
+                        this.game.value?.viewData.pingBuffer.splice(deletePingIndex, 1);
+                    }
+                }, this.pingDuration);
+                break;
+            }
+            case Status.ERROR:{
+                this.serverMessageBuffer.value.push({
+                    title : "Error",
+                    text : content.text
+                });
+                break;
             }
             //TODO: ADD THE REST OF THE STATUSES
                 

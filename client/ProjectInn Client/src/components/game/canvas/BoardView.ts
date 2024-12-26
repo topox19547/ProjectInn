@@ -210,59 +210,39 @@ export class BoardView{
         const tokenOffset : Vector2 = this.grid.getTokenOffset(this.viewScale);
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
-            const vectorPosition = new Vector2(token.position.x,token.position.y);
+            const vectorPosition : Vector2 = new Vector2(token.position.x,token.position.y);
             const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
+            tokenPosition.translateBy(tokenOffset);
             if(spriteData === undefined || spriteData.sprite === undefined){
                 continue;
             }
             if(!token.inDrag){
-                this.ctx.drawImage(
-                    spriteData.sprite,
-                    tokenPosition.getX() + tokenOffset.getX(),
-                    tokenPosition.getY() + tokenOffset.getY(),
-                    Math.floor(tokenSize.getX()),
-                    Math.floor(tokenSize.getY()));
+                this.drawToken(spriteData.sprite, tokenPosition, tokenSize);
                 if(this.viewData.selectedToken == token){
-                    this.ctx.beginPath();
                     this.ctx.strokeStyle = "#D9D9D9"
                     this.ctx.lineWidth = 2;
-                    this.ctx.roundRect(
-                        tokenPosition.getX() + tokenOffset.getX(),
-                        tokenPosition.getY() + tokenOffset.getY(),
-                        Math.floor(tokenSize.getX()),
-                        Math.floor(tokenSize.getY()),
-                        8
-                    );
-                    this.ctx.stroke();
+                    this.drawRoundRect(tokenPosition, tokenSize, false);
                 }
             }
         }
         //Draw the tokens that are being moved
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
-            const vectorPosition = new Vector2(token.position.x,token.position.y);
+            const vectorPosition : Vector2  = new Vector2(token.position.x,token.position.y);
             const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
+            tokenPosition.translateBy(tokenOffset);
             if(spriteData === undefined || spriteData.sprite === undefined){
                 continue;
             }
             if(token.inDrag){
                 this.ctx.globalAlpha = 0.6;
-                this.ctx.drawImage(
-                    spriteData.sprite,
-                    tokenPosition.getX() + tokenOffset.getX(),
-                    tokenPosition.getY() + tokenOffset.getY(),
-                    Math.floor(tokenSize.getX()),
-                    Math.floor(tokenSize.getY()));
+                this.drawToken(spriteData.sprite, tokenPosition, tokenSize);
                 const isOverlappingToken : boolean = this.tokens.find(t => t != token && 
                     t.position.x == token.position.x && t.position.y == token.position.y) !== undefined;
                 if(isOverlappingToken && this.draggedToken == token){
                     this.ctx.globalAlpha = 0.5;
                     this.ctx.fillStyle = "#9D2C2C";
-                    this.ctx.fillRect(
-                        tokenPosition.getX() + tokenOffset.getX(),
-                        tokenPosition.getY() + tokenOffset.getY(),
-                        Math.floor(tokenSize.getX()),
-                        Math.floor(tokenSize.getY()));
+                    this.drawRoundRect(tokenPosition, tokenSize, true);
                 }
                 this.ctx.globalAlpha = 1;
                 if(token.byUser !== this.localPlayer.name){
@@ -270,22 +250,25 @@ export class BoardView{
                     if(player === undefined){
                         continue;
                     }
-                    this.ctx.fillStyle = player.color;
-                    const measurements : TextMetrics = this.ctx.measureText(player.name);
-                    const textHeight : number = tokenSize.getY() / 4;
-                    const padding : number = textHeight / 2;
-                    this.ctx.beginPath();
-                    this.ctx.roundRect(tokenPosition.getX() - padding / 2, tokenPosition.getY() - padding / 2,
-                         measurements.width + padding, textHeight + padding, 8);
-                    this.ctx.fill();
-                    this.ctx.textBaseline = "top";
-                    this.ctx
-                    this.ctx.fillStyle = "#FFFFFF";
-                    this.ctx.font = `${textHeight}px Inter`
-                    this.ctx.fillText(token.byUser,tokenPosition.getX(), tokenPosition.getY())
+                    this.drawPlayerTag(tokenPosition, tokenSize, player);
                 }
             }
             
+        }
+        //Draw the scene pings
+        for(const ping of this.viewData.pingBuffer){
+            const vectorPosition : Vector2 = new Vector2(ping.position.x, ping.position.y);
+            const pingPosition : Vector2 = this.grid.tileToCanvas(this.viewOffset, vectorPosition, this.viewScale);
+            const player : Player | undefined = this.players.find(p => p.name == ping.player);
+            pingPosition.translateBy(tokenOffset);
+            if(player == undefined){
+                continue;
+            }
+            this.ctx.strokeStyle = player.color;
+            this.ctx.lineWidth = 4;
+            this.drawRoundRect(pingPosition, tokenSize, false);
+            pingPosition.translateBy(new Vector2(0, -32));
+            this.drawPlayerTag(pingPosition, tokenSize, player);
         }
         //Draw the token that follows the cursor
         if(this.draggedToken === undefined){
@@ -297,14 +280,57 @@ export class BoardView{
                 continue;
             }
             if(token.inDrag == true && token.byUser == this.localPlayer.name){
-                this.ctx.drawImage(
-                    spriteData.sprite,
+                const dragPosition = new Vector2(
                     this.cursorPosition.getX() - tokenSize.getX() / 2,
-                    this.cursorPosition.getY() - tokenSize.getY() / 2,
-                    Math.floor(tokenSize.getX() * this.draggedSizeMultiplier),
-                    Math.floor(tokenSize.getY() * this.draggedSizeMultiplier));
+                    this.cursorPosition.getY() - tokenSize.getY() / 2
+                );
+                tokenSize.multiplyByScalar(this.draggedSizeMultiplier);
+                this.drawToken(spriteData.sprite, dragPosition, tokenSize);
             }
         }
+    }
+
+    private drawRoundRect(position : Vector2, size : Vector2, fill : boolean){
+        if(this.ctx === null) return;
+        this.ctx.beginPath();
+        this.ctx.roundRect(
+            position.getX(),
+            position.getY(),
+            Math.floor(size.getX()),
+            Math.floor(size.getY()),
+            8);
+        if(fill == true){
+            this.ctx.fill();
+        } else {
+            this.ctx.stroke();
+        }
+    }
+
+    private drawToken(sprite : ImageBitmap, position : Vector2, size : Vector2){
+        if(this.ctx === null) return;
+        this.ctx.drawImage(
+            sprite,
+            position.getX(),
+            position.getY(),
+            Math.floor(size.getX()),
+            Math.floor(size.getY()));
+    }
+
+    private drawPlayerTag(position : Vector2, tokenSize : Vector2, player : Player) : void{
+        if(this.ctx === null) return;
+        this.ctx.fillStyle = player.color;
+        const measurements : TextMetrics = this.ctx.measureText(player.name);
+        const textHeight : number = tokenSize.getY() / 4;
+        const padding : number = textHeight / 2;
+        this.ctx.beginPath();
+        this.ctx.roundRect(position.getX() - padding / 2, position.getY() - padding / 2,
+                measurements.width + padding, textHeight + padding, 8);
+        this.ctx.fill();
+        this.ctx.textBaseline = "top";
+        this.ctx
+        this.ctx.fillStyle = "#FFFFFF";
+        this.ctx.font = `${textHeight}px Inter`
+        this.ctx.fillText(player.name,position.getX(), position.getY())
     }
 
 
@@ -318,6 +344,8 @@ export class BoardView{
         this.canvas.ondragenter = e => e.preventDefault();
         this.canvas.ondragover = e => e.preventDefault();
         this.canvas.ondrop = e => this.onDrop(e);
+        this.canvas.ondblclick = e => this.onDoubleClick(e);
+        onkeydown = e => this.onKeyDown(e);
     }
 
     private unbindEvents() : void{
@@ -330,6 +358,24 @@ export class BoardView{
         this.canvas.ondragover = null;
         this.canvas.ondragenter = null;
         this.canvas.ondrop = null;
+        this.canvas.ondblclick = null;
+        onkeydown = null;
+    }
+
+    private onKeyDown(e : KeyboardEvent){
+        if(e.key == "x" && e.ctrlKey == true && this.viewData.selectedToken !== undefined){
+            this.deleteToken(this.viewData.selectedToken?.id);
+        }
+    }
+
+    private onDoubleClick(e : MouseEvent){
+        const boundingRect = this.canvas.getBoundingClientRect();
+        this.ping(this.grid.canvasToTile(
+            this.viewOffset,
+            new Vector2(e.clientX - boundingRect.x, e.clientY - boundingRect.y),
+            this.viewScale
+        )
+        );
     }
 
     private onMouseUp(e : MouseEvent) : void{
@@ -434,6 +480,26 @@ export class BoardView{
                 position : position
             }
         })
+    }
+
+    private deleteToken(id : number){
+        this.serverPublisher.send({
+            status : Status.TOKEN,
+            command : Command.DELETE,
+            content : {
+                id : id
+            }
+        });
+    }
+
+    private ping(position : Vector2){
+        this.serverPublisher.send({
+            status : Status.SCENE_PING,
+            command : Command.CREATE,
+            content : {
+                position : position
+            }
+        });
     }
 
     private cursorMoved(movement:Vector2, position:Vector2):void{

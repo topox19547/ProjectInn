@@ -8,7 +8,7 @@
     import { SaveManager } from '../../filesystem/SaveManager.js';
     
     const currentTab = ref(SideBarTab.CHAT);
-    const previousTab = ref(SideBarTab.CHAT);
+    const savedTab = ref(SideBarTab.CHAT);
     const sidebarWidth = ref(400);
     const headerHeight = ref(64);
     const canvasSize = ref({ x : 0, y : 0});
@@ -26,8 +26,17 @@
         canvasSize.value.y = window.innerHeight - headerHeight.value;
     }
 
+    function manualTabChange(tab : SideBarTab){
+        if(props.game.viewData.selectedToken !== undefined){
+            savedTab.value = tab;
+            props.game.viewData.selectedToken = undefined;
+        } else {
+            changeTab(tab);
+        }
+    }
+
     function changeTab(tab : SideBarTab){
-        previousTab.value = currentTab.value;
+        savedTab.value = currentTab.value;
         currentTab.value = tab;
     }
 
@@ -37,7 +46,7 @@
         } else if (newToken !== undefined && newToken !== oldToken){
             currentTab.value = SideBarTab.TOKENS;
         } else if(newToken === undefined) {
-            changeTab(previousTab.value);
+            changeTab(savedTab.value);
         }
     })
 </script>
@@ -66,8 +75,8 @@
             <Sidebar
             :local-player="game.localPlayer"
             :current-tab="currentTab"
-            :previous-tab="previousTab"
-            @tab-changed="changeTab"
+            :previous-tab="savedTab"
+            @tab-changed="manualTabChange"
             :players="game.players"
             :chat="game.chat"
             :assets="game.tokenAssets"

@@ -7,7 +7,7 @@ import type { ServerPublisher } from '../../network/ServerHandler.js';
 import { Status } from '../../network/message/Status.js';
 import { Command } from '../../network/message/Command.js';
 import type { GamePreview } from '../../model/gamePreview.js';
-import ErrorWindow from '../shared/windows/ErrorWindow.vue';
+import ErrorWindow from '../shared/windows/MessageWindow.vue';
 import ButtonBase from '../shared/ButtonBase.vue';
 import PasswordInput from './windows/PasswordInput.vue';
     const emits = defineEmits<{

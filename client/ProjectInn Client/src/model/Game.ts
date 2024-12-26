@@ -28,7 +28,6 @@ export interface LocalSettings{
 export interface ViewData{
     selectedToken : Token | undefined
     viewCenterPosition : Vector2
-    errorBuffer : Array<string>
     pingBuffer : Array<{position : WeakVector2, player : string}>
 }
 
@@ -37,7 +36,6 @@ export function getInitializedViewData(): ViewData{
     return{
         selectedToken : undefined,
         viewCenterPosition : new Vector2(0,0),
-        errorBuffer : [],
         pingBuffer : []
     }
 }

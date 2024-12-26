@@ -169,12 +169,19 @@ export class LobbyController implements ClientState{
                     status : Status.ERROR,
                     command : Command.NONE,
                     content : {
-                        error : e.message
+                        text : e.message
                     }
                 });
-            } else if (e instanceof FormatError || e instanceof SyntaxError){
+            } else if (e instanceof SyntaxError || e instanceof FormatError){
                 console.log(e);
-                console.log(`Message parse error: message of type ${message.status} is malformed`)
+                console.log(`Message parse error: message of type ${message.status} is malformed`);
+                this.clientHandler.send({
+                    status : Status.ERROR,
+                    command : Command.NONE,
+                    content : {
+                        text : "wrong message format."
+                    }
+                });
             }   
         }
         
