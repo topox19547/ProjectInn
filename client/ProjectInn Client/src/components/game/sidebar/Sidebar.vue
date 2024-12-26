@@ -58,7 +58,7 @@
         v-if="currentTab == 0"></Chat>
         <Players :local-player="localPlayer" :players="players" 
         v-if="currentTab == 1"></Players>
-        <Assets :assets="assets" :local-player="localPlayer" 
+        <Assets :assets="assets" :local-player="localPlayer" :view-position="viewData.viewCenterPosition"
         v-if="currentTab == 2"></Assets>
         <Tokens :selected-token="viewData.selectedToken" :players="players" :local-player="localPlayer"
         v-if="currentTab == 3"></Tokens>

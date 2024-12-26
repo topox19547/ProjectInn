@@ -367,6 +367,10 @@ export class BoardView{
     private onCursorUp() : void{
         this.isCursorDown = false;
         this.draggingView = false;
+        this.viewData.viewCenterPosition = this.grid.canvasToTile(this.viewOffset, new Vector2(
+            this.canvas.width / 2,
+            this.canvas.height / 2
+        ), this.viewScale);
         if(this.draggedToken !== undefined){
             if(this.draggedToken.virtualPosition !== undefined){
                 this.serverPublisher.send({

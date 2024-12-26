@@ -12,6 +12,8 @@
     import { Command } from '../../../../../network/message/Command.js';
     import AssetCard from '../../../shared/AssetCard.vue';
     import ConfirmAction from '../../../windows/ConfirmAction.vue';
+    import type { ViewData } from '../../../../../model/Game.js';
+    import type { Vector2 } from '../../../../../types/Vector2.js';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const showEditAssetWindow = ref(false);
@@ -21,6 +23,7 @@
     const props = defineProps<{
         assets : Array<Asset>
         localPlayer : Player
+        viewPosition : Vector2
     }>();
 
     const newAsset = ref<Asset>(createEmptyAsset());
@@ -77,6 +80,23 @@
             }
         })
     }
+
+    function createToken(id : number, name : string){
+        serverPublisher.send({
+            status : Status.TOKEN,
+            command : Command.CREATE,
+            content : {
+                name : name,
+                id : -1,
+                assetID : id,
+                owners : [],
+                notes : {},
+                stats : {},
+                position : props.viewPosition
+            }
+        });
+    }
+
 </script>
 
 <template>
@@ -87,6 +107,7 @@
                     <AssetCard :asset="asset" v-for="asset in assets"
                     :show-delete="canDelete"
                     @edit-asset="editAsset"
+                    @asset-clicked="() => createToken(asset.assetID, asset.name)"
                     @delete-asset="deleteAsset"></AssetCard>
                 </div>
             </div>
