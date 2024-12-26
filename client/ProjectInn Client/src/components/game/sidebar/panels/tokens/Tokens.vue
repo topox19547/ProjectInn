@@ -10,9 +10,10 @@
     import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
     import { Status } from '../../../../../network/message/Status.js';
     import { Command } from '../../../../../network/message/Command.js';
-    import Stat from './Stat.vue';
+    import StatView from './Stat.vue';
     import Note from './Note.vue';
     import ButtonBase from '../../../../shared/ButtonBase.vue';
+    import type { Stat } from '../../../../../model/Stat.js';
 
     const props = defineProps<{
         selectedToken : Token | undefined
@@ -23,7 +24,9 @@
     const editLock = ref(false);
     const addingPlayer = ref("");
     const showNewNoteCard = ref(false);
-    const newNoteCard = useTemplateRef("newNoteScroll");
+    const showNewStatCard = ref(false);
+    const newNoteScroll = useTemplateRef("newNoteScroll");
+    const newStatScroll = useTemplateRef("newStatScroll");
     const serverPublisher : ServerPublisher = inject("serverPublisher") as ServerPublisher;
 
     const canEdit = computed(() => {
@@ -47,13 +50,25 @@
         editLock.value = status;
         if(status == true){
             nextTick(() => {
-                console.log(newNoteCard);
                 setTimeout(() => {
-                    newNoteCard.value?.scrollIntoView({ behavior:'smooth', block: 'center', inline: 'end' })
+                    newNoteScroll.value?.scrollIntoView({ behavior:'smooth', block: 'nearest', inline: 'end' })
                 },300)
             })
         }
     }
+
+    function changeNewStatStatus(status : boolean){
+        showNewStatCard.value = status;
+        editLock.value = status;
+        if(status == true){
+            nextTick(() => {
+                setTimeout(() => {
+                    newStatScroll.value?.scrollIntoView({ behavior:'smooth', block: 'nearest', inline: 'end' })
+                },300)
+            })
+        }
+    }
+
 
     function sendNewTokenName(name : string) : void{
         serverPublisher.send({
@@ -91,7 +106,7 @@
         });
     }
 
-    function deleteNote(title : string){
+    function sendDeletedNote(title : string){
         serverPublisher.send({
             status : Status.TOKEN_NOTE,
             command : Command.DELETE,
@@ -100,7 +115,30 @@
                 title : title
             }
         });
-        console.log(title);
+    }
+
+    function sendEditedStat(name : string, stat : Stat){
+        showNewStatCard.value = false
+        serverPublisher.send({
+            status : Status.TOKEN_STAT,
+            command : Command.MODIFY,
+            content : {
+                id : props.selectedToken?.id,
+                name : name,
+                stat : stat
+            }
+        })
+    }
+
+    function sendDeletedStat(name : string){
+        serverPublisher.send({
+            status : Status.TOKEN_STAT,
+            command : Command.DELETE,
+            content : {
+                id : props.selectedToken?.id,
+                name : name
+            }
+        });
     }
 
     function deleteToken(){
@@ -130,14 +168,37 @@
                @text-edited="(name) => sendNewTokenName(name)"></EditableText>
                 <div class="section">
                     <div class="title"> Stats </div>
-                    <Stat name="test" :stat="{value : 2, max : 3, min : 0}"></Stat>
-                    <Stat name="test" :stat="{value : 2, max : undefined, min : 0}"></Stat>
-                    <Stat name="test" :stat="{value : 2, max : 3, min : undefined}"></Stat>
-                    <div class="hoverButton" v-if="canEdit">
+                    <div class="hoverButton" v-if="canEdit" @click="() => changeNewStatStatus(true)">
                         <img class="miniButton" 
                         :src="AddIcon">
                     </div>
-                    <div class="spacer"></div>
+                    <TransitionGroup name="subElement">
+                        <StatView v-for="stat in Object.entries(selectedToken.stats)" 
+                        :name="stat[0]" 
+                        :stat="stat[1]" 
+                        :create="false"
+                        :can-edit="canEdit"
+                        :key="stat[0]"
+                        @set-edit-lock="(v : boolean) => editLock = v"
+                        @cancel="editLock = false"
+                        @edited-stat="sendEditedStat"
+                        @deleted-stat="() => sendDeletedStat(stat[0])"
+                        :current-token-id="selectedToken.id"></StatView>
+                        <StatView
+                        name="" 
+                        :stat="{value : 0, max : undefined, min : 0}" 
+                        :create="true"
+                        :can-edit="canEdit"
+                        key=""
+                        :taken-names="Object.keys(selectedToken.stats)"
+                        @set-edit-lock="(v : boolean) => editLock = v"
+                        @cancel="() => changeNewStatStatus(false)"
+                        @edited-stat="sendEditedStat"
+                        :current-token-id="selectedToken.id"
+                        v-if="showNewStatCard"></StatView>
+                        <div class="spacer" ref="newStatScroll"
+                        key="" v-if="Object.entries(selectedToken.stats).length > 0 || showNewStatCard"></div>
+                    </TransitionGroup>
                 </div>
                 <div class="section">
                     <div class="title"> Notes </div>
@@ -154,7 +215,7 @@
                         :current-token-id="selectedToken.id"
                         @cancel="editLock = false"
                         @edited-note="sendEditedNote"
-                        @deleted-note="() => deleteNote(note[0])"
+                        @deleted-note="() => sendDeletedNote(note[0])"
                         @set-edit-lock="(v : boolean) => editLock = v"
                         :key="note[0]"></Note>
                         <Note
@@ -202,7 +263,8 @@
                 </div>
             </div>
             <div class="buttons">
-                <ButtonBase
+                <Transition name="fade">
+                    <ButtonBase
                     @click="deleteToken"
                     text="Delete token" 
                     :icon="DeleteIcon" 
@@ -210,7 +272,8 @@
                     width="100%" 
                     height="42px"
                     :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
-                v-if="canEdit"></ButtonBase>
+                    v-if="canEdit"></ButtonBase>
+                </Transition>
             </div>
         </div>
     </div>
@@ -273,7 +336,7 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        border-color: #555555;
+        border-color: #636363;
         border-width: 2px;
         border-style: solid;
         padding-top: 16px;
@@ -370,5 +433,17 @@
         margin-block: 0px;
         overflow: hidden;
         transform: scale(1,0);
+    }
+
+    .fade-enter-active,
+    .fade-leave-active{
+        transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
+        transition-duration:0.3s;
+        opacity: 1;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
     }
 </style>

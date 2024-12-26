@@ -66,7 +66,7 @@
         </div>
         <Transition name="edit">
             <div class="editBox" v-if="editing == true">
-                <input class="textBox" :maxlength="maxLength" ref="textBox" v-model="editableText" @keyup.enter="submit"> 
+                <input class="textBox" :maxlength="maxLength" ref="textBox" v-model="editableText"> 
                 <ButtonBase :disable-shadow="true" :icon="OkIcon" @click="submit" height="32px"></ButtonBase>
                 <ButtonBase :disable-shadow="true" :icon="CloseIcon" @click="cancel" height="32px"></ButtonBase>
             </div>

@@ -39,11 +39,13 @@
     }
 
     function confirm(){
+        emits('editedNote', editedTitle.value , editedText.value);
         setEditStatus(false);
-        emits('editedNote', editedTitle.value , editedText.value)
     }
 
     function setEditStatus(status : boolean){
+        resetContent();
+        hoveredOn.value = false;
         emits("setEditLock", status);
         isEditing.value = status;
     }
@@ -57,7 +59,6 @@
     })
 
     watch(() => props.currentTokenId, () => {
-        console.log(props.currentTokenId)
         reset();
     })
 
@@ -71,12 +72,14 @@
         <TransitionGroup name="edit">
             <div class="static" v-if="!isEditing && create == false">
                 <div class="text">{{ text }}</div>
-                <div @dragstart="(e) => e.preventDefault()" class="hoverButton" @click="setEditStatus(true)">
+                <div @dragstart="(e) => e.preventDefault()" 
+                    class="hoverButton" @click="setEditStatus(true)"  v-if="canEdit">
                     <img class="miniButton editButton" 
                         :src="EditIcon" 
                         :style="{opacity : hoveredOn ? 1 : 0}" >
                 </div>
-                <div @dragstart="(e) => e.preventDefault()" class="hoverButton" @click="$emit('deletedNote')">
+                <div @dragstart="(e) => e.preventDefault()" 
+                    class="hoverButton" @click="$emit('deletedNote')" v-if="canEdit">
                     <img class="miniButton deleteButton" 
                     :src="DeleteIcon" 
                     :style="{opacity : hoveredOn ? 1 : 0}">
@@ -123,7 +126,6 @@
         padding-left: 12px;
         padding-bottom: 4px;
         box-sizing: border-box;
-
     }
 
     .title{
@@ -134,7 +136,7 @@
 
     .text{
         padding-top:8px;
-        padding-INLINE: 8px;
+        padding-inline: 8px;
         color: #ffffff;
     }
 

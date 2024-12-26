@@ -65,13 +65,13 @@ export class Token implements Identifiable, NotificationSource{
             }
         }
         for (const key of Object.keys(object.notes)){
-            const value = object.notes.key
+            const value = object.notes[key]
             if(!token.setNote(key,value)){
                 return undefined
             }
         }
         for (const key of Object.keys(object.stats)){
-            const value = object.stats.key
+            const value = object.stats[key]
             if(!token.setStat(key,new Stat(value.value, value.min, value.max))){
                 return undefined
             }
