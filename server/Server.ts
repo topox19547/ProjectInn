@@ -16,7 +16,6 @@ export class Server{
         server.addListener("connection",(w : WebSocket) =>{
             const handler : ClientHandler = new WebSocketHandler(w);
             handler.changeState(new LobbyController(lobby, handler));
-            lobby.addToLobby(handler);
         })
     }
 }

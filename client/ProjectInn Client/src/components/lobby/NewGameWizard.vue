@@ -36,7 +36,6 @@
         }
     }
 
-
     function goToPlayerEditor(){
         showPlayerMenu.value = true;
     }
@@ -80,6 +79,7 @@
     :player="newGameData.localPlayer"
     :show="showPlayerMenu"
     :on-confirm="goToGameEditor"
+    :force-new-player="true"
     @close="showPlayerMenu = false"
     ></PlayerEditWindow>
     <GameEditWindow

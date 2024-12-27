@@ -16,7 +16,7 @@ export class Chat implements NotificationSource{
 
     constructor(){
         const welcomeMessage : ChatMessage = {
-            text : "Welcome to ProjectInn...",
+            text : "Welcome to ProjectInn, type !h to see a list of all the available commands...",
             sender : "ProjectInn",
             isSystem : true
         }

@@ -66,11 +66,19 @@
         if(saveOnLeave.value == true){
             requestGameSave(false);
         }
-        serverPublisher.send({
+        if(props.game.localPlayer.isOwner){
+            serverPublisher.send({
+            status : Status.GAME_END,
+            command : Command.DELETE,
+            content : {}
+        });
+        } else {
+            serverPublisher.send({
             status : Status.CLIENT_STATUS,
             command : Command.DELETE,
             content : {}
         });
+        }
     }
 
     function closeLeaveGame(){
@@ -97,7 +105,7 @@
     <div class="topbarContent">
         <div class="topbarButton" @click="showLeaveGamePopup = true">
             <img :src="LeaveIcon">
-            <div>Leave Room</div>
+            <div>{{game.localPlayer.isOwner ? 'End Game' : 'Leave Room'}}</div>
         </div>
         <div class="topbarButton"
         v-if="game.localPlayer.isOwner" @click="() => requestGameSave(true)">
@@ -140,17 +148,19 @@
     :on-confirm="() => showSaveGamePopUp = false">
     </ConfirmAction>
     <ConfirmAction
-    action="Leave"
+    :action="props.game.localPlayer.isOwner ?'End Game' : 'Leave'"
     :destructive="false"
     :icon="LeaveIcon"
-    message="Are you sure you want to leave the game?"
-    title="Leave"
+    :message="props.game.localPlayer.isOwner ?
+        'Are you sure you want to end the game?' :
+        'Are you sure you want to leave the game?'"
+    :title="props.game.localPlayer.isOwner ?'End Game' : 'Leave'"
     :show="showLeaveGamePopup"
     :on-confirm="leaveGame"
     @close="closeLeaveGame">
         <template v-slot:additionalContent>
             <div class="section" v-if="game.localPlayer.isOwner">
-                <div class="inputTitle">Save the game before leaving:</div>
+                <div class="inputTitle">Save the game before ending it:</div>
                 <input class="toggle" v-model="saveOnLeave" type="checkbox">
             </div>
         </template>

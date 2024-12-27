@@ -3,7 +3,7 @@
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
     import CloseButton from '../CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
+    import { onMounted, ref, watch, type Ref } from 'vue';
     import WindowBackground from '../WindowBackground.vue';
     import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
     import { AssetType } from '../../../model/AssetType.js';
@@ -12,16 +12,29 @@
     import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
-        close : void
+        (e : "close") : void
+        (e : "changeNewPlayerStatus", status : boolean) : void
     }>();
     const props = defineProps<{
         player : Player
         show : boolean
         onConfirm : () => void
+        forceNewPlayer : boolean
     }>();
+    const isNewPlayer = ref(true);
+
+    watch(() => props.show, () => {
+        isNewPlayer.value = true;
+    })
+
     watch(props.player,(newPlayer) => {
         confirmDisabled.value = newPlayer.name.length == 0;
     })
+
+    function submit(){
+        emits("changeNewPlayerStatus", isNewPlayer.value);
+        props.onConfirm();
+    }
 </script>
 
 
@@ -38,18 +51,26 @@
                     </template>
                 </WindowTitleBar>
                 <div class="contentContainer">
-                    <div class="subCategory">
-                        <div class="inputTitle">Player name</div>
-                        <input class="textBox" v-model="player.name" maxlength="24" type="text">
-                    </div>
-                    <div class="subCategory">
-                        <div class="inputTitle">Player color</div>
-                        <input type="color" v-model="player.color" class="colorPicker">
-                    </div>
+                    <TransitionGroup name="edit">
+                        <div class="subCategory" key="newPlayer" v-if="forceNewPlayer == false">
+                            <div class="inputTitle">Join as a new player</div>
+                            <input class="checkbox" v-model="isNewPlayer" type="checkbox">
+                        </div>
+                        <div class="subCategory" key="playerName">
+                            <div class="inputTitle">
+                                {{ forceNewPlayer || isNewPlayer ? "Player name" : "Previous name"}}</div>
+                            <input class="textBox" v-model="player.name" maxlength="24" type="text">
+                        </div>
+                        <div class="subCategory" key="color" 
+                        v-if="forceNewPlayer == true || isNewPlayer">
+                            <div class="inputTitle">Player color</div>
+                            <input type="color" v-model="player.color" class="colorPicker">
+                        </div>
+                    </TransitionGroup>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="onConfirm"></ButtonBase>
-                </div>
+                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="submit"></ButtonBase>
+                </div> 
             </template>
         </WindowBase>
     </Transition>
@@ -70,6 +91,10 @@
         justify-content: space-between;
     }
 
+    .checkbox{
+        accent-color:#303F9F;
+    }
+
     .coordinateName{
         padding-left: 4px;
         color: #d9d9d9;
@@ -84,11 +109,11 @@
     .contentContainer{
         display: flex;
         flex-direction: column;
-        justify-content: center;
         width: 100%;
         border-radius: 16px;
         padding: 16px;
         gap:8px;
+        justify-content: center;
         box-sizing: border-box;
         height: 100%;
     }
@@ -142,5 +167,21 @@
     .window-leave-to {
         opacity: 0;
         transform: scale(0.75);
+    }
+
+    .edit-enter-active,
+    .edit-leave-active {
+        transition: all cubic-bezier(0.075, 0.82, 0.165, 1) ease-in-out;
+        transition-duration: 0.3s;
+        max-height: 1000px;
+        overflow: hidden;
+    }
+
+    .edit-enter-from,
+    .edit-leave-to {
+        padding-block: 0px;
+        margin-block: 0px;
+        max-height: 0px;
+        overflow: hidden;
     }
 </style>

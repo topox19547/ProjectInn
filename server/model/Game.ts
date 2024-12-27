@@ -33,6 +33,7 @@ export class Game implements NotificationSource{
     private currentScene : Scene;
     private password : string | undefined;
     private endCallback : () => void;
+    private endTimeout : NodeJS.Timeout | undefined;
     private static maxNameLength : number = 24;
     public static validate = ensureObject({
         name : ensureString,
@@ -56,6 +57,7 @@ export class Game implements NotificationSource{
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 24;
+        this.endTimeout = undefined;
         this.chat = new Chat();
         this.chat.addCommand(new Dice()).addCommand(new Help(this.chat))
         this.maxTokens = Number.MAX_SAFE_INTEGER;
@@ -194,6 +196,9 @@ export class Game implements NotificationSource{
             isSystem: true,
             text: `${player.getName()} has joined the game`
         })
+        if(player.isGameOwner() && this.endTimeout !== undefined){
+            clearTimeout(this.endTimeout);
+        }
         this.notifier?.subscribe(handler, player);
         return true
     }
@@ -208,6 +213,19 @@ export class Game implements NotificationSource{
             isSystem: true,
             text: `${player.getName()} has left the game`
         })
+        if(player.isGameOwner()){
+            const endTimeout = 300000;
+            this.chat.handleMessage({
+                sender: "ProjectInn",
+                isSystem: true,
+                text: `the owner of the game has left:
+                unless they reconnect within ${endTimeout / 60000} 
+                minutes, the game will end.`
+            });
+            this.endTimeout = setTimeout(() => {
+                this.endGame()
+            }, endTimeout);
+        }
         this.notifier?.removeClientsIf(p => p.getName() == player.getName());
         if(this.players.every(p => !p.isConnected())){
             this.endGame();
@@ -466,17 +484,7 @@ export class Game implements NotificationSource{
                 command : Command.DELETE,
                 content : {}
             },
-            p => p.getName() != this.ownerName
-        );
-        const gameSave = Game.toObject(this);
-        gameSave.chat = [];
-        this.notifier?.notifyIf(
-            {
-                status : Status.GAME_END,
-                command : Command.DELETE,
-                content : gameSave
-            },
-            p => p.getName() == this.ownerName
+            p => !p.isGameOwner()
         );
         this.notifier?.removeAllClients();
         this.endCallback();

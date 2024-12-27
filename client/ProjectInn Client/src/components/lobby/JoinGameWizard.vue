@@ -10,6 +10,7 @@ import type { GamePreview } from '../../model/gamePreview.js';
 import ErrorWindow from '../shared/windows/MessageWindow.vue';
 import ButtonBase from '../shared/ButtonBase.vue';
 import PasswordInput from './windows/PasswordInput.vue';
+import { RefSymbol } from '@vue/reactivity';
     const emits = defineEmits<{
         close : boolean
     }>();
@@ -24,7 +25,7 @@ import PasswordInput from './windows/PasswordInput.vue';
     const showJoinError = ref(false);
     const showPasswordScreen = ref(false);
     const showPlayerMenu = ref(false);
-    const joinData = ref<{ gameId : number, player : Player, password : string | undefined}>(getJoinDataBaseValue());
+    const joinData = ref(getJoinDataBaseValue());
 
     function getJoinDataBaseValue(){
         return {
@@ -36,7 +37,8 @@ import PasswordInput from './windows/PasswordInput.vue';
                 connected: false,
                 isOwner : false
             },
-            password : undefined
+            password : undefined,
+            enterAsNewPlayer : true
         }
     }
     
@@ -64,6 +66,7 @@ import PasswordInput from './windows/PasswordInput.vue';
                 gameId : joinData.value.gameId,
                 username : joinData.value.player.name,
                 playerColor : joinData.value.player.color,
+                newPlayer : joinData.value.enterAsNewPlayer,
                 password : undefined
             }
         });
@@ -81,11 +84,16 @@ import PasswordInput from './windows/PasswordInput.vue';
                 gameId : joinData.value.gameId,
                 username : joinData.value.player.name,
                 playerColor : joinData.value.player.color,
+                newPlayer : joinData.value.enterAsNewPlayer,
                 password : joinData.value.password
             }
         });
         joinData.value = getJoinDataBaseValue();
     }
+
+    watch(joinData, () => {
+        console.log(joinData.value.enterAsNewPlayer)
+    })
 
 </script>
 
@@ -120,10 +128,12 @@ import PasswordInput from './windows/PasswordInput.vue';
         $emit('close');
     }"
     :show="showPlayerMenu || showWizard && joinID !== undefined"
+    :force-new-player="false"
     @close="() => {
         showPlayerMenu = false;
         $emit('close');
-    }">
+    }"
+    @change-new-player-status="s => joinData.enterAsNewPlayer = s">
     </PlayerEditWindow>
     <PasswordInput
     :join-data="joinData"

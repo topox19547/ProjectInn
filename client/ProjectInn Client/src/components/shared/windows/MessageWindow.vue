@@ -13,7 +13,7 @@ import WindowBase from '../WindowBase.vue';
 
 <template>
     <WindowBackground></WindowBackground>
-    <WindowBase window-height="225px" window-width="325px">
+    <WindowBase window-height="225px" window-width="365px">
         <template v-slot:content>
             <div class="content">
                 <div class="title">{{ title }}</div>
@@ -31,7 +31,7 @@ import WindowBase from '../WindowBase.vue';
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        width: 325px;
+        width: 100%;
         height: 100%;
         gap: 24px;
         padding-block: 16px;
@@ -42,6 +42,7 @@ import WindowBase from '../WindowBase.vue';
     }
     .message{
         padding: 16px;
+        padding-inline: 32px;
         white-space: pre-wrap;
         text-align: center;
     }

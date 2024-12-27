@@ -67,6 +67,12 @@ export class MessageHandler{
                     });
                     break;
                 }
+                case Status.GAME_END:{
+                    this.serverMessageBuffer.value.push({
+                        title : "Game Closed",
+                        text : "The game was closed by the host."
+                    })
+                }
             }
             return;
         }
@@ -235,7 +241,6 @@ export class MessageHandler{
                 });
                 break;
             }
-            //TODO: ADD THE REST OF THE STATUSES
                 
         }
     }

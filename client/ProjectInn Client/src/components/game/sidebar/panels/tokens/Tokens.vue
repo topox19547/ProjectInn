@@ -354,7 +354,7 @@
         flex-direction: column;
         gap: 12px;
         overflow: auto;
-        padding-top: 16px;
+        padding-top: 8px;
         padding-bottom: 16px;
     }
 

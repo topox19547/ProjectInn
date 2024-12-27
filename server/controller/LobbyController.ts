@@ -10,7 +10,7 @@ import { Lobby } from "../model/Lobby.js";
 import { Command } from "../model/messages/Command.js";
 import { Message } from "../model/messages/Message.js";
 import { Status } from "../model/messages/Status.js";
-import { ensureObject, ensureString, weakEnsureOf, ensureNumber } from "../model/messages/Validators.js";
+import { ensureObject, ensureString, weakEnsureOf, ensureNumber, ensureBoolean } from "../model/messages/Validators.js";
 import { ClientHandler } from "./ClientHandler.js";
 import { ClientState } from "./ClientState.js";
 import { GameController } from "./GameController.js";
@@ -24,6 +24,7 @@ export class LobbyController implements ClientState{
     constructor(lobby : Lobby, clientHandler : ClientHandler){
         this.lobby = lobby;
         this.clientHandler = clientHandler;
+        this.lobby.addToLobby(clientHandler);
     }
 
     getNextDefaultState(): ClientState {
@@ -105,6 +106,7 @@ export class LobbyController implements ClientState{
                         username : ensureString,
                         playerColor : ensureString,
                         password : weakEnsureOf(ensureString),
+                        newPlayer : ensureBoolean
                     })(message.content);
                     const games = this.lobby.getRunningGames();
                     const game = games.get(content.gameId);
@@ -118,14 +120,20 @@ export class LobbyController implements ClientState{
                         throw new ValueError("The player's name is too long");
                     }
                     let player : Player | undefined = game.getPlayer(content.username);
-                    if(!player){
+                    if(content.newPlayer == false && player === undefined){
+                        throw new ValueError(`No player already exists with the name "${content.username}", please create a new one`);
+                    }
+                    if(content.newPlayer == true && player !== undefined){
+                        throw new ValueError(`The player name "${content.username}" is already taken`);
+                    }
+                    if(player === undefined){
                         player = new Player(content.username, new Color(content.playerColor), false);
                         if(!game.addPlayer(player)){
                             throw new ValueError("an error occurred while creating the player");
                         }
                     }
                     if(player.isConnected()){
-                        throw new ValueError("This player name is already taken");
+                        throw new ValueError(`A player with the name "${content.username}" is already connected to the game`);
                     }
                     game.joinGame(player,this.clientHandler);
                     const gameObject : ReturnType<typeof Game.validate> = Game.toObject(game);
