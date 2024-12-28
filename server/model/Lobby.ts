@@ -68,7 +68,7 @@ export class Lobby implements NotificationSource{
         }));
         return {
             status : Status.LOBBY_UPDATE,
-            command : Command.SAFE_MODIFY,
+            command : Command.MODIFY,
             content : {
                 activeGames : gameList
             }

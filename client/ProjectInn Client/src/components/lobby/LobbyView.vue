@@ -1,29 +1,21 @@
 <script setup lang="ts">
+    import { inject, ref, type Ref } from 'vue';
+    import DeleteIcon from '../../assets/icons/delete.svg';
     import { SaveManager } from '../../filesystem/SaveManager.js';
+    import type { LocalSettings } from '../../model/Game.js';
     import type { Lobby } from '../../model/Lobby.js';
-    import WindowBase from '../shared/WindowBase.vue';
-    import ErrorWindow from '../shared/windows/MessageWindow.vue';
-    import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
+    import type { SavedGame } from '../../model/SavedGame.js';
+    import { Command } from '../../network/message/Command.js';
+    import { Status } from '../../network/message/Status.js';
+    import type { ServerPublisher } from '../../network/ServerHandler.js';
+    import ConfirmAction from '../game/windows/ConfirmAction.vue';
     import ButtonBase from '../shared/ButtonBase.vue';
+    import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import LocalGameList from './gamelists/LocalGameList.vue';
     import RemoteGameList from './gamelists/RemoteGameList.vue';
-    import { inject, ref, type Ref } from 'vue';
-    import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
-    import type { Game, LocalSettings } from '../../model/Game.js';
-    import { GridType } from '../../model/GridType.js';
-    import { AssetType } from '../../model/AssetType.js';
-    import GameEditWindow from '../shared/windows/GameEditWindow.vue';
-    import type { ServerPublisher } from '../../network/ServerHandler.js';
-    import { parseJsonSourceFileConfigFileContent, server } from 'typescript';
-    import { Status } from '../../network/message/Status.js';
-    import { Command } from '../../network/message/Command.js';
-    import { Vector2 } from '../../types/Vector2.js';
-    import GameInfo from './windows/GameInfo.vue';
-    import NewGameWizard from './NewGameWizard.vue';
     import JoinGameWizard from './JoinGameWizard.vue';
-    import ConfirmAction from '../game/windows/ConfirmAction.vue';
-    import DeleteIcon from '../../assets/icons/delete.svg';
-import type { SavedGame } from '../../model/SavedGame.js';
+    import NewGameWizard from './NewGameWizard.vue';
+    import GameInfo from './windows/GameInfo.vue';
 
       
     const failedLoadText = 
@@ -52,7 +44,7 @@ Press the button below to clear it.`;
 
     function clearSaveData(){
         const saveManager = new SaveManager();
-        saveManager.clearSaves();
+        saveManager.clearGameSaves();
         window.location.reload();
     }
 

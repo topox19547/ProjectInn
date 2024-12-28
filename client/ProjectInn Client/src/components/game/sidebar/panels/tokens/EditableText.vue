@@ -79,7 +79,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 64px;
+        min-height: 64px;
         padding-inline: 16px;
     }
 
@@ -91,6 +91,7 @@
     }
 
     .editButton{
+        background-color: #494949;
         border-radius: 8px;
         padding: 2px;
     }

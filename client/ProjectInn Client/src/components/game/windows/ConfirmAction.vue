@@ -1,13 +1,9 @@
 <script setup lang="ts">
-    import DeleteIcon from '../../../assets/icons/delete.svg'
-    import type { Scene } from '../../../model/Scene.js';
-    import type { Asset } from '../../../model/Asset.js';
-    import type { Token } from '../../../model/Token.js';
+    import ButtonBase from '../../shared/ButtonBase.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
-    import CloseButton from '../../shared/CloseButton.vue';
-    import ButtonBase from '../../shared/ButtonBase.vue';
 
     const emits = defineEmits<{
         close : void

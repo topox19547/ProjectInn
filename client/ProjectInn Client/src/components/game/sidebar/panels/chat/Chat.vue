@@ -1,12 +1,12 @@
 <script setup lang="ts">
-    import { inject, nextTick, onUpdated, ref, useTemplateRef, watch } from 'vue';
-import type { ChatMessage } from '../../../../../model/ChatMessage.js';
+    import { inject, nextTick, ref, useTemplateRef, watch } from 'vue';
+    import type { ChatMessage } from '../../../../../model/ChatMessage.js';
     import type { Player } from '../../../../../model/Player.js';
+    import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
+    import { Command } from '../../../../../network/message/Command.js';
+    import { Status } from '../../../../../network/message/Status.js';
+    import ButtonBase from '../../../../shared/ButtonBase.vue';
     import MessageView from './ChatMessage.vue';
-import ButtonBase from '../../../../shared/ButtonBase.vue';
-import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
-import { Status } from '../../../../../network/message/Status.js';
-import { Command } from '../../../../../network/message/Command.js';
 
     const scrolledToBottom = ref(true);
     const chatMessage = ref("");

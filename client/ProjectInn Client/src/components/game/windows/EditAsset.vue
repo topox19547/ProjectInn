@@ -1,18 +1,14 @@
 <script setup lang="ts">
-    import type { Scene } from '../../../model/Scene.js';
-    import AssetIcon from '../../../assets/icons/assets.svg'
+    import { ref, watch } from 'vue';
+    import AssetIcon from '../../../assets/icons/assets.svg';
+    import ErrorImage from '../../../assets/placeholders/token_placeholder.png';
+    import type { Asset } from '../../../model/Asset.js';
+    import ButtonBase from '../../shared/ButtonBase.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
+    import UploadHelp from '../../shared/UploadHelp.vue';
+    import WindowBackground from '../../shared/WindowBackground.vue';
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
-    import CloseButton from '../../shared/CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../../shared/WindowBackground.vue';
-    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
-    import { AssetType } from '../../../model/AssetType.js';
-    import { GridType } from '../../../model/GridType.js';
-    import ButtonBase from '../../shared/ButtonBase.vue';
-    import type { Asset } from '../../../model/Asset.js';
-    import UploadHelp from '../../shared/UploadHelp.vue';
-    import ErrorImage from '../../../assets/placeholders/token_placeholder.png';
     const minTileSize = ref(10);
     const maxTileSize = ref(300);
     const tileSizeValue = ref(35);

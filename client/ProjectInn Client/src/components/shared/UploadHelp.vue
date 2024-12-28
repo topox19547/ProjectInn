@@ -1,10 +1,9 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-import HelpIcon from '../../assets/icons/help.svg'
-import ErrorWindow from './windows/MessageWindow.vue';
-import WindowBase from './WindowBase.vue';
-import WindowBackground from './WindowBackground.vue';
-import ButtonBase from './ButtonBase.vue';
+    import HelpIcon from '../../assets/icons/help.svg';
+    import ButtonBase from './ButtonBase.vue';
+    import WindowBackground from './WindowBackground.vue';
+    import WindowBase from './WindowBase.vue';
 
     const showHelp = ref(false);
 </script>

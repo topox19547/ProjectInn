@@ -1,18 +1,30 @@
 <script setup lang="ts">
-    import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
-    import BoardCanvas from './canvas/BoardCanvas.vue';
-    import type { Game } from '../../model/Game.js';
-    import { SideBarTab } from './sidebar/sidebarTab.js';
-    import Sidebar from './sidebar/Sidebar.vue';
-    import Topbar from './topbar/Topbar.vue';
+    import { ref, watch } from 'vue';
+    import BoardSettingsIcon from '../../assets/icons/boardSettings.svg';
     import { SaveManager } from '../../filesystem/SaveManager.js';
+    import type { Game } from '../../model/Game.js';
+    import { getDefaultGlobalSettings } from '../../model/GlobalSettings.js';
+    import ButtonBase from '../shared/ButtonBase.vue';
+    import ErrorWindow from '../shared/windows/MessageWindow.vue';
+    import BoardCanvas from './canvas/BoardCanvas.vue';
+    import Sidebar from './sidebar/Sidebar.vue';
+    import { SideBarTab } from './sidebar/sidebarTab.js';
+    import Topbar from './topbar/Topbar.vue';
+    import BoardSettings from './windows/BoardSettings.vue';
     
+    const loadError = ref(false);
     const currentTab = ref(SideBarTab.CHAT);
     const savedTab = ref(SideBarTab.CHAT);
     const sidebarWidth = ref(400);
     const headerHeight = ref(64);
     const canvasSize = ref({ x : 0, y : 0});
     const saveManager = new SaveManager();
+    const showBoardSettings = ref(false);
+    const globalSettings = ref(getDefaultGlobalSettings());
+    const loadedSettings = saveManager.loadSettings();
+    if(loadedSettings !== undefined){
+        globalSettings.value = loadedSettings;
+    }
 
     const props = defineProps<{
         game : Game
@@ -20,6 +32,20 @@
 
     setCanvasSize();
     window.addEventListener("resize", setCanvasSize);
+    
+    function reloadPage(){
+        window.location.reload();
+    }
+
+    function setShowNames(value : boolean){
+        globalSettings.value.showNames = value;
+        saveManager.saveSettings(globalSettings.value);
+    }
+
+    function setShowStats(value : boolean){
+        globalSettings.value.showStats = value;
+        saveManager.saveSettings(globalSettings.value);
+    }
 
     function setCanvasSize(){
         canvasSize.value.x = window.innerWidth - sidebarWidth.value;
@@ -58,17 +84,28 @@
                 <Topbar 
                 :game="props.game"></Topbar>
             </div>
-            <BoardCanvas 
+            <BoardCanvas @mousedown="showBoardSettings = false"
             :tokens="game.tokens" 
             :token-assets="game.tokenAssets" 
             :current-scene="game.currentScene"
             :local-player="game.localPlayer"
             :players="game.players"
             :view-data="game.viewData"
-            rounded="0px 16px 0px 0px" 
+            :global-settings="globalSettings"
+            rounded="0px 16px 0px 0px"
+            :on-load-error="() => loadError = true"
             :canvas-size="canvasSize"></BoardCanvas>
             <div class="gameId">
-                ProjectInn Beta, Game id : {{ game.id }}
+                <div>
+                    ProjectInn Beta, Game id : {{ game.id }}
+                </div>
+            </div>
+            <BoardSettings :global-settings="globalSettings"
+             :show="showBoardSettings"
+             @change-show-names="setShowNames"
+             @change-show-stats="setShowStats"></BoardSettings>
+            <div class="boardSettingsButton" @click="showBoardSettings = !showBoardSettings"> 
+                <img :src="BoardSettingsIcon"> 
             </div>
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">
@@ -82,6 +119,12 @@
             :assets="game.tokenAssets"
             :view-data="game.viewData"></Sidebar>
         </div>
+        <ErrorWindow title="Load error" 
+        message="unable to load the current scene. please try joining again" v-if="loadError">
+            <template v-slot:button>
+                <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
+            </template>
+    </ErrorWindow>
     </div>
 </template>
 
@@ -113,9 +156,11 @@
     }
 
     .gameId{
+        display: flex;
+        align-items: center;
         position: absolute;
         bottom: 16px;
-        left: 16px;
+        left: 64px;
         color: #FFFFFF;
         pointer-events: none;
         font-weight: bold;
@@ -123,5 +168,22 @@
         backdrop-filter: blur(4px);
         padding: 8px;
         border-radius: 8px;
+        height: 24px;
+    }
+
+    .boardSettingsButton{
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        background: #24242480;
+        backdrop-filter: blur(4px);
+        bottom: 16px;
+        left: 16px;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .boardSettingsButton:hover{
+        opacity: 0.8;
     }
 </style>

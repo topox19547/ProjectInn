@@ -1,15 +1,13 @@
 <script setup lang="ts">
+    import { ref, watch } from 'vue';
     import PlayerIcon from '../../../assets/icons/player.svg';
+    import type { Player } from '../../../model/Player.js';
+    import ButtonBase from '../ButtonBase.vue';
+    import CloseButton from '../CloseButton.vue';
+    import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
-    import CloseButton from '../CloseButton.vue';
-    import { onMounted, ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../WindowBackground.vue';
-    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
-    import { AssetType } from '../../../model/AssetType.js';
-    import { GridType } from '../../../model/GridType.js';
-    import ButtonBase from '../ButtonBase.vue';
-    import type { Player } from '../../../model/Player.js';
+    
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         (e : "close") : void

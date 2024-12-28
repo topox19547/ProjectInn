@@ -1,14 +1,20 @@
 import type { Game, LocalSettings } from "../model/Game.js";
 import type { GamePreview } from "../model/gamePreview.js";
+import { getDefaultGlobalSettings, type GlobalSettings } from "../model/GlobalSettings.js";
 import type { SavedGame } from "../model/SavedGame.js";
 
 export class SaveManager{
     private readonly gamesKey : string;
+    private readonly settingsKey : string;
 
     constructor(){
         this.gamesKey = "innGames";
+        this.settingsKey = "globalSettings";
         if(localStorage.getItem(this.gamesKey) === null){
-            this.clearSaves();
+            this.clearGameSaves();
+        }
+        if(localStorage.getItem(this.settingsKey) === null){
+            this.clearSettings();
         }
     }
 
@@ -71,8 +77,29 @@ export class SaveManager{
         return gamesPreview;
     }
     
-    public clearSaves() : void{
+    public clearGameSaves() : void{
         localStorage.setItem(this.gamesKey, JSON.stringify([]));
+    }
+
+    public clearSettings() : void{
+        localStorage.setItem(this.settingsKey,JSON.stringify(getDefaultGlobalSettings()));
+    }
+
+    public saveSettings(settings : GlobalSettings) : void{
+        try{
+            localStorage.setItem(this.settingsKey, JSON.stringify(settings));
+        } catch(e){
+            this.handleSaveError(e);
+        }
+    }
+
+    public loadSettings() : GlobalSettings | undefined{
+        try{
+            return JSON.parse(localStorage.getItem(this.settingsKey)!);
+        } catch(e){
+            this.handleSaveError(e);
+        }
+        return undefined
     }
 
     private handleSaveError(e : unknown){

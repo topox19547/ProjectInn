@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import WindowBackground from '../WindowBackground.vue';
-import WindowBase from '../WindowBase.vue';
+    import WindowBackground from '../WindowBackground.vue';
+    import WindowBase from '../WindowBase.vue';
 
     const props = defineProps<
         {

@@ -12,6 +12,8 @@ import type { Player } from "../../../model/Player.js";
 import PlaceholderSprite from "../../../assets/placeholders/token_placeholder.png"
 import PlaceholderBackground from "../../../assets/placeholders/background_placeholder.png"
 import type { ViewData } from "../../../model/Game.js";
+import { statToString, type Stat } from "../../../model/Stat.js";
+import type { GlobalSettings } from "../../../model/GlobalSettings.js";
 
 export class BoardView{
     //the offset of the view as the coordinates of its top left corner
@@ -30,15 +32,13 @@ export class BoardView{
     private draggedToken : Token | undefined;
     private background:ImageBitmap | undefined;
     private backgroundSource : string | undefined;
-    private defaultBackground:ImageBitmap | undefined;
-    private placeHolderSpriteColor:string;
     private noSprite : ImageBitmap | undefined;
     private spriteCache:Map<number,{
         url : string | undefined, 
         sprite : ImageBitmap | undefined,
         unused : boolean}>;
     private tokens:Array<Token>;
-    private currentScene:Scene;
+    private globalSettings:GlobalSettings;
     private localPlayer:Player;
     private players:Array<Player>;
     private viewData:ViewData;
@@ -52,15 +52,15 @@ export class BoardView{
             tokens:Array<Token>,
             localPlayer:Player,
             players:Array<Player>,
-            currentScene:Scene,
-            viewData : ViewData
+            viewData : ViewData,
+            globalSettings : GlobalSettings
         },
         serverPublisher : ServerPublisher){
         this.tokens = gameContext.tokens;
-        this.currentScene = gameContext.currentScene;
         this.localPlayer = gameContext.localPlayer;
         this.players = gameContext.players;
-        this.viewData=  gameContext.viewData;
+        this.viewData =  gameContext.viewData;
+        this.globalSettings = gameContext.globalSettings;
         this.viewScale = 1;
         this.maxScale = 1.75;
         this.scrollWheelMultiplier = 1 / 2000;
@@ -71,16 +71,15 @@ export class BoardView{
         this.draggedToken = undefined;
         this.viewOffset = new Vector2(0,0);
         this.grid = new SquareGrid(10,new Vector2(0,0),1);
-        this.placeHolderSpriteColor = "#222222"
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d", { alpha : false});
-        this.defaultBackground = undefined;
         this.background = undefined;
         this.backgroundSource = undefined;
         this.spriteCache = new Map();
         this.nextAnimationFrameID = 0;
         this.serverPublisher = serverPublisher;
         this.draggedSizeMultiplier = 8 / 7;
+
         this.bindEvents();
         const image : HTMLImageElement = new Image();
         image.src = PlaceholderSprite;
@@ -221,6 +220,19 @@ export class BoardView{
                 }
             }
         }
+        //draw token stats and tags (if enabled)
+        for(const token of this.tokens){
+            const vectorPosition : Vector2 = new Vector2(token.position.x,token.position.y);
+            const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
+            tokenPosition.translateBy(tokenOffset);
+            if(this.globalSettings.showNames == true){
+                this.drawTokenTag(tokenPosition, tokenSize, token.name);
+            }
+            if(!token.inDrag && this.globalSettings.showStats){
+                this.drawTokenStats(tokenPosition, tokenSize, token.stats);
+            }
+        }
+
         //Draw the tokens that are being moved
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
@@ -231,7 +243,7 @@ export class BoardView{
                 continue;
             }
             if(token.inDrag){
-                this.ctx.globalAlpha = 0.6;
+                this.ctx.globalAlpha = 0.5;
                 this.drawToken(spriteData.sprite, tokenPosition, tokenSize);
                 const isOverlappingToken : boolean = this.tokens.find(t => t != token && 
                     t.position.x == token.position.x && t.position.y == token.position.y) !== undefined;
@@ -256,6 +268,7 @@ export class BoardView{
             const vectorPosition : Vector2 = new Vector2(ping.position.x, ping.position.y);
             const pingPosition : Vector2 = this.grid.tileToCanvas(this.viewOffset, vectorPosition, this.viewScale);
             const player : Player | undefined = this.players.find(p => p.name == ping.player);
+            const padding : number = 16;
             pingPosition.translateBy(tokenOffset);
             if(player == undefined){
                 continue;
@@ -263,7 +276,7 @@ export class BoardView{
             this.ctx.strokeStyle = player.color;
             this.ctx.lineWidth = 4;
             this.drawRoundRect(pingPosition, tokenSize, false);
-            pingPosition.translateBy(new Vector2(0, -32));
+            pingPosition.translateBy(new Vector2(0, - tokenSize.getY() / 4 - padding * this.viewScale));
             this.drawPlayerTag(pingPosition, tokenSize, player);
         }
         //Draw the token that follows the cursor
@@ -314,21 +327,75 @@ export class BoardView{
 
     private drawPlayerTag(position : Vector2, tokenSize : Vector2, player : Player) : void{
         if(this.ctx === null) return;
-        this.ctx.fillStyle = player.color;
-        const measurements : TextMetrics = this.ctx.measureText(player.name);
         const textHeight : number = tokenSize.getY() / 4;
-        const padding : number = textHeight / 2;
-        this.ctx.beginPath();
-        this.ctx.roundRect(position.getX() - padding / 2, position.getY() - padding / 2,
-                measurements.width + padding, textHeight + padding, 8);
-        this.ctx.fill();
+        this.ctx.font = `${textHeight}px Inter`;
         this.ctx.textBaseline = "top";
-        this.ctx
+        this.ctx.textAlign = "left"
+        const measurements : TextMetrics = this.ctx.measureText(player.name);
+        this.ctx.fillStyle = player.color;
+        const padding : number = textHeight / 2;
+        this.drawRoundRect(
+            new Vector2(position.getX() - padding / 2, position.getY() - padding / 2),
+            new Vector2(measurements.width + padding, textHeight + padding), true);
         this.ctx.fillStyle = "#FFFFFF";
-        this.ctx.font = `${textHeight}px Inter`
-        this.ctx.fillText(player.name,position.getX(), position.getY())
+        this.ctx.fillText(player.name,position.getX(), position.getY());
     }
 
+    private drawTokenTag(tokenPosition : Vector2, tokenSize : Vector2, tokenName : string) : void{
+        if(this.ctx === null) return;
+        const textHeight : number = tokenSize.getY() / 8;
+        const padding : number = 4;
+        this.ctx.textBaseline = "top";
+        this.ctx.textAlign = "center";
+        this.ctx.fillStyle = "#FFFFFF";
+        this.ctx.font = `${textHeight}px Inter`;
+        this.ctx.shadowColor = "#000000"
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText(tokenName,
+            tokenPosition.getX() + tokenSize.getX() / 2,
+            tokenPosition.getY() + tokenSize.getY() + padding * this.viewScale,
+            tokenSize.getX());
+        this.ctx.shadowColor = "#00000000"
+        this.ctx.shadowBlur = 0;
+    }
+
+    private drawTokenStats(tokenPosition : Vector2, tokenSize : Vector2, tokenStats : Record<string,Stat>){
+        if(this.ctx === null) return;
+        const initialPadding : number = 2 * this.viewScale;
+        const padding : number = 16 * this.viewScale;
+        const drawPosition : Vector2 = tokenPosition.clone();
+        const barHeight : number = 16 * this.viewScale;
+        const textHeight : number = tokenSize.getY() / 10;
+        const barSize : Vector2 = new Vector2(tokenSize.getX(), barHeight);
+        drawPosition.translateY(-padding - initialPadding);
+        for(const stat of Object.entries(tokenStats).reverse()){
+            let shortenedName = stat[0];
+            if(stat[0].length >= 5){
+                shortenedName = `${stat[0].slice(0,4)}..`
+            }
+            const text : string = statToString(shortenedName.slice(0,6), stat[1]);
+            const progressSize : Vector2 = barSize.clone();
+            this.ctx.fillStyle = "#000000";
+            this.ctx.globalAlpha = 0.7;
+            this.drawRoundRect(drawPosition, barSize, true);
+            if(stat[1].min !== undefined && stat[1].max !== undefined){
+                progressSize.setX((stat[1].value - stat[1].min) / (stat[1].max - stat[1].min) * barSize.getX());
+                this.ctx.fillStyle = "#303F9F";
+                this.drawRoundRect(drawPosition, progressSize, true);
+            }
+            this.ctx.font = `${textHeight}px Inter`;
+            this.ctx.globalAlpha = 1;
+            this.ctx.textBaseline = "top";
+            this.ctx.textAlign = "left";
+            this.ctx.fillStyle = "#FFFFFF";
+            this.ctx.fillText(text,
+                drawPosition.getX() + padding / 2,
+                drawPosition.getY() + (barSize.getY() - textHeight) / 2,
+                tokenSize.getX() - padding);
+            drawPosition.translateY(- barHeight - padding / 4);
+        }
+        
+    }
 
     private bindEvents() : void{
         this.canvas.onmousedown = () => this.onCursorDown();

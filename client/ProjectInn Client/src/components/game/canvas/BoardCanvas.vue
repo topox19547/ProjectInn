@@ -1,18 +1,18 @@
 <script setup lang="ts">
-    import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-    import { Vector2, type WeakVector2 } from '../../../types/Vector2.js';
-    import type { Token } from '../../../model/Token.js';
-    import type { Scene } from '../../../model/Scene.js';
+    import { inject, onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
     import type { Asset } from '../../../model/Asset.js';
-    import { BoardView } from './BoardView.js';
+    import type { ViewData } from '../../../model/Game.js';
+    import type { GlobalSettings } from '../../../model/GlobalSettings.js';
     import { GridType } from '../../../model/GridType.js';
-    import { SquareGrid } from './grid/SquareGrid.js';
+    import type { Player } from '../../../model/Player.js';
+    import type { Scene } from '../../../model/Scene.js';
+    import type { Token } from '../../../model/Token.js';
+    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import { Vector2, type WeakVector2 } from '../../../types/Vector2.js';
+    import { BoardView } from './BoardView.js';
     import type { Grid } from './grid/Grid.js';
     import { HexagonGrid } from './grid/HexagonGrid.js';
-    import ErrorWindow from '../../shared/windows/MessageWindow.vue';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
-    import type { Player } from '../../../model/Player.js';
-    import type { ViewData } from '../../../model/Game.js';
+    import { SquareGrid } from './grid/SquareGrid.js';
     const props = defineProps<{
         tokens : Array<Token>
         currentScene : Scene
@@ -20,6 +20,7 @@
         localPlayer : Player
         players : Array<Player>
         viewData : ViewData
+        globalSettings : GlobalSettings
         rounded : string
         canvasSize : WeakVector2
         onLoadError? : () => void;
@@ -27,7 +28,6 @@
     }>();
 
 
-    const loadError = ref(false);
     const canvas = useTemplateRef("board");
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     let renderer: BoardView;
@@ -47,10 +47,10 @@
         if(canvas.value !== null){
             const gameContext = {
                 tokens : props.tokens,
-                currentScene : props.currentScene,
                 localPlayer : props.localPlayer,
                 players : props.players,
-                viewData : props.viewData
+                viewData : props.viewData,
+                globalSettings : props.globalSettings
             }
             renderer = 
                 new BoardView(
@@ -82,9 +82,6 @@
     ref="board" class="canvas" :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
         Game board
     </canvas>
-    <ErrorWindow title="Load error" 
-    message="unable to load the current scene. please try joining again" v-if="loadError">      
-    </ErrorWindow>
 </template>
 
 <style scoped>

@@ -1,22 +1,22 @@
 <script setup lang="ts">
+    import { inject, ref } from 'vue';
+    import AddIcon from '../../../assets/icons/add.svg';
+    import deleteIcon from '../../../assets/icons/delete_darker.svg';
+    import SceneIcon from '../../../assets/icons/scene.svg';
+    import type { Asset } from '../../../model/Asset.js';
     import { getStartingSceneData, type Scene } from '../../../model/Scene.js';
+    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import { Command } from '../../../network/message/Command.js';
+    import { Status } from '../../../network/message/Status.js';
+    import type { WeakVector2 } from '../../../types/Vector2.js';
+    import ButtonBase from '../../shared/ButtonBase.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
     import WindowBase from '../../shared/WindowBase.vue';
-    import SceneIcon from '../../../assets/icons/scene.svg';
-    import AddIcon from '../../../assets/icons/add.svg';
-    import deleteIcon from '../../../assets/icons/delete_darker.svg'
-    import CloseButton from '../../shared/CloseButton.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
+    import SceneEditWindow from '../../shared/windows/SceneEditWindow.vue';
     import AssetCard from '../shared/AssetCard.vue';
-    import ButtonBase from '../../shared/ButtonBase.vue';
-import SceneEditWindow from '../../shared/windows/SceneEditWindow.vue';
-import type { Asset } from '../../../model/Asset.js';
-import type { WeakVector2 } from '../../../types/Vector2.js';
-import { computed, inject, ref } from 'vue';
-import ConfirmAction from './ConfirmAction.vue';
-import type { ServerPublisher } from '../../../network/ServerHandler.js';
-import { Status } from '../../../network/message/Status.js';
-import { Command } from '../../../network/message/Command.js';
+    import ConfirmAction from './ConfirmAction.vue';
     const emits = defineEmits<{
         (e : "close") : void
         (e : "show") : void

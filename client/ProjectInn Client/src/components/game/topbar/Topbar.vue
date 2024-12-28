@@ -1,19 +1,17 @@
 <script setup lang="ts">
-    import { computed, inject, onMounted, onUpdated, ref, watch } from 'vue';
+    import { inject, ref, watch } from 'vue';
+    import LeaveIcon from '../../../assets/icons/leave.svg';
+    import SaveIcon from '../../../assets/icons/save.svg';
     import SceneIcon from "../../../assets/icons/scene.svg";
     import SettingsIcon from '../../../assets/icons/settings.svg';
-    import SaveIcon from '../../../assets/icons/save.svg';
-    import LeaveIcon from '../../../assets/icons/leave.svg';
-    import type { Player } from '../../../model/Player.js';
-    import type { Scene } from '../../../model/Scene.js';
-    import Scenes from '../windows/Scenes.vue';
-    import { Permission } from '../../../model/Permission.js';
-    import GameEditWindow from '../../shared/windows/GameEditWindow.vue';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
     import type { Game } from '../../../model/Game.js';
-    import { Status } from '../../../network/message/Status.js';
+    import { Permission } from '../../../model/Permission.js';
     import { Command } from '../../../network/message/Command.js';
+    import { Status } from '../../../network/message/Status.js';
+    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import GameEditWindow from '../../shared/windows/GameEditWindow.vue';
     import ConfirmAction from '../windows/ConfirmAction.vue';
+    import Scenes from '../windows/Scenes.vue';
 
     const showSceneMenu = ref(false);
     const showGameSettings = ref(false);

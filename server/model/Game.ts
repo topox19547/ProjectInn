@@ -415,7 +415,7 @@ export class Game implements NotificationSource{
         this.currentScene = scene;
         this.notifier?.notify({
             status : Status.SCENE_CHANGE,
-            command : Command.SAFE_MODIFY,
+            command : Command.MODIFY,
             content : Scene.toObject(scene)
         });
         this.adjustTokenPositions(true);

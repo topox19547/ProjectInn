@@ -1,18 +1,17 @@
 <script setup lang="ts">
+    import { onUpdated, ref, watch } from 'vue';
+    import SceneIcon from '../../../assets/icons/scene.svg';
+    import { getInitializedViewData } from '../../../model/Game.js';
+    import { getDefaultGlobalSettings } from '../../../model/GlobalSettings.js';
+    import { getStartingPlayerData } from '../../../model/Player.js';
     import type { Scene } from '../../../model/Scene.js';
-    import SceneIcon from '../../../assets/icons/scene.svg'
+    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
+    import ButtonBase from '../ButtonBase.vue';
+    import CloseButton from '../CloseButton.vue';
+    import UploadHelp from '../UploadHelp.vue';
+    import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
-    import CloseButton from '../CloseButton.vue';
-    import { onUpdated, ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../WindowBackground.vue';
-    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
-    import { AssetType } from '../../../model/AssetType.js';
-    import { GridType } from '../../../model/GridType.js';
-    import ButtonBase from '../ButtonBase.vue';
-    import UploadHelp from '../UploadHelp.vue';
-import { getStartingPlayerData } from '../../../model/Player.js';
-import { getInitializedViewData } from '../../../model/Game.js';
     const minTileSize = 30;
     const maxTileSize = 300;
     const tileSizeValue = ref(100);
@@ -123,6 +122,7 @@ import { getInitializedViewData } from '../../../model/Game.js';
                             :current-scene="scene"
                             :local-player="getStartingPlayerData()"
                             :players="[]"
+                            :global-settings="getDefaultGlobalSettings()"
                             :view-data="getInitializedViewData()"
                             :canvas-size="{ x : 256, y : 256}">
                             </BoardCanvas>

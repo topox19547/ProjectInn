@@ -1,19 +1,18 @@
 <script setup lang="ts">
     import { computed, inject, ref } from 'vue';
-    import type { Player } from '../../../../../model/Player.js';
-    import ButtonBase from '../../../../shared/ButtonBase.vue';
     import addIcon from '../../../../../assets/icons/add.svg';
-    import deleteIcon from '../../../../../assets/icons/delete_darker.svg'
+    import deleteIcon from '../../../../../assets/icons/delete_darker.svg';
     import type { Asset } from '../../../../../model/Asset.js';
-    import EditAsset from '../../../windows/EditAsset.vue';
     import { AssetType } from '../../../../../model/AssetType.js';
+    import type { Player } from '../../../../../model/Player.js';
     import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
-    import { Status } from '../../../../../network/message/Status.js';
     import { Command } from '../../../../../network/message/Command.js';
+    import { Status } from '../../../../../network/message/Status.js';
+    import type { Vector2 } from '../../../../../types/Vector2.js';
+    import ButtonBase from '../../../../shared/ButtonBase.vue';
     import AssetCard from '../../../shared/AssetCard.vue';
     import ConfirmAction from '../../../windows/ConfirmAction.vue';
-    import type { ViewData } from '../../../../../model/Game.js';
-    import type { Vector2 } from '../../../../../types/Vector2.js';
+    import EditAsset from '../../../windows/EditAsset.vue';
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const showEditAssetWindow = ref(false);

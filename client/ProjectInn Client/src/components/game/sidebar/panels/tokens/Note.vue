@@ -137,6 +137,7 @@
     .text{
         padding-top:8px;
         padding-inline: 8px;
+        overflow-wrap: break-word;
         color: #ffffff;
     }
 

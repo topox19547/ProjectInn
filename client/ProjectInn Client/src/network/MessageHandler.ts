@@ -155,8 +155,7 @@ export class MessageHandler{
                 break;
             }
             case Status.ASSET_NAME:
-            case Status.ASSET_URL:
-            case Status.ASSET_SIZE:{
+            case Status.ASSET_URL:{
                 let asset : any;
                 if(content.assetType == AssetType.SCENE){
                     const scene = this.game.value.scenes.find(s => s.asset.assetID == content.assetID);

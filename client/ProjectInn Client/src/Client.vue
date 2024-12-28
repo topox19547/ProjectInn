@@ -15,7 +15,7 @@
   import { Status } from './network/message/Status.js';
   import { Command } from './network/message/Command.js';
 
-  const serverUrl : string = `ws://${window.location.hostname}:23435/`;
+  const serverUrl : string = `wss://${window.location.hostname}:23435/`;
   //use ws instead of wss if your server doesn't use secure websockets.
   const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
@@ -54,6 +54,23 @@
     window.location.reload();
   }
 
+  function reconnectToGame(){
+    if(game.value === undefined){
+      return;
+    }
+    serverPublisher.send({
+      status : Status.JOIN_GAME,
+        command : Command.NONE,
+        content : {
+            gameId : game.value.id,
+            username : game.value.localPlayer.name,
+            playerColor : game.value.localPlayer.color,
+            newPlayer : false,
+            password : game.value.password
+        }
+    })
+  }
+
   function deleteLocalGame(id : number){
     saveManager.DeleteGame(id);
     refreshLocalGames();
@@ -88,9 +105,10 @@
   <Transition name="game">
     <GameView v-if="game !== undefined" :game=game></GameView>
   </Transition>
-  <MessageWindow v-if="showNetworkError == true" title="Network error" message="Couldn't connect to the ProjectInn Server.">
+  <MessageWindow v-if="showNetworkError == true" title="Network error" message="Lost connection to the ProjectInn Server.">
     <template v-slot:button>
-      <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
+      <ButtonBase v-if="game !== undefined" text="Try reconnecting" @click="reconnectToGame"></ButtonBase>
+      <ButtonBase v-else text="Reload page" @click="reloadPage"></ButtonBase>
     </template>
   </MessageWindow>
   <MessageWindow v-if="serverMessageBuffer.length > 0" 

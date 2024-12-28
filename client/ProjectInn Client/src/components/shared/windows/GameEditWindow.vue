@@ -1,16 +1,11 @@
 <script setup lang="ts">
+    import { ref, watch } from 'vue';
     import SettingsIcon from '../../../assets/icons/settings.svg';
+    import ButtonBase from '../ButtonBase.vue';
+    import CloseButton from '../CloseButton.vue';
+    import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
-    import CloseButton from '../CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
-    import WindowBackground from '../WindowBackground.vue';
-    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
-    import { AssetType } from '../../../model/AssetType.js';
-    import { GridType } from '../../../model/GridType.js';
-    import ButtonBase from '../ButtonBase.vue';
-    import type { Player } from '../../../model/Player.js';
-    import type { Scene } from '../../../model/Scene.js';
     const passwordEnabled = ref(false);
     const emits = defineEmits<{
         (e : 'close') : void,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import CloseButton from './CloseButton.vue';
 
     const props = defineProps<{
         title : string,

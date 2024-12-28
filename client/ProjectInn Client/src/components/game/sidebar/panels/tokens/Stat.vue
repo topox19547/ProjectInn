@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-    import type { Stat } from '../../../../../model/Stat.js';
+    import { statToString, type Stat } from '../../../../../model/Stat.js';
     import EditIcon from '../../../../../assets/icons/edit.svg';
     import DeleteIcon from '../../../../../assets/icons/delete.svg';
     import OkIcon from '../../../../../assets/icons/ok.svg';
@@ -56,6 +56,8 @@
         }
         return true;
     })
+
+    const statString = computed(() => statToString(props.name, props.stat))
 
     function resetContent(){
         editableStat.value = {
@@ -125,17 +127,12 @@
                     {width: (props.stat.value - props.stat.min) / (props.stat.max - props.stat.min) * 100 + '%' }"
                     ></div>
                     <div class="progressText" @dblclick="() => {if(canEdit) setEditStatus(true)}">
-                        {{ name }}: {{ stat.min == 0 ? '' : stat.min + ' / ' }} {{stat.value}} / {{stat.max}}
+                        {{ statString }}
                     </div>
                 </div>
-                <div class="anchor noProgress" v-if="props.stat.max !== undefined && props.stat.min === undefined">
+                <div class="anchor noProgress"  v-else>
                     <div class="progressText" @dblclick="() => {if(canEdit) setEditStatus(true)}">
-                        {{ name }}: {{stat.value}} / {{stat.max}}
-                    </div>
-                </div>
-                <div class="anchor noProgress"  v-if="props.stat.max === undefined">
-                    <div class="progressText" @dblclick="() => {if(canEdit) setEditStatus(true)}">
-                        {{ name }}: {{stat.value}}
+                        {{ statString }}
                     </div>
                 </div>
                 <div @dragstart="(e) => e.preventDefault()" 

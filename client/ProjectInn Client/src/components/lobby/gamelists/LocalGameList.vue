@@ -1,12 +1,11 @@
 <script setup lang="ts">
+    import Add from '../../../assets/icons/add.svg';
+    import Delete from '../../../assets/icons/delete.svg';
+    import type { GamePreview } from '../../../model/gamePreview.js';
     import Fab from './Fab.vue';
     import GameEntry from './GameEntry.vue';
     import GameListRoot from './GameListRoot.vue';
-    import Add from '../../../assets/icons/add.svg';
-    import Delete from '../../../assets/icons/delete.svg';
     import NoGamesText from './NoGamesText.vue';
-    import type { GamePreview } from '../../../model/gamePreview.js';
-    import ErrorWindow from '../../shared/windows/MessageWindow.vue';
     
     const emits = defineEmits<{
         (e: 'newGame') : void,

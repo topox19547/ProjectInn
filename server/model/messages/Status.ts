@@ -25,9 +25,7 @@ export enum Status{
     SCENE_PING,
     SAVE_GAME,
     CHAT,
-    PING,
     ERROR,
-    ASSET_SIZE,
     LOAD_GAME
 }
 

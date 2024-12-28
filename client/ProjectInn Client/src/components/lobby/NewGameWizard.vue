@@ -1,19 +1,16 @@
 <script setup lang="ts">
     import { inject, ref } from 'vue';
-    import type { ServerPublisher } from '../../network/ServerHandler.js';
-    import { Status } from '../../network/message/Status.js';
-    import { Command } from '../../network/message/Command.js';
-    import { GridType } from '../../model/GridType.js';
-    import { AssetType } from '../../model/AssetType.js';
-    import type { Game } from '../../model/Game.js';
-    import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
-    import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
-    import GameEditWindow from '../shared/windows/GameEditWindow.vue';
-    import { getStartingSceneData } from '../../model/Scene.js';
-    import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import { SaveManager } from '../../filesystem/SaveManager.js';
-    import ButtonBase from '../shared/ButtonBase.vue';
     import { getStartingPlayerData } from '../../model/Player.js';
+    import { getStartingSceneData } from '../../model/Scene.js';
+    import type { ServerPublisher } from '../../network/ServerHandler.js';
+    import { Command } from '../../network/message/Command.js';
+    import { Status } from '../../network/message/Status.js';
+    import ButtonBase from '../shared/ButtonBase.vue';
+    import GameEditWindow from '../shared/windows/GameEditWindow.vue';
+    import ErrorWindow from '../shared/windows/MessageWindow.vue';
+    import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
+    import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
     const props = defineProps<{
         showWizard : boolean
     }>();

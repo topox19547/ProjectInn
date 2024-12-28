@@ -1,16 +1,14 @@
 <script setup lang="ts">
+    import { inject, ref } from 'vue';
+    import kickIcon from '../../../assets/icons/kick.svg';
+    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import { Command } from '../../../network/message/Command.js';
+    import { Status } from '../../../network/message/Status.js';
+    import ButtonBase from '../../shared/ButtonBase.vue';
+    import CloseButton from '../../shared/CloseButton.vue';
+    import WindowBackground from '../../shared/WindowBackground.vue';
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
-    import CloseButton from '../../shared/CloseButton.vue';
-    import { inject, ref} from 'vue';
-    import WindowBackground from '../../shared/WindowBackground.vue';
-    import ButtonBase from '../../shared/ButtonBase.vue';
-    import type { Player } from '../../../model/Player.js';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
-    import { Status } from '../../../network/message/Status.js';
-    import { Command } from '../../../network/message/Command.js';
-    import Players from '../sidebar/panels/players/Players.vue';
-    import kickIcon from '../../../assets/icons/kick.svg'
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const toKick = ref("");

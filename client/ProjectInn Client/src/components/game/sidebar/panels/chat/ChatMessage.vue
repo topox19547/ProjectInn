@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { ChatMessage } from '../../../../../model/ChatMessage.js';
+    import { computed } from 'vue';
+    import type { ChatMessage } from '../../../../../model/ChatMessage.js';
     const props = defineProps<{
         message : ChatMessage
         playerColor? : string
