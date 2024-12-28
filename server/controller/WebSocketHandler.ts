@@ -15,11 +15,7 @@ export class WebSocketHandler extends ClientHandler{
         webSocket.addEventListener("close", () => this.close());
         webSocket.addEventListener("error", () => this.close())
     }
-
-    open(): void {
-        throw new Error("Method not implemented.");
-    }
-
+    
     close(): void {
         this.currentState?.handleMessage({
             status : Status.CLIENT_STATUS,
