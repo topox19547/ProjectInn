@@ -14,7 +14,7 @@
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const emits = defineEmits<{
-        close : void
+        (e : "close") : void
     }>();
     const props = defineProps<{
         editablePlayers : Array<string>

@@ -18,8 +18,8 @@ import type { ServerPublisher } from '../../../network/ServerHandler.js';
 import { Status } from '../../../network/message/Status.js';
 import { Command } from '../../../network/message/Command.js';
     const emits = defineEmits<{
-        close : void,
-        show : void
+        (e : "close") : void
+        (e : "show") : void
     }>();
 
     const props = defineProps<{
