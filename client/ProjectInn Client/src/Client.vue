@@ -15,6 +15,8 @@
   import { Status } from './network/message/Status.js';
   import { Command } from './network/message/Command.js';
 
+  const serverUrl : string = `ws://${window.location.hostname}:23435/`;
+  //use ws instead of wss if your server doesn't use secure websockets.
   const showNetworkError = ref(false);
   const game : Ref<Game | undefined> = ref(undefined);
   const serverMessageBuffer : Ref<Array<{title : string, text :string}>> = ref([]);
@@ -29,7 +31,8 @@
   });
   refreshLocalGames();
   const messageHandler : MessageHandler = new MessageHandler(lobby, game, localSettings, serverMessageBuffer);
-  const serverPublisher : ServerPublisher = new WebSocketHandler(messageHandler, requestGames, notifyNetworkError);
+  const serverPublisher : ServerPublisher = new WebSocketHandler(
+    messageHandler, requestGames, notifyNetworkError, serverUrl);
   provide("serverPublisher", serverPublisher);
 
   function requestGames(){
