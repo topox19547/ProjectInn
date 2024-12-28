@@ -58,7 +58,6 @@ import { getInitializedViewData } from '../../../model/Game.js';
 
     function enableConfirm(image : ImageBitmap){
         props.scene.asset.assetSize = {x : image.width, y : image.height};
-        console.log(props.scene);
         confirmDisabled.value = false;
     }
 </script>

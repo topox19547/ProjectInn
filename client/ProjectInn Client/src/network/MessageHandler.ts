@@ -36,7 +36,6 @@ export class MessageHandler{
     }
 
     handleMessage(message : Message){
-        console.log(message);
         const content = message.content;
 
         if(this.game.value === undefined){ //Handle lobby messages

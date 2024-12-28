@@ -19,7 +19,6 @@
     }>();
 
     function onDragStart(e : DragEvent){
-        console.log("drag started");
         if(e.dataTransfer === null){
             return;
         }
@@ -31,7 +30,7 @@
 </script>
 
 <template>
-    <div class="card" @drop="console.log('aa')" draggable @click="$emit('assetClicked', asset)" 
+    <div class="card" draggable @click="$emit('assetClicked', asset)" 
     @dragstart="onDragStart"
     @mouseenter="hoveredOn = true" 
     @mouseleave="hoveredOn = false">

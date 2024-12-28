@@ -16,10 +16,6 @@ export class WebSocketHandler implements ServerPublisher{
         this.socket.addEventListener("open", onConnect)
     }
 
-    private close(): void {
-        throw new Error("Method not implemented.");
-    }
-
     private receive(event : MessageEvent): void {
         try{
             const parsedMessage = JSON.parse(event.data) as Message

@@ -68,7 +68,6 @@
             renderer.clearUnusedSprites();
         }, {deep : true, immediate : true})
         watch(() => props.currentScene, (newScene) => {
-            console.log("aaaaa");
             changeScene(newScene, renderer);
         }, { immediate : true, deep : true});
     });

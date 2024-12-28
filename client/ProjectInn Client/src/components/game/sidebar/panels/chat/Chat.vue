@@ -42,7 +42,6 @@ import { Command } from '../../../../../network/message/Command.js';
 
     function updateScrollToBottom(target : any){
         scrolledToBottom.value = target.scrollTop + target.clientHeight >= target.scrollHeight;
-        console.log(scrolledToBottom.value);
     }
 
     function scrollToBottom(){
@@ -69,8 +68,7 @@ import { Command } from '../../../../../network/message/Command.js';
     <div class="margin">
         <div class="container">
             <div class="messageViewer" @scrollend="e => updateScrollToBottom(e.target)">
-                <MessageView v-for="message in chat" 
-                @vue-before-update="console.log('aaa')"
+                <MessageView v-for="message in chat"
                 :message="message"
                 :player-color="message.isSystem ? undefined : getPlayerColor(message.sender)" ></MessageView>
                 <div ref="bottom" class="bottom"></div>

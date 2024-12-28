@@ -55,7 +55,6 @@ import { RefSymbol } from '@vue/reactivity';
             return;
         }
         if(game.private == true){
-            console.log("password required");
             showPasswordScreen.value = true;
             return;
         }
@@ -90,10 +89,6 @@ import { RefSymbol } from '@vue/reactivity';
         });
         joinData.value = getJoinDataBaseValue();
     }
-
-    watch(joinData, () => {
-        console.log(joinData.value.enterAsNewPlayer)
-    })
 
 </script>
 

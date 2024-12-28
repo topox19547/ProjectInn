@@ -56,7 +56,6 @@ export class BoardView{
             viewData : ViewData
         },
         serverPublisher : ServerPublisher){
-        console.log("new boardrenderer created");
         this.tokens = gameContext.tokens;
         this.currentScene = gameContext.currentScene;
         this.localPlayer = gameContext.localPlayer;
@@ -89,8 +88,7 @@ export class BoardView{
         image.addEventListener("load",() =>{
             createImageBitmap(image).then((placeholder) => {
                 this.noSprite = placeholder;
-                console.log(PlaceholderSprite)
-            }).catch(() => console.log(PlaceholderSprite));
+            });
         });
     }
 
@@ -133,8 +131,7 @@ export class BoardView{
     }
 
     public updateSpriteCache(id:number, url:string):void{
-        let spriteEntry = this.spriteCache.get(id); 
-        console.log(this.spriteCache);
+        let spriteEntry = this.spriteCache.get(id);
         if(spriteEntry == undefined){
             spriteEntry = {
                 url : undefined,
@@ -182,7 +179,6 @@ export class BoardView{
         window.cancelAnimationFrame(this.nextAnimationFrameID);
         this.background?.close();
         this.unbindEvents();
-        console.log("boardrenderer destroyed");
     }
 
     private renderView():void{
@@ -576,7 +572,6 @@ export class BoardView{
             this.grid.getTokenSize(this.viewScale).getY() / this.viewScale,
             Math.abs(this.grid.getTileOffset().getY()));
         if(newX < 0 - extraPaddingX){
-            console.log(this.viewOffset)
             let limitedX:number = - extraPaddingX - this.viewOffset.getX();
             vector.setX(limitedX);
         }

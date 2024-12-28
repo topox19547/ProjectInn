@@ -44,7 +44,6 @@ export class SaveManager{
 
     public LoadGame(id : number) : SavedGame | undefined{
         const games : string | null = localStorage.getItem(this.gamesKey)
-        console.log(id);
         try{
             const parsedGames : Array<SavedGame> = JSON.parse(games!);
             return parsedGames.length > id && id >= 0 ? parsedGames[id] : undefined;

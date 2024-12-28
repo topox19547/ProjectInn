@@ -16,7 +16,6 @@
     const props = defineProps<{
         localGames : Array<GamePreview>
     }>();
-    console.log(props.localGames);
 </script>
 
 <template>

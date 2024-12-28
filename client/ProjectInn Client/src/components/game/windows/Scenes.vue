@@ -93,7 +93,6 @@ import { Command } from '../../../network/message/Command.js';
             command : Command.MODIFY,
             content : editingScene.value
         });
-        console.log(editingScene.value)
         showSceneEditWindow.value = false;
     }
 

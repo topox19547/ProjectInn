@@ -63,7 +63,6 @@
     }
 
     function sendEditedAsset(){
-        console.log(editableAsset.value);
         serverPublisher.send({
             status: Status.TOKEN_ASSET,
             command : Command.MODIFY,

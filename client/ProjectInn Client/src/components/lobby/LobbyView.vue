@@ -73,7 +73,6 @@ Press the button below to clear it.`;
 
     function showDeleteGamePopup(id : number){
         deletingGame.value = id;
-        console.log(deletingGame);
         showDeleteGame.value = true
     }
 

@@ -57,8 +57,7 @@
                 }
             }
         }
-        editedPermissions[playerName][key] = value;    
-        console.log(editedPermissions[playerName])
+        editedPermissions[playerName][key] = value;
     }
 
     function generatePermissionsCopy() : Record<string,Record<string, boolean>>{
