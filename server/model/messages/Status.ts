@@ -13,6 +13,7 @@ export enum Status{
     TOKEN_STAT,
     TOKEN_NOTE,
     TOKEN_ASSET,
+    TOKEN_COPY,
     ASSET_NAME,
     ASSET_URL,
     SCENE,

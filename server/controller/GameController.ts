@@ -130,6 +130,19 @@ export class GameController implements ClientState{
                     }
                     break;
                 }
+                case Status.TOKEN_COPY:{
+                    const content = ensureObject({
+                        id : ensureNumber
+                    })(message.content);
+                    const token : Token = this.getTokenIfAuthorized(content.id, false);
+                    const copy : Token | undefined = Token.fromObject(Token.toObject(token), this.currentGame);
+                    if(copy === undefined){
+                        throw new ValueError(`An error occurred while copying the token`);
+                    }
+                    copy.setPosition(this.getClosestFreePosition(token.getPosition()));
+                    this.currentGame.addToken(copy);
+                    break;
+                }
                 case Status.TOKEN_OWNERSHIP:{
                     const content = ensureObject({
                         name : ensureString,

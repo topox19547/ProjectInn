@@ -4,6 +4,7 @@
     import AddIcon from '../../../../../assets/icons/add-alt.svg';
     import RemoveIcon from '../../../../../assets/icons/close.svg';
     import DeleteIcon from '../../../../../assets/icons/delete.svg';
+    import CopyIcon from '../../../../../assets/icons/copy.svg';
     import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
     import EditableText from './EditableText.vue';
     import { Permission } from '../../../../../model/Permission.js';
@@ -151,6 +152,16 @@
         });
     }
 
+    function copyToken(){
+        serverPublisher.send({
+            status : Status.TOKEN_COPY,
+            command : Command.CREATE,
+            content : {
+                id : props.selectedToken?.id
+            }
+        });
+    }
+
     watch(() => props.selectedToken?.id, () => {
         addingPlayer.value = "";
     });
@@ -265,6 +276,16 @@
             <div class="buttons" v-if="selectedToken !== undefined">
                 <Transition name="fade">
                     <ButtonBase
+                    @click="copyToken"
+                    text="Copy Token" 
+                    :icon="CopyIcon" 
+                    :disable-shadow="true"
+                    width="100%" 
+                    height="42px"
+                    v-if="canEditStrict"></ButtonBase>
+                </Transition>
+                <Transition name="fade">
+                    <ButtonBase
                     @click="deleteToken"
                     text="Delete token" 
                     :icon="DeleteIcon" 
@@ -332,8 +353,11 @@
     }
 
     .buttons{
+        display: flex;
+        flex-direction: column;
         padding-inline: 16px;
         padding-bottom: 16px;
+        gap : 8px
     }
 
     .section{

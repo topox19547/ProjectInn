@@ -79,7 +79,8 @@
 
 <template>
     <canvas @dragover.prevent @dragenter.prevent
-    ref="board" class="canvas" :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
+    ref="board" class="canvas" tabindex="1"
+    :style="{ 'border-radius': rounded }" :width="canvasSize.x" :height="canvasSize.y" >
         Game board
     </canvas>
 </template>

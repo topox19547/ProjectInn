@@ -408,7 +408,7 @@ export class BoardView{
         this.canvas.ondragover = e => e.preventDefault();
         this.canvas.ondrop = e => this.onDrop(e);
         this.canvas.ondblclick = e => this.onDoubleClick(e);
-        onkeydown = e => this.onKeyDown(e);
+        this.canvas.onkeydown = e => this.onKeyDown(e);
     }
 
     private unbindEvents() : void{
@@ -422,12 +422,18 @@ export class BoardView{
         this.canvas.ondragenter = null;
         this.canvas.ondrop = null;
         this.canvas.ondblclick = null;
-        onkeydown = null;
+        this.canvas.onkeydown = null;
     }
 
     private onKeyDown(e : KeyboardEvent){
+        e.preventDefault();
+        if(this.localPlayer.permissions["MANAGE_TOKENS"] == false){
+            return;
+        }
         if(e.key == "x" && e.ctrlKey == true && this.viewData.selectedToken !== undefined){
             this.deleteToken(this.viewData.selectedToken?.id);
+        }else if(e.key == "c" && e.ctrlKey == true && this.viewData.selectedToken !== undefined){
+            this.copyToken(this.viewData.selectedToken.id);
         }
     }
 
@@ -506,7 +512,7 @@ export class BoardView{
     }
 
 
-    private onDrop(e : DragEvent){
+    private onDrop(e : DragEvent) : void{
         if(e.dataTransfer?.getData("id") == undefined || e.dataTransfer.getData("name") == undefined){
             return;
         }
@@ -519,7 +525,7 @@ export class BoardView{
             tilePosition);
     }
 
-    private onSelect(position : Vector2){
+    private onSelect(position : Vector2) : void{
         if(this.draggingView || this.draggedToken !== undefined){
             return;
         }
@@ -529,7 +535,7 @@ export class BoardView{
         this.viewData.selectedToken = overlappedToken != this.viewData.selectedToken ? overlappedToken : undefined;
     }
 
-    private sendNewToken(id : number, name : string, position : Vector2){
+    private sendNewToken(id : number, name : string, position : Vector2) : void{
         this.serverPublisher.send({
             status : Status.TOKEN,
             command : Command.CREATE,
@@ -545,7 +551,7 @@ export class BoardView{
         })
     }
 
-    private deleteToken(id : number){
+    private deleteToken(id : number) : void{
         this.serverPublisher.send({
             status : Status.TOKEN,
             command : Command.DELETE,
@@ -555,7 +561,17 @@ export class BoardView{
         });
     }
 
-    private ping(position : Vector2){
+    private copyToken(id : number) : void{
+        this.serverPublisher.send({
+            status : Status.TOKEN_COPY,
+            command : Command.CREATE,
+            content : {
+                id : id
+            }
+        });
+    }
+
+    private ping(position : Vector2) : void{
         this.serverPublisher.send({
             status : Status.SCENE_PING,
             command : Command.CREATE,

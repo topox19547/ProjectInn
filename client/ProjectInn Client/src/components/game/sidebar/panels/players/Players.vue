@@ -79,6 +79,14 @@
             </div>
             <div class="buttonBar">
                 <ButtonBase
+                @click="showPermissionsWindow = true"
+                text="Edit permissions" 
+                :icon="editPermsIcon" 
+                :disable-shadow="true"
+                width="100%" 
+                height="42px"
+                v-if="localPlayer.permissions[Permission.MASTER] == true || localPlayer.isOwner"></ButtonBase>
+                <ButtonBase
                 @click="showKickWindow = true"
                 text="Kick player" 
                 :icon="kickIcon" 
@@ -87,14 +95,6 @@
                 height="42px"
                 :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
                 v-if="canKickPlayers"></ButtonBase>
-                <ButtonBase
-                @click="showPermissionsWindow = true"
-                text="Edit permissions" 
-                :icon="editPermsIcon" 
-                :disable-shadow="true"
-                width="100%" 
-                height="42px"
-                v-if="localPlayer.permissions[Permission.MASTER] == true || localPlayer.isOwner"></ButtonBase>
             </div>
         </div>
     </div>
