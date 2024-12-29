@@ -1,4 +1,5 @@
 import { WebSocketServer } from "ws";
+import { WebSocket } from "ws";
 import { readFileSync } from "fs";
 import { createServer } from "node:https"
 import { ClientHandler } from "./controller/ClientHandler.js";

@@ -54,23 +54,6 @@
     window.location.reload();
   }
 
-  function reconnectToGame(){
-    if(game.value === undefined){
-      return;
-    }
-    serverPublisher.send({
-      status : Status.JOIN_GAME,
-        command : Command.NONE,
-        content : {
-            gameId : game.value.id,
-            username : game.value.localPlayer.name,
-            playerColor : game.value.localPlayer.color,
-            newPlayer : false,
-            password : game.value.password
-        }
-    })
-  }
-
   function deleteLocalGame(id : number){
     saveManager.DeleteGame(id);
     refreshLocalGames();
@@ -107,8 +90,7 @@
   </Transition>
   <MessageWindow v-if="showNetworkError == true" title="Network error" message="Lost connection to the ProjectInn Server.">
     <template v-slot:button>
-      <ButtonBase v-if="game !== undefined" text="Try reconnecting" @click="reconnectToGame"></ButtonBase>
-      <ButtonBase v-else text="Reload page" @click="reloadPage"></ButtonBase>
+      <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
     </template>
   </MessageWindow>
   <MessageWindow v-if="serverMessageBuffer.length > 0" 

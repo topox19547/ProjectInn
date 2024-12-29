@@ -3,20 +3,39 @@ import { Command } from "../model/messages/Command.js";
 import { validateMessage, Message } from "../model/messages/Message.js";
 import { Status } from "../model/messages/Status.js";
 import { ClientHandler } from "./ClientHandler.js";
+import { WebSocket } from "ws";
 
 
 export class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
+    private isConnected : boolean;
     
     constructor(webSocket : WebSocket){
         super()
+        this.isConnected = true;
         this.webSocket = webSocket;
-        webSocket.addEventListener("message", (m) => this.receive(m));
-        webSocket.addEventListener("close", () => this.close());
-        webSocket.addEventListener("error", () => this.close())
+        this.webSocket.on("message", (m) => this.receive(m.toString()));
+        this.webSocket.on("pong", () => this.markConnected())
+        this.checkConnectionState();
+    }
+
+    private checkConnectionState() : void{
+        const pingInterval = 10000;
+        if(!this.isConnected){
+            this.close()
+            return;
+        }
+        this.isConnected = false;
+        this.webSocket.ping();
+        setTimeout(() => this.checkConnectionState(), pingInterval)
+    }
+
+    private markConnected() : void{
+        this.isConnected = true;
     }
     
-    close(): void {
+    public close() : void {
+        this.webSocket.close();
         this.currentState?.handleMessage({
             status : Status.CLIENT_STATUS,
             command : Command.DELETE,
@@ -25,9 +44,9 @@ export class WebSocketHandler extends ClientHandler{
         console.log("A player has left");
     }
 
-    receive(event : MessageEvent): void {
+    public receive(message : string) : void {
         try{
-            const parsedMessage = validateMessage(JSON.parse(event.data))
+            const parsedMessage = validateMessage(JSON.parse(message))
             if(this.currentState === undefined){
                 console.log("handler currently isn't in any state")
                 return;
@@ -43,7 +62,7 @@ export class WebSocketHandler extends ClientHandler{
         }  
     }
     
-    send(message : Message): void {
+    public send(message : Message): void {
         this.webSocket.send(JSON.stringify(message));
     }
 }
