@@ -61,13 +61,13 @@ export class HexagonGrid implements Grid{
         for(let c:number = -3; c * (xDistBetweenCenters * viewScale) < endX; c++){
             for(let y:number = gridOffsetY; y < endY; y += this.tileHeight * viewScale){
                 const x = gridOffsetX + (this.tileWidth / 2 + ((xDistBetweenCenters) * c * 2) ) * viewScale;
-                let center : Vector2 = new Vector2(x, y);
+                let center : Vector2 = new Vector2(x, y);   
                 this.drawShape(center, ctx, scaledPoints);
                 center = new Vector2(
                     x + xDistBetweenCenters * viewScale, 
                     y + this.tileHeight / 2 * viewScale);
-                this.drawShape(center, ctx, scaledPoints);
-            }
+                this.drawShape(center, ctx, scaledPoints);             
+            } 
         }
         ctx.stroke();
     }

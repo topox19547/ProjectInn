@@ -409,6 +409,9 @@ export class BoardView{
         this.canvas.ondrop = e => this.onDrop(e);
         this.canvas.ondblclick = e => this.onDoubleClick(e);
         this.canvas.onkeydown = e => this.onKeyDown(e);
+        this.canvas.onselectstart = e => {
+            //return true;
+        }
     }
 
     private unbindEvents() : void{
@@ -423,6 +426,7 @@ export class BoardView{
         this.canvas.ondrop = null;
         this.canvas.ondblclick = null;
         this.canvas.onkeydown = null;
+        this.canvas.onselectstart= null;
     }
 
     private onKeyDown(e : KeyboardEvent){
@@ -438,6 +442,7 @@ export class BoardView{
     }
 
     private onDoubleClick(e : MouseEvent){
+        e.preventDefault();
         const boundingRect = this.canvas.getBoundingClientRect();
         this.ping(this.grid.canvasToTile(
             this.viewOffset,
@@ -448,6 +453,7 @@ export class BoardView{
     }
 
     private onMouseUp(e : MouseEvent) : void{
+        e.preventDefault();
         const boundingRect = this.canvas.getBoundingClientRect();
         this.onSelect(
             new Vector2(
@@ -459,6 +465,7 @@ export class BoardView{
     }
 
     private onMouseMoved(e : MouseEvent) : void{
+        e.preventDefault();
         const boundingRect = this.canvas.getBoundingClientRect();
         this.cursorMoved(
         new Vector2(-e.movementX,-e.movementY),
@@ -468,6 +475,7 @@ export class BoardView{
     }
 
     private onWheelEvent(e : WheelEvent) : void{
+        e.preventDefault();
         if(!this.isCursorIn){
             return;
         }

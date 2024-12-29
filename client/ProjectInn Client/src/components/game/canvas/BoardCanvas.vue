@@ -86,4 +86,7 @@
 </template>
 
 <style scoped>
+    .canvas:focus { 
+        outline: none; 
+    }
 </style>

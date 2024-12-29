@@ -169,9 +169,11 @@
         padding: 8px;
         border-radius: 8px;
         height: 24px;
+        user-select: none;
     }
 
     .boardSettingsButton{
+        user-select: none;
         display: flex;
         justify-content: center;
         position: absolute;
