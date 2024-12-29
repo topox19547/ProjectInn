@@ -362,9 +362,9 @@ export class BoardView{
     private drawTokenStats(tokenPosition : Vector2, tokenSize : Vector2, tokenStats : Record<string,Stat>){
         if(this.ctx === null) return;
         const initialPadding : number = 2 * this.viewScale;
-        const padding : number = 16 * this.viewScale;
+        const padding : number = tokenSize.getY() / 6;
         const drawPosition : Vector2 = tokenPosition.clone();
-        const barHeight : number = 16 * this.viewScale;
+        const barHeight : number = tokenSize.getY() / 6;
         const textHeight : number = tokenSize.getY() / 10;
         const barSize : Vector2 = new Vector2(tokenSize.getX(), barHeight);
         drawPosition.translateY(-padding - initialPadding);
