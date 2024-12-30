@@ -14,7 +14,7 @@ A simple, quick, and easy to use virtual tabletop application designed to play r
 ![lobby-view](deliverables/screenshots/LobbyView.png)
 
 ## Setup
-A hosted instance of ProjectInn can be found on my website at https://topox.dev/ProjectInn.\
+A hosted instance of ProjectInn can be found on my website at https://topox.dev/ProjectInn. \
 If you're looking to self-host follow the guide below.\
 Before you continue, make sure you've already installed Node.js and npm.
 #building and deploying the client
@@ -24,6 +24,7 @@ keep in mind that the client will try to connect using a secured websocket. if y
 3. edit the "base" property of the vite.config.ts file so that it matches the directory where the client is going to be served.
 4. build the client with "npm run build"
 5. the built client will be in /dist. move the contents of the directory to your http server of choice and have fun!
+   
 #building and running the server
 1. cd into the "server" directory
 2. run "npm install" to install the required packages
