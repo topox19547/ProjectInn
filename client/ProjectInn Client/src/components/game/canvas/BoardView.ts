@@ -409,9 +409,7 @@ export class BoardView{
         this.canvas.ondrop = e => this.onDrop(e);
         this.canvas.ondblclick = e => this.onDoubleClick(e);
         this.canvas.onkeydown = e => this.onKeyDown(e);
-        this.canvas.onselectstart = e => {
-            //return true;
-        }
+        this.canvas.onselectstart  = e => false;
     }
 
     private unbindEvents() : void{
@@ -426,7 +424,8 @@ export class BoardView{
         this.canvas.ondrop = null;
         this.canvas.ondblclick = null;
         this.canvas.onkeydown = null;
-        this.canvas.onselectstart= null;
+        this.canvas.onselectstart = null;
+        
     }
 
     private onKeyDown(e : KeyboardEvent){
