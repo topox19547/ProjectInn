@@ -30,7 +30,7 @@ export class Dice implements ChatCommand{
         if(splitArgs.length == 0){
             return errorResponse
         }
-        let messageText : string = `${playerName} rolled `;
+        let messageText : string = `${playerName} rolled ${splitArgs.toString()}<br>`;
         let total : number = 0;
         for(const [i, arg] of splitArgs.entries()){
             const splitArg : Array<string> = arg.trim().split("d");
