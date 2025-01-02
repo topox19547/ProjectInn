@@ -2,6 +2,7 @@ import { ClientHandler } from "../controller/ClientHandler.js";
 import { Chat } from "./chat/Chat.js";
 import { Dice } from "./chat/commands/Dice.js";
 import { Help } from "./chat/commands/Help.js";
+import { Whisper } from "./chat/commands/Whisper.js";
 import { ClientNotifier } from "./ClientNotifier.js";
 import { Asset } from "./gameObjects/asset/Asset.js";
 import { Identifiable } from "./gameObjects/Identifiable.js";
@@ -59,7 +60,7 @@ export class Game implements NotificationSource{
         this.maxPasswordLength = 24;
         this.endTimeout = undefined;
         this.chat = new Chat();
-        this.chat.addCommand(new Dice()).addCommand(new Help(this.chat))
+        this.chat.addCommand(new Dice()).addCommand(new Help(this.chat)).addCommand(new Whisper(this));
         this.maxTokens = Number.MAX_SAFE_INTEGER;
         this.maxTokenAssets = Number.MAX_SAFE_INTEGER;
         this.maxScenes = Number.MAX_SAFE_INTEGER;
@@ -107,7 +108,7 @@ export class Game implements NotificationSource{
                 return true;
         }
         for(const player of object.players){
-            if(player.name.length > Player.getMaxNameLength()){
+            if(!Player.isNameValid(player.name)){
                 return undefined;
             }
             const newPlayer = Player.fromObject(player);

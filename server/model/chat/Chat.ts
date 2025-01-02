@@ -1,9 +1,11 @@
 import { ClientNotifier } from "../ClientNotifier.js";
+import { Player } from "../gameObjects/player/Player.js";
 import { Command } from "../messages/Command.js";
 import { Status } from "../messages/Status.js";
 import { NotificationSource } from "../NotificationSource.js";
 import { ChatMessage } from "./ChatMessage.js";
 import { ChatCommand } from "./commands/ChatCommand.js";
+import { CommandResponse } from "./commands/CommandResponse.js";
 
 
 export class Chat implements NotificationSource{
@@ -39,17 +41,21 @@ export class Chat implements NotificationSource{
         if(message.text.length > this.maxMessageLength){
             return;
         }
-        this.notifier?.notify({
-            status : Status.CHAT,
-            command : Command.CREATE,
-            content : message
-        })
-        this.chatHistory.push(message);
         if(!message.text.startsWith("!")){
+            this.notifier?.notify({
+                status : Status.CHAT,
+                command : Command.CREATE,
+                content : message
+            })
+            this.chatHistory.push(message);
             return;
         }
-        const splitQuery : Array<string> = message.text.slice(1).split(" ");
-        const command : ChatCommand | undefined = this.commandMap.get(splitQuery[0]);
+        const trimmedMessage : string = message.text.slice(1).trim();
+        const separatorIndex : number = message.text.indexOf(" ");
+        const commandString : string = separatorIndex === -1 ? 
+            trimmedMessage : trimmedMessage.substring(0, separatorIndex - 1);
+        const argsString = trimmedMessage.substring(separatorIndex);
+        const command : ChatCommand | undefined = this.commandMap.get(commandString);
         if (command === undefined){
             this.notifier?.notifyIf({
                 status : Status.CHAT,
@@ -62,14 +68,23 @@ export class Chat implements NotificationSource{
             }, p => p.getName() == message.sender)
             return;
         }
-        splitQuery.splice(0,1)
-        const response : ChatMessage = command.execute(splitQuery,message.sender);
-        this.notifier?.notify({
-            status : Status.CHAT,
-            command : Command.CREATE,
-            content : response
-        });
-        this.chatHistory.push(response);
+        const commandResponse : CommandResponse = command.execute(argsString, message.sender);
+        const sendTo : Array<String> | undefined = commandResponse.sendTo;
+        if(sendTo !== undefined){
+            this.notifier?.notifyIf({
+                status : Status.CHAT,
+                command : Command.CREATE,
+                content : commandResponse.response
+            }, p => sendTo.includes(p.getName()));
+            //Private messages aren't saved to the global chat history
+        } else {
+            this.notifier?.notify({
+                status : Status.CHAT,
+                command : Command.CREATE,
+                content : commandResponse.response
+            });
+            this.chatHistory.push(commandResponse.response);
+        }
     }
 
     public getChatHistory() : Array<ChatMessage>{

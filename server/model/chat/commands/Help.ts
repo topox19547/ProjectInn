@@ -1,6 +1,7 @@
 import { Chat } from "../Chat.js";
 import { ChatMessage } from "../ChatMessage.js";
 import { ChatCommand } from "./ChatCommand.js";
+import { CommandResponse } from "./CommandResponse.js";
 
 
 export class Help implements ChatCommand{
@@ -18,13 +19,16 @@ export class Help implements ChatCommand{
         return "!h    shows a list of all the available commands"
     }
 
-    execute(args: Array<string>, playerName : string): ChatMessage {
-        let text : string = "Available commands: <br>";
-        this.chat.getAvailableCommands().forEach(c => text += c.getExplanation() + "<br>");
+    execute(args: string, playerName : string): CommandResponse {
+        let text : string = `${playerName}, these are the available commands: <br><br>`;
+        this.chat.getAvailableCommands().forEach(c => text += c.getExplanation() + "<br><br>");
         return {
-            text : text,
-            sender : this.readableName,
-            isSystem : true
+            response : {
+                text : text,
+                sender : this.readableName,
+                isSystem : true
+            },
+            sendTo : [playerName]
         };
     }
 

@@ -19,6 +19,7 @@
         onConfirm : () => void
         forceNewPlayer : boolean
     }>();
+    const allowedCharacters : string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
     const isNewPlayer = ref(true);
 
     watch(() => props.show, () => {
@@ -26,7 +27,8 @@
     })
 
     watch(props.player,(newPlayer) => {
-        confirmDisabled.value = newPlayer.name.length == 0;
+        confirmDisabled.value = newPlayer.name.length == 0 || [...newPlayer.name].some(
+            c => !allowedCharacters.includes(c));
     })
 
     function submit(){

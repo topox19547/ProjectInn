@@ -47,8 +47,8 @@ export class LobbyController implements ClientState{
                     startingScene.setNotifier(notifier);
                     const game : Game = new Game(content.gameName, content.username, startingScene);
                     game.setNotifier(notifier);
-                    if(content.username.length > Player.getMaxNameLength()){
-                        throw new ValueError("The player's name is too long");
+                    if(!Player.isNameValid(content.username)){
+                        throw new ValueError(`Invalid player name`)
                     }
                     const player : Player = new Player(content.username, new Color(content.playerColor), true)
                     game.addPlayer(player);
@@ -116,8 +116,8 @@ export class LobbyController implements ClientState{
                     if(!game.checkPassword(content.password)){
                         throw new ValueError("Wrong password")
                     }
-                    if(content.username.length > Player.getMaxNameLength()){
-                        throw new ValueError("The player's name is too long");
+                    if(!Player.isNameValid(content.username)){
+                        throw new ValueError(`Invalid player name`)
                     }
                     let player : Player | undefined = game.getPlayer(content.username);
                     if(content.newPlayer == false && player === undefined){

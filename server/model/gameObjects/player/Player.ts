@@ -14,6 +14,8 @@ export class Player implements NotificationSource{
     private connected : boolean;
     private notifier : ClientNotifier | undefined;
     private static readonly maxNameLength : number = 24;
+    private static readonly allowedCharacters : string = 
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
     public static readonly validate = ensureObject({
         name : ensureString,
         color : ensureString,
@@ -67,8 +69,9 @@ export class Player implements NotificationSource{
         }
     }
 
-    public static getMaxNameLength() : number{
-        return this.maxNameLength;
+    public static isNameValid(name : string) : boolean{
+        return name.length <= Player.maxNameLength && 
+        [...name].every(c => Player.allowedCharacters.includes(c))
     }
 
     public setNotifier(notifier : ClientNotifier) : void{
