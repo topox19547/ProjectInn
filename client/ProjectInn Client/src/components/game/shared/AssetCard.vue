@@ -47,7 +47,7 @@
             :style="{opacity : hoveredOn ? 1 : 0}" 
             @click.stop="$emit('deleteAsset',asset)">
         </div>
-        <img :src="asset.assetURL" @error="(e : any) => e.target.src = ErrorImage" class="sprite">
+        <img loading="lazy" :src="asset.assetURL" @error="(e : any) => e.target.src = ErrorImage" class="sprite">
         <div class="centered">
             <div class="name">{{ asset.name }}</div>
         </div>

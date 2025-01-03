@@ -139,7 +139,7 @@ export class MessageHandler{
                         }
                     }
                 } else if (message.command == Command.DELETE){
-                    const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
+                    const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.id);
                     this.game.value.scenes.splice(index,1);
                 }
                 break;

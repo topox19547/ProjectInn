@@ -50,6 +50,7 @@
     })
 
     onUpdated(() => {
+        confirmDisabled.value = true;
         tileSizeValue.value = props.scene.tileSize;
         offsetValue.value.x = props.scene.offset.x;
         offsetValue.value.y = props.scene.offset.y;
