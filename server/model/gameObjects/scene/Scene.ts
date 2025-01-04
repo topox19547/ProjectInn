@@ -18,7 +18,7 @@ export class Scene implements Identifiable, NotificationSource{
     private notifier : ClientNotifier | undefined;
     private sceneLimits : {
         min : Vector2,
-        max : Vector2
+        max : Vector2 
     };
     private static readonly maxTileSize : number = 300;
     private static readonly minTileSize : number = 30;
@@ -153,8 +153,8 @@ export class Scene implements Identifiable, NotificationSource{
         return this.sceneLimits != undefined &&
             position.getX() >= this.sceneLimits.min.getX() &&
             position.getY() >= this.sceneLimits.min.getY() &&
-            position.getX() < this.sceneLimits.max.getX() &&
-            position.getY() < this.sceneLimits.max.getY();
+            position.getX() <= this.sceneLimits.max.getX() &&
+            position.getY() <= this.sceneLimits.max.getY();
     }
 
     private recalculateSceneLimits() : void{
@@ -180,8 +180,8 @@ export class Scene implements Identifiable, NotificationSource{
             -Math.abs(realOffset.getX()) / realTileSize.getX(), 
             -Math.abs(realOffset.getY()) / realTileSize.getY())
         this.sceneLimits.max = new Vector2(
-            -this.sceneLimits.min.getX() + Math.ceil((assetSize.getX()) / realTileSize.getX()),
-            -this.sceneLimits.min.getY() + Math.ceil((assetSize.getY()) / realTileSize.getY())
+            -this.sceneLimits.min.getX() + Math.floor((assetSize.getX()) / realTileSize.getX()),
+            -this.sceneLimits.min.getY() + Math.floor((assetSize.getY()) / realTileSize.getY())
         )
     }
 }
