@@ -304,7 +304,7 @@ export class GameController implements ClientState{
                     const content = ensureObject({
                         id : ensureNumber
                     })(message.content);
-                    if(!this.clientPlayer.hasPermission(Permission.MASTER)){
+                    if(!this.clientPlayer.hasPermission(Permission.MANAGE_SCENES)){
                         throw new PermissionError();
                     }
                     if(!this.currentGame.changeScene(content.id)){

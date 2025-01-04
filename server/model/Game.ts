@@ -426,7 +426,10 @@ export class Game implements NotificationSource{
     public adjustTokenPositions(hardReset : boolean){
         //reset token positions by putting all of them next to
         //each other starting from the top left corner
-        const newPosition : Vector2 = new Vector2(0,0)
+        const newPosition : Vector2 = new Vector2(0,0);
+        if(hardReset){
+            this.tokens.forEach(t => t.setPosition(new Vector2(-1,-1)))
+        }
         for(const token of this.tokens){
             if(!hardReset && this.currentScene.isValidPosition(token.getPosition())){
                 continue;

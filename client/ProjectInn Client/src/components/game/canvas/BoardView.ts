@@ -125,7 +125,7 @@ export class BoardView{
     }
 
 
-    public startCacheUpdate():void{
+    public startFullCacheUpdate():void{
         this.spriteCache.forEach((v, k) => v.unused = true);
     }
 
@@ -185,10 +185,11 @@ export class BoardView{
         if(this.ctx === null || this.background == undefined){
             return;
         }
-        //Clear the canvas and draw the grid
+        //Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "#111111";
         this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+        //Draw the scene
         this.ctx.drawImage(
             this.background,
             this.viewOffset.getX(),
@@ -199,10 +200,24 @@ export class BoardView{
             0,
             this.canvas.width,
             this.canvas.height);
+        //Draw the grid
         this.grid.drawGrid(this.canvas,this.viewOffset,this.viewScale);
-        //Draw the tokens that aren't being moved first
         const tokenSize : Vector2 = this.grid.getTokenSize(this.viewScale);
         const tokenOffset : Vector2 = this.grid.getTokenOffset(this.viewScale);
+        //Draw the tokens that aren't moving
+        this.drawStillTokens(tokenSize, tokenOffset);
+        //Draw token stats and tags (if enabled)
+        this.drawTokenInfo(tokenSize,tokenOffset);
+        //Draw the tokens that are being moved
+        this.drawMovingTokens(tokenSize,tokenOffset);
+        //Draw the scene pings
+        this.drawPings(tokenSize,tokenOffset);
+        //Draw the token that follows the cursor
+        this.drawTokenInDrag(tokenSize);
+    }
+
+    private drawStillTokens(tokenSize : Vector2, tokenOffset : Vector2){
+        if(this.ctx === null) return;
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
             const vectorPosition : Vector2 = new Vector2(token.position.x,token.position.y);
@@ -220,7 +235,9 @@ export class BoardView{
                 }
             }
         }
-        //draw token stats and tags (if enabled)
+    }
+
+    private drawTokenInfo(tokenSize : Vector2, tokenOffset : Vector2){
         for(const token of this.tokens){
             const vectorPosition : Vector2 = new Vector2(token.position.x,token.position.y);
             const tokenPosition:Vector2 = this.grid.tileToCanvas(this.viewOffset,vectorPosition,this.viewScale);
@@ -232,8 +249,10 @@ export class BoardView{
                 this.drawTokenStats(tokenPosition, tokenSize, token.stats);
             }
         }
+    }
 
-        //Draw the tokens that are being moved
+    private drawMovingTokens(tokenSize : Vector2, tokenOffset : Vector2){
+        if(this.ctx === null) return;
         for(const token of this.tokens){
             const spriteData = this.spriteCache.get(token.assetID);
             const vectorPosition : Vector2  = new Vector2(token.position.x,token.position.y);
@@ -263,7 +282,10 @@ export class BoardView{
             }
             
         }
-        //Draw the scene pings
+    }
+
+    private drawPings(tokenSize : Vector2, tokenOffset : Vector2){
+        if(this.ctx === null) return;
         for(const ping of this.viewData.pingBuffer){
             const vectorPosition : Vector2 = new Vector2(ping.position.x, ping.position.y);
             const pingPosition : Vector2 = this.grid.tileToCanvas(this.viewOffset, vectorPosition, this.viewScale);
@@ -279,7 +301,9 @@ export class BoardView{
             pingPosition.translateBy(new Vector2(0, - tokenSize.getY() / 4 - padding * this.viewScale));
             this.drawPlayerTag(pingPosition, tokenSize, player);
         }
-        //Draw the token that follows the cursor
+    }
+
+    private drawTokenInDrag(tokenSize : Vector2){
         if(this.draggedToken === undefined){
             return;
         }
@@ -350,7 +374,9 @@ export class BoardView{
         this.ctx.fillStyle = "#FFFFFF";
         this.ctx.font = `${textHeight}px Inter`;
         this.ctx.shadowColor = "#000000"
-        this.ctx.shadowBlur = 4;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.shadowBlur = 3;
         this.ctx.fillText(tokenName,
             tokenPosition.getX() + tokenSize.getX() / 2,
             tokenPosition.getY() + tokenSize.getY() + padding * this.viewScale,

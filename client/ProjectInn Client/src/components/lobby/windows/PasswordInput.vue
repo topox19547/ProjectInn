@@ -12,7 +12,7 @@
     import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
-        close : void
+        (e: "close") : void
     }>();
     const props = defineProps<{
         joinData : { gameId : number, player : Player, password : string | undefined}
@@ -22,6 +22,11 @@
     watch(props.joinData,(joinData) => {
         confirmDisabled.value = joinData.password?.length == 0;
     })
+
+    function confirm(){
+        emits("close");
+        props.onConfirm();
+    }
 </script>
 
 
@@ -44,7 +49,7 @@
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="onConfirm"></ButtonBase>
+                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="confirm"></ButtonBase>
                 </div>
             </template>
         </WindowBase>

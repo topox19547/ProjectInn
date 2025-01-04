@@ -47,7 +47,10 @@ export class Player implements NotificationSource{
         );
         if(!object.isOwner){
             let i : number = 0;
-            for(const key in Permission){
+            for(const key of Object.values(Permission)){
+                if(typeof key !== "string"){
+                    continue;
+                }
                 player.setPermission(i, object.permissions[key] != undefined ? object.permissions[key] : false);
                 i++;
             }

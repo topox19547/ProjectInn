@@ -3,6 +3,7 @@
     import AddIcon from '../../../assets/icons/add.svg';
     import deleteIcon from '../../../assets/icons/delete_darker.svg';
     import SceneIcon from '../../../assets/icons/scene.svg';
+    import SceneThumbnail from '../../../assets/placeholders/default_thumbnail.png';
     import type { Asset } from '../../../model/Asset.js';
     import { getStartingSceneData, type Scene } from '../../../model/Scene.js';
     import type { ServerPublisher } from '../../../network/ServerHandler.js';
@@ -136,6 +137,7 @@
                     <div class="assetList">
                         <div class="assets">
                             <AssetCard :asset="scene.asset" v-for="scene in scenes"
+                            :thumbnail="scene.asset.assetID != currentScene.asset.assetID ?  SceneThumbnail : undefined"
                             :show-delete="scene.asset.assetID != currentScene.asset.assetID"
                             @edit-asset="a => editScene(a.assetID)"
                             @delete-asset="a => deleteScene(a.assetID)"

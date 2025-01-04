@@ -16,7 +16,10 @@ export class Scene implements Identifiable, NotificationSource{
     private offset : Vector2;
     private tileSize : number;
     private notifier : ClientNotifier | undefined;
-    private sceneSize : Vector2;
+    private sceneLimits : {
+        min : Vector2,
+        max : Vector2
+    };
     private static readonly maxTileSize : number = 300;
     private static readonly minTileSize : number = 30;
     public static readonly validate = ensureObject({
@@ -32,8 +35,11 @@ export class Scene implements Identifiable, NotificationSource{
         this.gridType = grid;
         this.tileSize = tileSize;
         this.offset = offset;
-        this.sceneSize = new Vector2(0,0);
-        this.recalculateSceneSize();
+        this.sceneLimits = {
+            max : new Vector2(0,0),
+            min : new Vector2(0,0)
+        }
+        this.recalculateSceneLimits();
     }
     
     public static getMaxTileSize() : number{ return this.maxTileSize; }
@@ -76,7 +82,7 @@ export class Scene implements Identifiable, NotificationSource{
     public setURL(url : string, assetSize : Vector2, permissionRequirement? : Permission) : boolean{
         const status : boolean = this.asset.setURL(url, assetSize, permissionRequirement);
         if(status){
-            this.recalculateSceneSize();
+            this.recalculateSceneLimits();
         }
         return status;
     }
@@ -100,7 +106,7 @@ export class Scene implements Identifiable, NotificationSource{
                 gridType : gridType
             }
         })
-        this.recalculateSceneSize();
+        this.recalculateSceneLimits();
     }
 
     public getOffset() :Vector2{
@@ -117,7 +123,7 @@ export class Scene implements Identifiable, NotificationSource{
                 offset : offset
             }
         })
-        this.recalculateSceneSize();
+        this.recalculateSceneLimits();
     }
 
     public getTileSize() : number{
@@ -132,7 +138,7 @@ export class Scene implements Identifiable, NotificationSource{
         } else {
             this.tileSize = tileSize;
         }
-        this.recalculateSceneSize();
+        this.recalculateSceneLimits();
         this.notifier?.notify({
             status : Status.SCENE_TILESIZE,
             command : Command.MODIFY,
@@ -144,15 +150,16 @@ export class Scene implements Identifiable, NotificationSource{
     }
 
     public isValidPosition(position : Vector2) : boolean{
-        return this.sceneSize != undefined &&
-            position.getX() >= 0 &&
-            position.getY() >= 0 &&
-            position.getX() < this.sceneSize.getX() &&
-            position.getY() < this.sceneSize.getY();
+        return this.sceneLimits != undefined &&
+            position.getX() >= this.sceneLimits.min.getX() &&
+            position.getY() >= this.sceneLimits.min.getY() &&
+            position.getX() < this.sceneLimits.max.getX() &&
+            position.getY() < this.sceneLimits.max.getY();
     }
 
-    private recalculateSceneSize() : void{
-        this.sceneSize = new Vector2(0,0);
+    private recalculateSceneLimits() : void{
+        this.sceneLimits.min = new Vector2(0,0);
+        this.sceneLimits.max = new Vector2(0,0);
         const assetSize : Vector2 | undefined = this.asset.getSize();
         if(assetSize === undefined){
             return;
@@ -164,13 +171,17 @@ export class Scene implements Identifiable, NotificationSource{
             realOffset = new Vector2(this.offset.getX() % this.tileSize,this.offset.getY() % this.tileSize);
         } else if (this.gridType == GridType.HEXAGONAL){
             realTileSize = new Vector2(this.tileSize * 3 / 4, this.tileSize * Math.sqrt(3) / 2);
-            realOffset = new Vector2(this.offset.getX() % this.tileSize * 3,this.offset.getY() % realTileSize.getY());
+            realOffset = new Vector2(this.offset.getX() % (this.tileSize * 3 / 2),this.offset.getY() % realTileSize.getY());
         } else {
             realTileSize = new Vector2(0,0);
+            realOffset = new Vector2(0,0);
         }
-        this.sceneSize = new Vector2(
-            Math.ceil((assetSize.getX() + this.offset.getX()) / realTileSize.getX()),
-            Math.ceil((assetSize.getY() + this.offset.getY()) / realTileSize.getY())
+        this.sceneLimits.min = new Vector2(
+            -Math.abs(realOffset.getX()) / realTileSize.getX(), 
+            -Math.abs(realOffset.getY()) / realTileSize.getY())
+        this.sceneLimits.max = new Vector2(
+            -this.sceneLimits.min.getX() + Math.ceil((assetSize.getX()) / realTileSize.getX()),
+            -this.sceneLimits.min.getY() + Math.ceil((assetSize.getY()) / realTileSize.getY())
         )
     }
 }

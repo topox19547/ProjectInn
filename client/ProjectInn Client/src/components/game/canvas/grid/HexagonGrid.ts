@@ -15,7 +15,7 @@ export class HexagonGrid implements Grid{
         this.tileWidth = tileWidth;
         this.tileHeight = tileWidth * Math.sqrt(3) / 2;
         this.tileOffset = new Vector2(
-            tileOffset.getX() % (this.tileWidth * 3),
+            tileOffset.getX() % (this.tileWidth * 3 / 2),
             tileOffset.getY() % (this.tileHeight));
         this.lineWidth = lineWidth;
         this.color = "#111111";

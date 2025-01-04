@@ -59,7 +59,7 @@
                     serverPublisher);
         }
         watch(() => props.tokenAssets, (newAssets) => {
-            renderer.startCacheUpdate();
+            renderer.startFullCacheUpdate();
             newAssets.forEach(a => {
                 if(a.assetURL !== undefined){
                     renderer.updateSpriteCache(a.assetID, a.assetURL);
