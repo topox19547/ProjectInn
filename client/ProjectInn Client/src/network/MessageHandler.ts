@@ -83,7 +83,10 @@ export class MessageHandler{
                     this.game.value.tokens.push(content);
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
-                    if(index !== -1 && this.game.value.tokens[index] == this.game.value.viewData.selectedToken){
+                    if(index === -1){
+                        return;
+                    }
+                    if(this.game.value.tokens[index] == this.game.value.viewData.selectedToken){
                         this.game.value.viewData.selectedToken = undefined;
                     }
                     this.game.value.tokens.splice(index,1);
@@ -100,7 +103,9 @@ export class MessageHandler{
                     }
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokenAssets.findIndex(t => t.assetID == content.id);
-                    this.game.value.tokenAssets.splice(index,1);
+                    if(index !== -1){
+                        this.game.value.tokenAssets.splice(index,1);
+                    }
                 }
                 break;
             }
@@ -140,7 +145,9 @@ export class MessageHandler{
                     }
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.scenes.findIndex(s => s.asset.assetID == content.id);
-                    this.game.value.scenes.splice(index,1);
+                    if(index !== -1){
+                        this.game.value.scenes.splice(index,1);
+                    }
                 }
                 break;
             }
@@ -178,6 +185,12 @@ export class MessageHandler{
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.players.findIndex(p => p.name == content.name);
                     this.game.value.players.splice(index,1);
+                    if(content.name == this.game.value.localPlayer.name){
+                        this.serverMessageBuffer.value.push({
+                            title : "Kicked",
+                            text : "you have been kicked from the game"
+                        })
+                    }
                 }
                 break;
             }

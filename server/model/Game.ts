@@ -239,6 +239,14 @@ export class Game implements NotificationSource{
         if(playerIndex == -1){
             return false;
         }
+        this.notifier?.notify({
+            status : Status.PLAYER,
+            command : Command.DELETE,
+            content : {
+                name : player.getName()
+            }
+        })
+        this.players[playerIndex].setConnected(false);
         this.players.splice(playerIndex, 1);
         this.tokens.forEach(t => t.removeOwner(player.getName())); //clear token ownerships
         let messageText : string = `${player.getName()} has been kicked`;
@@ -250,13 +258,6 @@ export class Game implements NotificationSource{
             sender: "ProjectInn",
             isSystem: true,
             text: messageText
-        })
-        this.notifier?.notify({
-            status : Status.PLAYER,
-            command : Command.DELETE,
-            content : {
-                name : player.getName()
-            }
         })
         this.notifier?.removeClientsIf(p => p.getName() == player.getName())
         return true;
