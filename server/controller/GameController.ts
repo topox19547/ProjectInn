@@ -472,10 +472,16 @@ export class GameController implements ClientState{
         let isValidRadius : boolean =  true;
         while(isValidRadius && !position){
             isValidRadius = false;
-            for(let x : number = -radius; x <= radius && !position; x++){
-                for(let y : number = -radius; y <= radius && !position; y++){
-                    const newPosition : Vector2 = new Vector2(
-                        tokenPosition.getX() + x, tokenPosition.getY() + y)
+            let isXRow : boolean = true;
+            for(let side : number = 0; side < 4 && !position; side++){
+                for(let i : number = -radius; i <= radius && !position; i++){
+                    const xPosition : number = 
+                        isXRow ? tokenPosition.getX() + i : 
+                        (side == 1 ? tokenPosition.getX() + radius : tokenPosition.getX() - radius)
+                    const yPosition : number = 
+                        !isXRow ? tokenPosition.getY() + i : 
+                        (side == 0 ? tokenPosition.getY() + radius : tokenPosition.getY() - radius)
+                    const newPosition : Vector2 = new Vector2(xPosition,yPosition)
                     if(this.currentGame.getCurrentScene().isValidPosition(newPosition)){
                         isValidRadius = true;
                     } else {
@@ -485,6 +491,7 @@ export class GameController implements ClientState{
                         position = newPosition;
                     }
                 }
+                isXRow = !isXRow;
             }
             radius++;
         }
