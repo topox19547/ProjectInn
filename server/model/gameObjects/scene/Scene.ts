@@ -150,7 +150,9 @@ export class Scene implements Identifiable, NotificationSource{
     }
 
     public isValidPosition(position : Vector2) : boolean{
-        return this.sceneLimits != undefined &&
+        return Number.isInteger(position.getX()) && //Reject float positions, as they aren't currently supported
+            Number.isInteger(position.getY()) &&
+            this.sceneLimits != undefined &&
             position.getX() >= this.sceneLimits.min.getX() &&
             position.getY() >= this.sceneLimits.min.getY() &&
             position.getX() <= this.sceneLimits.max.getX() &&
