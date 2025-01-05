@@ -7,7 +7,7 @@
     import type { Player } from '../../../model/Player.js';
     import type { Scene } from '../../../model/Scene.js';
     import type { Token } from '../../../model/Token.js';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import { Vector2, type WeakVector2 } from '../../../types/Vector2.js';
     import { BoardView } from './BoardView.js';
     import type { Grid } from './grid/Grid.js';

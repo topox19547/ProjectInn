@@ -8,7 +8,7 @@
     import { Permission } from '../../../model/Permission.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import GameEditWindow from '../../shared/windows/GameEditWindow.vue';
     import ConfirmAction from '../windows/ConfirmAction.vue';
     import Scenes from '../windows/Scenes.vue';

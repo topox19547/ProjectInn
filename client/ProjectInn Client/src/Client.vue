@@ -3,7 +3,7 @@
   import { WebSocketHandler } from './network/WebsocketHandler.js';
   import { MessageHandler } from './network/MessageHandler.js';
   import { provide, ref, watch, type Ref } from 'vue';
-  import type { ServerPublisher } from './network/ServerHandler.js';
+  import type { ServerPublisher } from './network/ServerPublisher.js';
   import type { Game, LocalSettings } from './model/Game.js';
   import type { Lobby } from './model/Lobby.js';
   import LobbyView from './components/lobby/LobbyView.vue';

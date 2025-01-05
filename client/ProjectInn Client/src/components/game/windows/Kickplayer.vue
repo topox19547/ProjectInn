@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { inject, ref } from 'vue';
     import kickIcon from '../../../assets/icons/kick.svg';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
     import ButtonBase from '../../shared/ButtonBase.vue';

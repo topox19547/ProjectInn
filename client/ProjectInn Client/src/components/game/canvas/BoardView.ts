@@ -5,7 +5,7 @@ import type { Ref } from "vue";
 import type { Asset } from "../../../model/Asset.js";
 import type { Scene } from "../../../model/Scene.js";
 import { SquareGrid } from "./grid/SquareGrid.js";
-import type { ServerPublisher } from "../../../network/ServerHandler.js";
+import type { ServerPublisher } from "../../../network/ServerPublisher.js";
 import { Status } from "../../../network/message/Status.js";
 import { Command } from "../../../network/message/Command.js";
 import type { Player } from "../../../model/Player.js";

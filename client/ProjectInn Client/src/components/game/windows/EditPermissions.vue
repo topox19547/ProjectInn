@@ -3,7 +3,7 @@
     import editPermsIcon from '../../../assets/icons/editPerms.svg';
     import { Permission } from '../../../model/Permission.js';
     import type { Player } from '../../../model/Player.js';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
     import ButtonBase from '../../shared/ButtonBase.vue';

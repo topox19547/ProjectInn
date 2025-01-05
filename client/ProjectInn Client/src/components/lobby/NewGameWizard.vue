@@ -3,7 +3,7 @@
     import { SaveManager } from '../../filesystem/SaveManager.js';
     import { getStartingPlayerData } from '../../model/Player.js';
     import { getStartingSceneData } from '../../model/Scene.js';
-    import type { ServerPublisher } from '../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../network/ServerPublisher.js';
     import { Command } from '../../network/message/Command.js';
     import { Status } from '../../network/message/Status.js';
     import ButtonBase from '../shared/ButtonBase.vue';

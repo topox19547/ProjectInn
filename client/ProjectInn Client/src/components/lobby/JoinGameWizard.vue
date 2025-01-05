@@ -3,7 +3,7 @@ import { inject, ref, watch } from 'vue';
 import type { Player } from '../../model/Player.js';
 import IdInput from './windows/IdInput.vue';
 import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
-import type { ServerPublisher } from '../../network/ServerHandler.js';
+import type { ServerPublisher } from '../../network/ServerPublisher.js';
 import { Status } from '../../network/message/Status.js';
 import { Command } from '../../network/message/Command.js';
 import type { GamePreview } from '../../model/gamePreview.js';

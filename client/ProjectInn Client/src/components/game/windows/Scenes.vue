@@ -6,7 +6,7 @@
     import SceneThumbnail from '../../../assets/placeholders/default_thumbnail.png';
     import type { Asset } from '../../../model/Asset.js';
     import { getStartingSceneData, type Scene } from '../../../model/Scene.js';
-    import type { ServerPublisher } from '../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
     import type { WeakVector2 } from '../../../types/Vector2.js';

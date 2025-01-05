@@ -7,7 +7,7 @@
     import type { SavedGame } from '../../model/SavedGame.js';
     import { Command } from '../../network/message/Command.js';
     import { Status } from '../../network/message/Status.js';
-    import type { ServerPublisher } from '../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../network/ServerPublisher.js';
     import ConfirmAction from '../game/windows/ConfirmAction.vue';
     import ButtonBase from '../shared/ButtonBase.vue';
     import ErrorWindow from '../shared/windows/MessageWindow.vue';

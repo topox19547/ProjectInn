@@ -8,7 +8,7 @@
     import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
     import EditableText from './EditableText.vue';
     import { Permission } from '../../../../../model/Permission.js';
-    import type { ServerPublisher } from '../../../../../network/ServerHandler.js';
+    import type { ServerPublisher } from '../../../../../network/ServerPublisher.js';
     import { Status } from '../../../../../network/message/Status.js';
     import { Command } from '../../../../../network/message/Command.js';
     import StatView from './Stat.vue';
