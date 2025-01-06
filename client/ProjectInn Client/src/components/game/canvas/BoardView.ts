@@ -121,7 +121,13 @@ export class BoardView{
                 }
                 this.setMap(PlaceholderBackground,this.grid)
              });
-        })
+        },  {once : true})
+        image.addEventListener("error",() => {
+            if(onFail){
+                onFail();
+            }
+            this.setMap(PlaceholderBackground,this.grid)
+        }, {once : true})
     }
 
 
@@ -149,7 +155,7 @@ export class BoardView{
                 }
                 spriteEntry.url = PlaceholderSprite;
                 spriteEntry.sprite = this.noSprite;
-            })
+            },  {once : true})
             image.addEventListener("load", () =>{
                 createImageBitmap(image).then(s => {
                     spriteEntry.sprite = s;
@@ -161,7 +167,7 @@ export class BoardView{
                         spriteEntry.url = PlaceholderSprite;
                         spriteEntry.sprite = this.noSprite;
                 });
-            })
+            }, {once : true})
         }
         spriteEntry.url = url;
     }

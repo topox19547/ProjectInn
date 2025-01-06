@@ -32,10 +32,6 @@
 
     setCanvasSize();
     window.addEventListener("resize", setCanvasSize);
-    
-    function reloadPage(){
-        window.location.reload();
-    }
 
     function setShowNames(value : boolean){
         globalSettings.value.showNames = value;
@@ -122,7 +118,7 @@
         <ErrorWindow title="Load error" 
         message="unable to load the current scene. please try joining again" v-if="loadError">
             <template v-slot:button>
-                <ButtonBase text="Reload page" @click="reloadPage"></ButtonBase>
+                <ButtonBase text="Ok" @click="loadError = false"></ButtonBase>
             </template>
     </ErrorWindow>
     </div>
