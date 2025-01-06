@@ -14,11 +14,11 @@ import { Vector2 } from "./gameObjects/Vector2.js";
 import { Command } from "./messages/Command.js";
 import { Status } from "./messages/Status.js";
 import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericObject, ensureNumber } from "./messages/Validators.js";
-import { NotificationSource } from "./NotificationSource.js";
+import { NotificationSource } from "./gameObjects/NotificationSource.js";
 
 
 
-export class Game implements NotificationSource{
+export class Game{
     private readonly name : string;
     private readonly ownerName : string;
     private readonly players : Array<Player>;
@@ -30,7 +30,7 @@ export class Game implements NotificationSource{
     private readonly maxTokens : number;
     private readonly maxTokenAssets : number;
     private readonly maxScenes : number;
-    private notifier : ClientNotifier | undefined;
+    private notifier : ClientNotifier<Player> | undefined;
     private currentScene : Scene;
     private password : string | undefined;
     private endCallback : () => void;
@@ -68,7 +68,7 @@ export class Game implements NotificationSource{
         this.endCallback = () => {};
     }
 
-    public static fromObject(object : ReturnType<typeof this.validate>, notifier : ClientNotifier) : Game | undefined{
+    public static fromObject(object : ReturnType<typeof this.validate>, notifier : ClientNotifier<Player>) : Game | undefined{
         const currentSceneIndex : number = 
             object.scenes.findIndex(s => s.asset.assetID == object.currentScene);
         if(currentSceneIndex == -1){
@@ -155,7 +155,7 @@ export class Game implements NotificationSource{
         return this.maxNameLength;
     }
 
-    public setNotifier(notifier : ClientNotifier) : void{
+    public setNotifier(notifier : ClientNotifier<Player>) : void{
         this.notifier = notifier;
         this.chat.setNotifier(notifier);
     }
@@ -204,7 +204,7 @@ export class Game implements NotificationSource{
         return true
     }
 
-    public leaveGame(player : Player, handler : ClientHandler) : boolean{
+    public leaveGame(player : Player) : boolean{
         if(!this.getPlayer(player.getName())){
             return false;
         }

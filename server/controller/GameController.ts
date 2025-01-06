@@ -396,7 +396,7 @@ export class GameController implements ClientState{
                 }
                 case Status.CLIENT_STATUS : {
                     if(message.command == Command.DELETE){
-                        this.currentGame.leaveGame(this.clientPlayer, this.clientHandler);
+                        this.currentGame.leaveGame(this.clientPlayer);
                     }
                     break;
                 }

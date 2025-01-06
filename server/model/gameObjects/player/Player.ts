@@ -2,7 +2,8 @@ import { ClientNotifier } from "../../ClientNotifier.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
 import { ensureObject, ensureString, ensureMapObject, ensureBoolean } from "../../messages/Validators.js";
-import { NotificationSource } from "../../NotificationSource.js";
+import { Notifier } from "../../Notifier.js";
+import { NotificationSource } from "../NotificationSource.js";
 import { Color } from "./Color.js";
 import { Permission } from "./Permission.js";
 
@@ -12,7 +13,7 @@ export class Player implements NotificationSource{
     private readonly permissions : Map<Permission, boolean>;
     private readonly isOwner : boolean
     private connected : boolean;
-    private notifier : ClientNotifier | undefined;
+    private notifier : Notifier<Player> | undefined;
     private static readonly maxNameLength : number = 24;
     private static readonly allowedCharacters : string = 
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
@@ -77,7 +78,7 @@ export class Player implements NotificationSource{
         [...name].every(c => Player.allowedCharacters.includes(c))
     }
 
-    public setNotifier(notifier : ClientNotifier) : void{
+    public setNotifier(notifier : Notifier<Player>) : void{
         this.notifier = notifier;
     }
 

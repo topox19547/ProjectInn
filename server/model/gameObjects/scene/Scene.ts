@@ -2,12 +2,14 @@ import { ClientNotifier } from "../../ClientNotifier.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
 import { ensureObject, ensureEnumLike, ensureNumber } from "../../messages/Validators.js";
-import { NotificationSource } from "../../NotificationSource.js";
+import { NotificationSource } from "../NotificationSource.js";
 import { Asset } from "../asset/Asset.js";
 import { Identifiable } from "../Identifiable.js";
 import { Permission } from "../player/Permission.js";
 import { Vector2 } from "../Vector2.js";
 import { GridType } from "./GridType.js";
+import { Notifier } from "../../Notifier.js";
+import { Player } from "../player/Player.js";
 
 
 export class Scene implements Identifiable, NotificationSource{
@@ -15,7 +17,7 @@ export class Scene implements Identifiable, NotificationSource{
     private gridType : GridType;
     private offset : Vector2;
     private tileSize : number;
-    private notifier : ClientNotifier | undefined;
+    private notifier : Notifier<Player> | undefined;
     private sceneLimits : {
         min : Vector2,
         max : Vector2 
@@ -91,7 +93,7 @@ export class Scene implements Identifiable, NotificationSource{
         return this.gridType;
     }
 
-    public setNotifier(notifier : ClientNotifier) : void{
+    public setNotifier(notifier : Notifier<Player>) : void{
         this.notifier = notifier;
         this.asset.setNotifier(notifier);
     }

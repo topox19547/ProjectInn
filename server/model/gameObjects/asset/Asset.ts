@@ -2,18 +2,20 @@ import { ClientNotifier } from "../../ClientNotifier.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
 import { ensureObject, ensureNumber, weakEnsureOf, ensureString, ensureEnumLike } from "../../messages/Validators.js";
-import { NotificationSource } from "../../NotificationSource.js";
+import { NotificationSource } from "../NotificationSource.js";
 import { Identifiable } from "../Identifiable.js";
 import { Permission } from "../player/Permission.js";
 import { Vector2 } from "../Vector2.js";
 import { AssetType } from "./AssetType.js";
+import { Notifier } from "../../Notifier.js";
+import { Player } from "../player/Player.js";
 
 
 export class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;
     private assetSize : Vector2;
     private name : string;
-    private notifier : ClientNotifier | undefined;
+    private notifier : Notifier<Player> | undefined;
     private assetID : number;
     private readonly assetType : AssetType;
     private static readonly maxNameLength: number = 24;
@@ -56,7 +58,7 @@ export class Asset implements Identifiable,NotificationSource{
         return this.maxNameLength;
     }
 
-    public setNotifier(notifier : ClientNotifier) : void{
+    public setNotifier(notifier : Notifier<Player>) : void{
         this.notifier = notifier;
     }
 

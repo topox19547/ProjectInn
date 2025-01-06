@@ -42,7 +42,7 @@ export class LobbyController implements ClientState{
                         password : weakEnsureOf(ensureString),
                         scene : Scene.validate
                     })(message.content);
-                    const notifier : ClientNotifier = new ClientNotifier()
+                    const notifier : ClientNotifier<Player> = new ClientNotifier()
                     const startingScene : Scene = Scene.fromObject(content.scene);
                     startingScene.setNotifier(notifier);
                     const game : Game = new Game(content.gameName, content.username, startingScene);
@@ -75,7 +75,7 @@ export class LobbyController implements ClientState{
                 }
                 case Status.LOAD_GAME:{
                     const content = Game.validate(message.content);
-                    const notifier : ClientNotifier = new ClientNotifier();
+                    const notifier : ClientNotifier<Player> = new ClientNotifier();
                     const game : Game | undefined = Game.fromObject(content, notifier);
                     if(game === undefined){
                         throw new ValueError("Not a valid game file!")

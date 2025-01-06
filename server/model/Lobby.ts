@@ -4,11 +4,11 @@ import { Game } from "./Game.js";
 import { Command } from "./messages/Command.js";
 import { Message } from "./messages/Message.js";
 import { Status } from "./messages/Status.js";
-import { NotificationSource } from "./NotificationSource.js";
+import { NotificationSource } from "./gameObjects/NotificationSource.js";
 
 
 
-export class Lobby implements NotificationSource{
+export class Lobby{
     private readonly games : Map<number, Game>;
     private readonly maxConcurrentGames : number;
     private notifier : ClientNotifier | undefined;

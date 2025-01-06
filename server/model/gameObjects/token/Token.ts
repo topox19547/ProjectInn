@@ -3,12 +3,13 @@ import { Game } from "../../Game.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
 import { ensureObject, ensureString, ensureNumber, ensureArrayOf, ensureMapObject } from "../../messages/Validators.js";
-import { NotificationSource } from "../../NotificationSource.js";
+import { NotificationSource } from "../NotificationSource.js";
 import { Asset } from "../asset/Asset.js";
 import { Identifiable } from "../Identifiable.js";
 import { Player } from "../player/Player.js";
 import { Vector2 } from "../Vector2.js";
 import { Stat } from "./Stat.js";
+import { Notifier } from "../../Notifier.js";
 
 type TokenInt = typeof Game.validate
 
@@ -16,7 +17,7 @@ type TokenInt = typeof Game.validate
 
 export class Token implements Identifiable, NotificationSource{
     private name : string;
-    private notifier : ClientNotifier | undefined;
+    private notifier : Notifier<Player> | undefined;
     private dragLockTimer : NodeJS.Timeout | undefined;
     private dragLockOwner : string | undefined;
     private id : number;
@@ -97,7 +98,7 @@ export class Token implements Identifiable, NotificationSource{
         }
     }
 
-    public setNotifier(notifier : ClientNotifier) : void{
+    public setNotifier(notifier : Notifier<Player>) : void{
         this.notifier = notifier;
     }
 

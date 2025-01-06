@@ -2,10 +2,11 @@ import { ClientNotifier } from "../ClientNotifier.js";
 import { Player } from "../gameObjects/player/Player.js";
 import { Command } from "../messages/Command.js";
 import { Status } from "../messages/Status.js";
-import { NotificationSource } from "../NotificationSource.js";
+import { NotificationSource } from "../gameObjects/NotificationSource.js";
 import { ChatMessage } from "./ChatMessage.js";
 import { ChatCommand } from "./commands/ChatCommand.js";
 import { CommandResponse } from "./commands/CommandResponse.js";
+import { Notifier } from "../Notifier.js";
 
 
 export class Chat implements NotificationSource{
@@ -13,7 +14,7 @@ export class Chat implements NotificationSource{
     private readonly chatHistory : Array<ChatMessage>;
     private readonly commandPrefix : string;
     private readonly maxMessageLength : number;
-    private notifier : ClientNotifier | undefined;
+    private notifier : Notifier<Player> | undefined;
 
 
     constructor(){
@@ -33,7 +34,7 @@ export class Chat implements NotificationSource{
         return this;
     }
 
-    public setNotifier(notifier: ClientNotifier): void {
+    public setNotifier(notifier: Notifier<Player>): void {
         this.notifier = notifier
     }
 

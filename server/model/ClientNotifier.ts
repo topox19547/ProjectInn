@@ -1,17 +1,19 @@
 import { ClientHandler } from "../controller/ClientHandler.js";
+import { WebSocketHandler } from "../controller/WebSocketHandler.js";
 import { Player } from "./gameObjects/player/Player.js";
 import { Message } from "./messages/Message.js";
+import { Notifier } from "./Notifier.js";
 
 
-export class ClientNotifier{
-    private readonly subscribers : Map<ClientHandler, Player | undefined>;
+export class ClientNotifier<T = void> implements Notifier<T>{
+    private readonly subscribers : Map<ClientHandler, T>;
 
     constructor(){
         this.subscribers = new Map();
     }
 
-    public subscribe(clientHandler : ClientHandler, player?: Player) : void{
-        this.subscribers.set(clientHandler, player);
+    public subscribe(clientHandler : ClientHandler, identity: T) : void{
+        this.subscribers.set(clientHandler, identity);
     }
 
     public unsubscribe(clientHandler : ClientHandler) : void{
@@ -24,9 +26,9 @@ export class ClientNotifier{
         })
     }
 
-    public notifyIf(message : Message, check : (player : Player) => boolean) : void{
-        this.subscribers.forEach((p, c) => {
-            if(p != undefined && check(p)){
+    public notifyIf(message : Message, check : (identity : T) => boolean) : void{
+        this.subscribers.forEach((i, c) => {
+            if(check(i)){
                 c.send(message);
             }
         });
@@ -39,9 +41,9 @@ export class ClientNotifier{
         this.subscribers.clear();
     }
 
-    public removeClientsIf(check : (player : Player) => boolean){
-        this.subscribers.forEach((p,c) => {
-            if(p != undefined && check(p)){
+    public removeClientsIf(check : (identity : T) => boolean){
+        this.subscribers.forEach((i,c) => {
+            if(check(i)){
                 c.leaveCurrentState();
                 this.subscribers.delete(c);
             }
