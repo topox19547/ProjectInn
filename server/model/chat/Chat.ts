@@ -42,7 +42,7 @@ export class Chat implements NotificationSource{
         if(message.text.length > this.maxMessageLength){
             return;
         }
-        if(!message.text.startsWith("!")){
+        if(!message.text.startsWith(this.commandPrefix)){
             this.notifier?.notify({
                 status : Status.CHAT,
                 command : Command.CREATE,
