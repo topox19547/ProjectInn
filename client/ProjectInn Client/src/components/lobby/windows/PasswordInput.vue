@@ -20,7 +20,7 @@
         onConfirm : () => void
     }>();
     watch(props.joinData,(joinData) => {
-        confirmDisabled.value = joinData.password?.length == 0;
+        confirmDisabled.value = joinData.password == undefined || joinData.password?.length == 0;
     })
 
     function confirm(){
