@@ -403,7 +403,7 @@ export class GameController implements ClientState{
             }
         }
         catch (e){
-            if(e instanceof PermissionError || e instanceof ValueError || e instanceof FormatError){
+            if(e instanceof PermissionError || e instanceof ValueError){
                 this.clientHandler.send({
                     status : Status.ERROR,
                     command : Command.NONE,
