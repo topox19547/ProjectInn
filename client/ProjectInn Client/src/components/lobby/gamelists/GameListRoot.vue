@@ -14,7 +14,6 @@
         <slot name="fab"></slot>
     </div>
 </template>
-//PARAMS : button(icon url, name, action),  game list ref
 
 <style scoped>
     .categoryTitle{

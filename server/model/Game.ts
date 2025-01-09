@@ -534,6 +534,4 @@ export class Game{
         }
         return password;
     }
-
-    //TODO:ID MUST BE PRESERVED ACROSS SESSIONS, SO ADDTOKEN CAN'T ASSIGN IDs INDEPENDENTLY
 }
