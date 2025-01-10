@@ -3,6 +3,9 @@ import { ChatMessage } from "../ChatMessage.js";
 import { ChatCommand } from "./ChatCommand.js";
 import { CommandResponse } from "./CommandResponse.js";
 
+/**
+ * Implements a command for sending messages to a limited set of users
+ */
 export class Whisper implements ChatCommand{
     private gameContext : Game;
     private readonly visualName;

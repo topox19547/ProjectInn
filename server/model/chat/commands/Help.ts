@@ -3,7 +3,9 @@ import { ChatMessage } from "../ChatMessage.js";
 import { ChatCommand } from "./ChatCommand.js";
 import { CommandResponse } from "./CommandResponse.js";
 
-
+/**
+ * implements a way to get the information about all the commands available in a chat
+ */
 export class Help implements ChatCommand{
     private readonly readableName;
     private readonly commandName;

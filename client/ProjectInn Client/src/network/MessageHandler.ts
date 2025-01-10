@@ -13,7 +13,9 @@ import { SaveManager } from "../filesystem/SaveManager.js";
 import { tokenToString } from "typescript";
 
 
-
+/**
+ * handles the messages received from the server by modifying the local model Refs accordingly
+ */
 export class MessageHandler{
     private lobby : Ref<Lobby>;
     private game : Ref<Game | undefined>;

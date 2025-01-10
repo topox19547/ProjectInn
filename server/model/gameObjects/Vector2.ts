@@ -1,8 +1,8 @@
 import { ensureObject, ensureNumber } from "../messages/Validators.js";
 
 /**
- * class representing a vector with two components
- * a few useful methods added for convenience
+ * class representing a vector with two components.
+ * Has a few useful methods added for convenience.
  */
 export class Vector2{
     private x:number;

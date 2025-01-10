@@ -2,6 +2,9 @@ import { ChatMessage } from "../ChatMessage.js";
 import { ChatCommand } from "./ChatCommand.js";
 import { CommandResponse } from "./CommandResponse.js";
 
+/**
+ * implements dice rolling for the chat
+ */
 export class Dice implements ChatCommand{
     private readonly visualName;
     private readonly commandName;

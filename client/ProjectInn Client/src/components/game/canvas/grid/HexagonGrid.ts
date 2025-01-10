@@ -1,7 +1,7 @@
 import { Vector2 } from "../../../../types/Vector2.js";
 import type { Grid } from "./Grid.js";
 
-
+//implements an hexagonal grid for the BoardView
 export class HexagonGrid implements Grid{
     private tileHeight:number; //height of the hexagon
     private tileWidth:number;

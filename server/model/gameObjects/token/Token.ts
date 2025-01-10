@@ -11,10 +11,12 @@ import { Vector2 } from "../Vector2.js";
 import { Stat } from "./Stat.js";
 import { Notifier } from "../../Notifier.js";
 
-type TokenInt = typeof Game.validate
 
-
-
+/**
+ * Defines a token with a position and a set of stats and notes.
+ * Prevents more than one user from dragging it at the same time when moved using the drag methods.
+ * Remember to acquire the lock through acquireDragLock before starting the actual drag.
+ */
 export class Token implements Identifiable, NotificationSource{
     private name : string;
     private notifier : Notifier<Player> | undefined;

@@ -10,7 +10,9 @@ import { AssetType } from "./AssetType.js";
 import { Notifier } from "../../Notifier.js";
 import { Player } from "../player/Player.js";
 
-
+/**
+ * Defines an asset, which is the blueprint that every token and scene is based on
+ */
 export class Asset implements Identifiable,NotificationSource{
     private assetURL : string | undefined;
     private assetSize : Vector2;

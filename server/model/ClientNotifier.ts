@@ -4,7 +4,10 @@ import { Player } from "./gameObjects/player/Player.js";
 import { Message } from "./messages/Message.js";
 import { Notifier } from "./Notifier.js";
 
-
+/**
+ * Notifies client handlers and optionally assigns an identity of type T so they can be filtered without exposing
+ * the handler itself.
+ */
 export class ClientNotifier<T = void> implements Notifier<T>{
     private readonly subscribers : Map<ClientHandler, T>;
 

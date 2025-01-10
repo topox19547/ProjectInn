@@ -1,7 +1,9 @@
 import { ensureObject, weakEnsureOf, ensureNumber } from "../../messages/Validators.js";
 
 
-
+/**
+ * Defines a token's stat
+ */
 export class Stat{
     private min : number | undefined;
     private max : number | undefined;

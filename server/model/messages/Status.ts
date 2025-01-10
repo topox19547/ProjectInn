@@ -1,3 +1,6 @@
+/**
+ * defines the messsage types
+ */
 export enum Status{
     CREATE_GAME,
     JOIN_GAME,

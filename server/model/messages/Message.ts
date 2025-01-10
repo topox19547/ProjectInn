@@ -2,7 +2,9 @@ import { Command } from "./Command.js"
 import { Status } from "./Status.js"
 import { ensureObject, ensureEnumLike, ensureGenericObject } from "./Validators.js"
 
-
+/**
+ * defines the structure of the messages sent between the server and the client
+ */
 export interface Message{
     status : Status,
     command : Command,

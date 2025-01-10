@@ -1,3 +1,6 @@
+/**
+ * Defines the commands used in messages
+ */
 export enum Command{
     CREATE, //The command will create something
     DELETE, //The command will delete something

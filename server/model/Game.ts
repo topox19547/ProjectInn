@@ -17,7 +17,9 @@ import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericO
 import { NotificationSource } from "./gameObjects/NotificationSource.js";
 
 
-
+/**
+ * Main game class
+ */
 export class Game{
     private readonly name : string;
     private readonly ownerName : string;

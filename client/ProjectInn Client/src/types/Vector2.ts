@@ -1,7 +1,7 @@
 
 /**
  * class representing a vector with two components
- * a few useful methods added for convenience
+ * with a few useful methods added for convenience
  */
 export interface WeakVector2{
     x : number,

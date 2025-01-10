@@ -15,6 +15,9 @@ import type { ViewData } from "../../../model/Game.js";
 import { statToString, type Stat } from "../../../model/Stat.js";
 import type { GlobalSettings } from "../../../model/GlobalSettings.js";
 
+/**
+ * Renders the board by leveraging the HTML Canvas API
+ */
 export class BoardView{
     //the offset of the view as the coordinates of its top left corner
     private viewOffset:Vector2;

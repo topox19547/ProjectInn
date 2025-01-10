@@ -5,7 +5,9 @@ import { Status } from "../model/messages/Status.js";
 import { ClientHandler } from "./ClientHandler.js";
 import { WebSocket } from "ws";
 
-
+/**
+ * ClientHandler implementation for the websocket protocol
+ */
 export class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
     private isConnected : boolean;

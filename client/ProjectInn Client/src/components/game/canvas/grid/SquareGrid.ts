@@ -1,7 +1,7 @@
 import { Vector2 } from "../../../../types/Vector2.js";
 import type { Grid } from "./Grid.js";
 
-
+//implements a square grid for the BoardView
 export class SquareGrid implements Grid{
     private tileSize:number;
     private tileOffset:Vector2;

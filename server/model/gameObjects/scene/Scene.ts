@@ -11,7 +11,10 @@ import { GridType } from "./GridType.js";
 import { Notifier } from "../../Notifier.js";
 import { Player } from "../player/Player.js";
 
-
+/**
+ * Defines a game's scene.
+ * Stores an asset, which contains the scene's name and image url, and a few customizable parameters.
+ */
 export class Scene implements Identifiable, NotificationSource{
     private readonly asset : Asset;
     private gridType : GridType;
@@ -31,7 +34,6 @@ export class Scene implements Identifiable, NotificationSource{
         tileSize : ensureNumber,
     })
 
-    //Remember to always check if the asset's image can be loaded before using it in the constructor
     constructor(asset : Asset, grid : GridType, offset : Vector2, tileSize : number){
         this.asset = asset;
         this.gridType = grid;

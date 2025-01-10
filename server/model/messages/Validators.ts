@@ -1,5 +1,9 @@
 import { FormatError } from "../../errors/FormatError.js";
 
+/**
+ * Library of functions that can be used to compose typeguards for complex objects
+ */
+
 export type ensureType<T> = (object : unknown) => T;
 
 export const ensureString : ensureType<string> = (object : unknown) => {

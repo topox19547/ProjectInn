@@ -7,7 +7,9 @@ import { Status } from "./messages/Status.js";
 import { NotificationSource } from "./gameObjects/NotificationSource.js";
 
 
-
+/**
+ * defines a lobby, which is a collection of all the running games that a client can browse.
+ */
 export class Lobby{
     private readonly games : Map<number, Game>;
     private readonly maxConcurrentGames : number;

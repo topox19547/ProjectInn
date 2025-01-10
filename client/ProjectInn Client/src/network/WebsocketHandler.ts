@@ -2,6 +2,9 @@ import type { Message } from "./message/Message.js";
 import { MessageHandler } from "./MessageHandler.js";
 import type { ServerPublisher } from "./ServerPublisher.js";
 
+/**
+ * ServerPublisher implementation for the websocket protocol
+ */
 export class WebSocketHandler implements ServerPublisher{
     private readonly messageHandler : MessageHandler;
     private readonly socket : WebSocket;

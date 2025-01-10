@@ -16,7 +16,9 @@ import { ClientState } from "./ClientState.js";
 import { GameController } from "./GameController.js";
 
 
-
+/**
+ * State that defines how to handle the client's messages whenever the player is in the lobby.
+ */
 export class LobbyController implements ClientState{
     private readonly lobby : Lobby;
     private readonly clientHandler : ClientHandler;

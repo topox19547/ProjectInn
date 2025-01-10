@@ -1,7 +1,9 @@
 import { Message } from "../model/messages/Message.js";
 import { ClientState } from "./ClientState.js";
 
-
+/**
+ * represents a client on the server side
+ */
 export abstract class ClientHandler{
     protected currentState : ClientState | undefined;
     public abstract close():void

@@ -7,6 +7,9 @@ import { NotificationSource } from "../NotificationSource.js";
 import { Color } from "./Color.js";
 import { Permission } from "./Permission.js";
 
+/**
+ * Defines the identity that's given to a player while in-game
+ */
 export class Player implements NotificationSource{
     private readonly name : string;
     private readonly color : Color;

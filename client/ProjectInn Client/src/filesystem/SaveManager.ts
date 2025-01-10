@@ -3,6 +3,9 @@ import type { GamePreview } from "../model/gamePreview.js";
 import { getDefaultGlobalSettings, type GlobalSettings } from "../model/GlobalSettings.js";
 import type { SavedGame } from "../model/SavedGame.js";
 
+/**
+ * manages the local game saves and the saved settings.
+ */
 export class SaveManager{
     private readonly gamesKey : string;
     private readonly settingsKey : string;

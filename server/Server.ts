@@ -10,7 +10,9 @@ import { Lobby } from "./model/Lobby.js";
 import { setDefaultResultOrder } from "dns";
 import { Http2SecureServer } from "node:http2";
 
-
+/**
+ * Main class used to create and start the server
+ */
 export class Server{
     public start(){
         console.log("Starting ProjectInn server");

@@ -8,7 +8,10 @@ import { ChatCommand } from "./commands/ChatCommand.js";
 import { CommandResponse } from "./commands/CommandResponse.js";
 import { Notifier } from "../Notifier.js";
 
-
+/**
+ * Implements the game's chat, which includes a history of all the messages that have been sent, and
+ * a set of commands that are mapped using their command names.
+ */
 export class Chat implements NotificationSource{
     private readonly commandMap : Map<string,ChatCommand>;
     private readonly chatHistory : Array<ChatMessage>;

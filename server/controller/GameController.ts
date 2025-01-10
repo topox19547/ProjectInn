@@ -22,7 +22,10 @@ import { ClientState } from "./ClientState.js";
 import { LobbyController } from "./LobbyController.js";
 import { FormatError } from "../errors/FormatError.js";
 
-
+/**
+ * State that defines how to handle the client's messages whenever the player is in a game.
+ * Contains information about the current game and the player's identity.
+ */
 export class GameController implements ClientState{
     private readonly lobby : Lobby
     private readonly currentGame : Game;
