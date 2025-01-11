@@ -119,19 +119,19 @@ export class MessageHandler{
             case Status.TOKEN_OWNERSHIP:{
                 const token : any = this.game.value.tokens.find(t => t.id == content.id)
                 if (token === undefined){
-                    throw Error("Message refers to a token that doesn't exist");
+                    return;
                 }
                 Object.keys(content).forEach(k  => token[k] = content[k])
                 break;
             }
             case Status.SCENE_CHANGE:{
-                let scene : Scene | undefined = 
-                    this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID);
-                if(scene === undefined){
+                const sceneIndex = this.game.value.scenes.findIndex(s => s.asset.assetID == content.asset.assetID);
+                if(sceneIndex == -1){
                     this.game.value.scenes.push(content);
-                    scene = content as Scene;
+                }else{
+                    this.game.value.scenes[sceneIndex] = content;
                 }
-                this.game.value.currentScene = scene;
+                this.game.value.currentScene = content;
                 break;
             }
             case Status.SCENE:{
@@ -158,7 +158,7 @@ export class MessageHandler{
             case Status.SCENE_TILESIZE:{
                 const scene : any = this.game.value.scenes.find(s => s.asset.assetID == content.asset.assetID)
                 if (scene === undefined){
-                    throw Error("Message refers to a scene that doesn't exist");
+                    return;
                 }
                 Object.keys(content).forEach(k => scene[k] = content[k] );
                 break;
@@ -169,13 +169,13 @@ export class MessageHandler{
                 if(content.assetType == AssetType.SCENE){
                     const scene = this.game.value.scenes.find(s => s.asset.assetID == content.assetID);
                     if (scene === undefined){
-                        throw Error("Message refers to a scene asset that doesn't exist");
+                        return;
                     }
                     asset = scene.asset;
                 } else if (content.assetType == AssetType.TOKEN){
                     asset = this.game.value.tokenAssets.find(a => a.assetID == content.assetID);
                     if(asset == undefined){
-                        throw Error("Message refers to a token asset that doesn't exist");
+                        return;
                     }
                 }
                 Object.keys(content).forEach(k => asset[k] = content[k]);
@@ -199,7 +199,7 @@ export class MessageHandler{
             case Status.PERMISSIONS:{
                 const player : any = this.game.value.players.find(p => p.name == content.name);
                 if(player == undefined){
-                    throw Error("Message refers to a token asset that doesn't exist");
+                    return;
                 }
                 player.permissions = content.permissions;
                 break;

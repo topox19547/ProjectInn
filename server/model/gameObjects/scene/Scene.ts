@@ -100,16 +100,16 @@ export class Scene implements Identifiable, NotificationSource{
         this.asset.setNotifier(notifier);
     }
 
-    public setGridType(gridType : GridType) : void{
+    public setGridType(gridType : GridType, permissionRequirement? : Permission) : void{
         this.gridType = gridType;
-        this.notifier?.notify({
+        this.notifier?.notifyIf({
             status : Status.SCENE_GRIDTYPE,
             command : Command.MODIFY,
             content : {
                 asset : { assetID : this.asset.getID() },
                 gridType : gridType
             }
-        })
+        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
         this.recalculateSceneLimits();
     }
 
@@ -117,16 +117,16 @@ export class Scene implements Identifiable, NotificationSource{
         return this.offset;
     }
 
-    public setOffset(offset : Vector2) : void{
+    public setOffset(offset : Vector2, permissionRequirement? : Permission) : void{
         this.offset = offset
-        this.notifier?.notify({
+        this.notifier?.notifyIf({
             status : Status.SCENE_OFFSET,
             command : Command.MODIFY,
             content : {
                 asset : { assetID : this.asset.getID() },
                 offset : offset
             }
-        })
+        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
         this.recalculateSceneLimits();
     }
 
@@ -134,7 +134,7 @@ export class Scene implements Identifiable, NotificationSource{
         return this.tileSize;
     }
 
-    public setTileSize(tileSize : number) : void{
+    public setTileSize(tileSize : number, permissionRequirement? : Permission) : void{
         if(tileSize > Scene.maxTileSize){
             this.tileSize = Scene.maxTileSize;
         } else if(tileSize < Scene.minTileSize){
@@ -143,14 +143,14 @@ export class Scene implements Identifiable, NotificationSource{
             this.tileSize = tileSize;
         }
         this.recalculateSceneLimits();
-        this.notifier?.notify({
+        this.notifier?.notifyIf({
             status : Status.SCENE_TILESIZE,
             command : Command.MODIFY,
             content : {
                 asset : { assetID : this.asset.getID() },
                 tileSize : tileSize
             }
-        })
+        }, p => permissionRequirement === undefined || p.hasPermission(permissionRequirement))
     }
 
     public isValidPosition(position : Vector2) : boolean{

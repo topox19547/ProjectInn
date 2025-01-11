@@ -11,9 +11,11 @@ import { WebSocket } from "ws";
 export class WebSocketHandler extends ClientHandler{
     private readonly webSocket : WebSocket;
     private isConnected : boolean;
+    private closed : boolean;
     
     constructor(webSocket : WebSocket){
         super()
+        this.closed = false;
         this.isConnected = true;
         this.webSocket = webSocket;
         this.webSocket.on("message", (m) => this.receive(m.toString()));
@@ -37,6 +39,7 @@ export class WebSocketHandler extends ClientHandler{
     }
     
     public close() : void {
+        this.closed = true;
         this.webSocket.close();
         this.currentState?.handleMessage({
             status : Status.CLIENT_STATUS,
@@ -46,7 +49,11 @@ export class WebSocketHandler extends ClientHandler{
         console.log("A player has left");
     }
 
-    public receive(message : string) : void {
+    public isClosed(): boolean {
+        return this.closed;
+    }
+
+    private receive(message : string) : void {
         try{
             const parsedMessage = validateMessage(JSON.parse(message))
             if(this.currentState === undefined){

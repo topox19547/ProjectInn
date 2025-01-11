@@ -39,13 +39,6 @@
         return props.localPlayer.permissions[Permission.MANAGE_TOKENS] == true;
     });
 
-    const ownerCandidatePlayers = computed(() => {
-        return props.players.filter(p =>{
-            return p.permissions[Permission.MANAGE_TOKENS] == false &&
-                props.selectedToken?.owners.find(o => o == p.name) == undefined;
-        });
-    });
-
     function changeNewNoteStatus(status : boolean){
         showNewNoteCard.value = status;
         editLock.value = status;
@@ -260,7 +253,7 @@
                     </TransitionGroup>
                     <div class="selectUser" v-if="canEditStrict">
                             <select class="dropDown" v-model="addingPlayer">
-                                <option :value="player.name" v-for="player in ownerCandidatePlayers">
+                                <option :value="player.name" v-for="player in players">
                                     {{ player.name }}
                                 </option>
                             </select>

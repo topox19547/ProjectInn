@@ -278,16 +278,13 @@ export class GameController implements ClientState{
                     } else if(message.command == Command.MODIFY){
                         const content = Scene.validate(message.content);
                         const scene : Scene = this.getSceneIfAuthorized(content.asset.assetID);
-                        scene.setGridType(content.gridType);
-                        scene.setOffset(new Vector2(content.offset.x,content.offset.y));
-                        scene.setTileSize(content.tileSize);
-                        const assetSize : Vector2 = new Vector2(
-                            content.asset.assetSize.x,
-                            content.asset.assetSize.y);
                         const minPermission : Permission | undefined = 
                             this.currentGame.getCurrentScene() == scene ?
                             undefined : 
                             Permission.MANAGE_SCENES;
+                        scene.setGridType(content.gridType, minPermission);
+                        scene.setOffset(new Vector2(content.offset.x,content.offset.y), minPermission);
+                        scene.setTileSize(content.tileSize, minPermission);
                         if(!scene.setName(content.asset.name, minPermission)){
                             throw new ValueError("The supplied name is too long");
                         }

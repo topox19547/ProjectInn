@@ -59,6 +59,7 @@ export class LobbyController implements ClientState{
                             throw new ValueError("Error when setting the game's password");
                         }
                     }
+                    this.lobby.leaveLobby(this.clientHandler);
                     game.joinGame(player, this.clientHandler);
                     const id : number = this.lobby.publishGame(game);
                     game.setEndCallback(() => this.lobby.removeGame(game))
@@ -86,6 +87,7 @@ export class LobbyController implements ClientState{
                     if(player === undefined){
                         throw new ValueError("Not a valid game file: owner is missing from the players")
                     }
+                    this.lobby.leaveLobby(this.clientHandler);
                     game.joinGame(player, this.clientHandler);
                     const id : number = this.lobby.publishGame(game);
                     game.setEndCallback(() => this.lobby.removeGame(game))
@@ -137,6 +139,7 @@ export class LobbyController implements ClientState{
                     if(player.isConnected()){
                         throw new ValueError(`A player with the name "${content.username}" is already connected to the game`);
                     }
+                    this.lobby.leaveLobby(this.clientHandler);
                     game.joinGame(player,this.clientHandler);
                     const gameObject : ReturnType<typeof Game.validate> = Game.toObject(game);
                     //Hide certain elements from the player if they don't have the specific permissions

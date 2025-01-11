@@ -7,7 +7,7 @@ import { ClientState } from "./ClientState.js";
 export abstract class ClientHandler{
     protected currentState : ClientState | undefined;
     public abstract close():void
-    public abstract receive(event : any):void
+    public abstract isClosed(): boolean
     public abstract send(message : Message):void
 
     constructor(){
@@ -19,7 +19,7 @@ export abstract class ClientHandler{
     }
 
     leaveCurrentState() : void{
-        if(this.currentState === undefined){
+        if(this.currentState === undefined || this.isClosed()){
             return;
         }
         this.changeState(this.currentState.getNextDefaultState());
