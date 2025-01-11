@@ -34,6 +34,9 @@ Keep in mind that the client defaults to a secured websocket; if you're looking 
 5. optionally, add a file named ```KEYPATHS``` in the /js folder with two lines: the first one must be the path to the ssl key, while the second one has to be the path to the ssl certificate. Doing this will enable secured websocket mode.
 6. ```cd``` into the /js folder and run ```nodejs Server.js``` to start the server.
 
+## Running the tests for the server
+Simply run ```node --test``` from the server folder (after having completed the steps above).
+
 ## Stack
 The client is written using Vue without any additional dependencies and the game board is rendered with the built-in HTML Canvas API.\
 The server runs on Node.JS and makes use of the ws library to enable websocket support.
