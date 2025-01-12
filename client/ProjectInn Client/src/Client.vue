@@ -73,6 +73,7 @@
 
   watch(game, () => {
     refreshLocalGames();
+    requestGames();
   })
 
 </script>
