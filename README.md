@@ -42,7 +42,7 @@ The client is written using Vue without any additional dependencies and the game
 The server runs on Node.JS and makes use of the ws library to enable websocket support.
 
 ## Credits
-The map shown in the screenshots above belongs to AtaraxianBear: be sure to check out their outstanding work at:\
+The map shown in the screenshots above belongs to AtaraxianBear: check out their outstanding work at:\
 https://www.patreon.com/AtaraxianBear
 
 ## Special thanks to
