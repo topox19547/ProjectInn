@@ -43,7 +43,7 @@ it("an entire game can be played fully using all the main commands", () => {
     handler.ignoreLastMessages();
     game.addPlayer(extraPlayer);
     game.joinGame(extraPlayer, extraHandler);
-    extraHandler.changeState(new GameController(lobby, game, player, extraHandler));
+    extraHandler.changeState(new GameController(lobby, game, extraPlayer, extraHandler));
     assert(game.getPlayer("test") !== undefined && game.getPlayer("test2") !== undefined);
     assert(handler.compareLastMessages([Status.PLAYER, Status.CLIENT_STATUS, Status.CHAT]));
     //tokens
@@ -115,6 +115,13 @@ it("an entire game can be played fully using all the main commands", () => {
         }
     });
     handler.receive({
+        status : Status.TOKEN_COPY,
+        command : Command.CREATE,
+        content : {
+            id : 0
+        }
+    });
+    extraHandler.receive({
         status : Status.TOKEN_COPY,
         command : Command.CREATE,
         content : {

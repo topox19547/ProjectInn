@@ -18,7 +18,9 @@ it("games can be added, removed, and accessed through the lobby ", () => {
     lobby.setNotifier(new ClientNotifier());
     const handler : MockHandler = new MockHandler();
     const extraHandler : MockHandler = new MockHandler();
-    handler.changeState(new LobbyController(lobby, handler));
+    const testController : LobbyController = new LobbyController(lobby, handler);
+    handler.changeState(testController);
+    assert(testController.getNextDefaultState() == testController);
     extraHandler.changeState(new LobbyController(lobby, extraHandler));
     const sceneAsset : Asset = new Asset(0, "test", AssetType.SCENE);
     mock.timers.enable();
