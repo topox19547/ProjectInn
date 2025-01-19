@@ -7,7 +7,7 @@
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
     const passwordEnabled = ref(false);
-    const emits = defineEmits<{
+    defineEmits<{
         (e : 'close') : void,
     }>();
     const props = defineProps<{
@@ -51,7 +51,7 @@
                     <div class="editor">
                         <div class="subCategory" v-if=isNewGame>
                             <div class="inputTitle">Game name</div>
-                            <input class="textBox" v-model="game.name" 
+                            <input class="textBox" v-model="game.name"
                             maxlength="24" type="text">
                         </div>
                         <div class="multiLineSubCategory">
@@ -61,7 +61,7 @@
                             </div>
                             <div class="section">
                                 <div class="inputTitle">Password</div>
-                                <input 
+                                <input
                                 class="textBox" v-model="game.password" :disabled="!passwordEnabled"
                                  maxlength="24" type="text" title="sceneName" placeholder="Password">
                             </div>
@@ -69,14 +69,14 @@
                         <div class="subCategory" v-if="enableSaveManagement && game.localSettings !== undefined">
                             <div class="section">
                                 <div class="inputTitle">Enable autosave</div>
-                                <input class="toggle" 
+                                <input class="toggle"
                                 v-model="game.localSettings.autoSaveEnabled" type="checkbox">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase :text="confirmText" @click="onConfirm" height="42px" 
+                    <ButtonBase :text="confirmText" @click="onConfirm" height="42px"
                     :disabled="(game.name.length == 0 && isNewGame) || (passwordEnabled && !game.password)">
                     </ButtonBase>
                 </div>
@@ -193,7 +193,7 @@
         background-color: #3d3d3d;
         color:#9a9a9a;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

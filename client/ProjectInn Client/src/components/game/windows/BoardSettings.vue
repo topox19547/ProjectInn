@@ -6,7 +6,7 @@
         (e : "changeShowStats", value : boolean) : void
     }>();
 
-    const props = defineProps<{
+    defineProps<{
         globalSettings : GlobalSettings
         show : boolean
     }>();
@@ -21,12 +21,12 @@
                 <div class="title">Board settings</div>
                 <div class="section">
                     <div class="checkboxLabel">show names</div>
-                    <input class="checkbox" :checked="globalSettings.showNames" 
+                    <input class="checkbox" :checked="globalSettings.showNames"
                     type="checkbox" @change="e => emits('changeShowNames',(e.target as HTMLInputElement).checked)">
                 </div>
                 <div class="section">
                     <div class="checkboxLabel">show stats</div>
-                    <input class="checkbox" type="checkbox" :checked="globalSettings.showStats" 
+                    <input class="checkbox" type="checkbox" :checked="globalSettings.showStats"
                     @change="e => emits('changeShowStats',(e.target as HTMLInputElement).checked)">
                 </div>
             </div>

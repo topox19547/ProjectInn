@@ -1,5 +1,5 @@
 import assert from "assert/strict";
-import { describe, it, mock } from 'node:test';
+import { it } from 'node:test';
 import { Game } from "../model/Game.js";
 import { Scene } from "../model/gameObjects/scene/Scene.js";
 import { Asset } from "../model/gameObjects/asset/Asset.js";

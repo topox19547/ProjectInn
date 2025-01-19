@@ -9,13 +9,10 @@
     import WindowBackground from '../../shared/WindowBackground.vue';
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
-    const minTileSize = ref(10);
-    const maxTileSize = ref(300);
-    const tileSizeValue = ref(35);
     const confirmDisabled = ref(true);
     let imageValid = false;
     let errorOccurred = false;
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
     const props = defineProps<{
@@ -30,16 +27,19 @@
         confirmDisabled.value = !(imageValid && props.asset.name.length > 0);
     }
 
-    function onLoadError(e : any) : void{
+    function onLoadError(e : Event) : void{
         confirmDisabled.value = true;
         errorOccurred= true;
-        e.target.src = ErrorImage;
+        if(e.target instanceof HTMLImageElement){
+          e.target.src = ErrorImage;
+        }
+
     }
-    
+
     function onLoadSuccess() : void{
         if(!errorOccurred){
             imageValid = true
-            enableConfirm(); 
+            enableConfirm();
         }
         errorOccurred = false
     }
@@ -81,15 +81,15 @@
                     </div>
                     <div class="preview">
                         <div>
-                            <img :src="asset.assetURL" @error="onLoadError" 
+                            <img :src="asset.assetURL" @error="onLoadError"
                             width="128px" height="128px"
                             @load="onLoadSuccess">
                             <div class="previewLabel">
                                 preview
                             </div>
                         </div>
-                        <ButtonBase 
-                        :text="actionText" width="256px" height="42px" :disabled="confirmDisabled" 
+                        <ButtonBase
+                        :text="actionText" width="256px" height="42px" :disabled="confirmDisabled"
                         @click="() => {
                             $emit('close');
                             confirm();
@@ -177,7 +177,7 @@
         background-color: #353535;
         accent-color:#303F9F;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

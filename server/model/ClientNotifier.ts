@@ -1,6 +1,4 @@
 import { ClientHandler } from "../controller/ClientHandler.js";
-import { WebSocketHandler } from "../controller/WebSocketHandler.js";
-import { Player } from "./gameObjects/player/Player.js";
 import { Message } from "./messages/Message.js";
 import { Notifier } from "./Notifier.js";
 

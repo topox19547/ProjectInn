@@ -1,4 +1,3 @@
-import { permission } from "process";
 import { PermissionError } from "../errors/PermissionError.js";
 import { ValueError } from "../errors/ValueError.js";
 import { Chat } from "../model/chat/Chat.js";
@@ -7,7 +6,6 @@ import { Asset } from "../model/gameObjects/asset/Asset.js";
 import { AssetType } from "../model/gameObjects/asset/AssetType.js";
 import { Permission } from "../model/gameObjects/player/Permission.js";
 import { Player } from "../model/gameObjects/player/Player.js";
-import { GridType } from "../model/gameObjects/scene/GridType.js";
 import { Scene } from "../model/gameObjects/scene/Scene.js";
 import { Stat } from "../model/gameObjects/token/Stat.js";
 import { Token } from "../model/gameObjects/token/Token.js";
@@ -16,7 +14,7 @@ import { Lobby } from "../model/Lobby.js";
 import { Command } from "../model/messages/Command.js";
 import { Message } from "../model/messages/Message.js";
 import { Status } from "../model/messages/Status.js";
-import { ensureObject, ensureNumber, ensureString, ensureEnumLike, ensureBoolean, ensureStringEnumLike, ensureType, weakEnsureOf } from "../model/messages/Validators.js";
+import { ensureObject, ensureNumber, ensureString, ensureBoolean, ensureStringEnumLike, weakEnsureOf } from "../model/messages/Validators.js";
 import { ClientHandler } from "./ClientHandler.js";
 import { ClientState } from "./ClientState.js";
 import { LobbyController } from "./LobbyController.js";
@@ -339,10 +337,10 @@ export class GameController implements ClientState{
                             this.currentGame.isTokenAssetInUse(asset.getID()) ?
                             undefined : 
                             Permission.MANAGE_TOKENS;
-                        if(!asset.setName(content.name)){
+                        if(!asset.setName(content.name, minPermission)){
                             throw new ValueError("The supplied name is too long");
                         }
-                        if(!asset.setURL(content.assetURL, new Vector2(content.assetSize.x, content.assetSize.y))){
+                        if(!asset.setURL(content.assetURL, new Vector2(content.assetSize.x, content.assetSize.y), minPermission)){
                             throw new ValueError("The given url is too long")
                         }
                     }
@@ -453,10 +451,8 @@ export class GameController implements ClientState{
     }
 
     private getTokenAssetIfAuthorized(id : number) : Asset{
-        let asset : Asset | undefined;
-        let requiredPermission : Permission
-        requiredPermission = Permission.MANAGE_TOKENS;
-        asset = this.currentGame.getTokenAsset(id);
+        const requiredPermission : Permission = Permission.MANAGE_TOKENS;
+        const asset : Asset | undefined = this.currentGame.getTokenAsset(id);
         if(!this.clientPlayer.hasPermission(requiredPermission)){
             throw new PermissionError();
         }

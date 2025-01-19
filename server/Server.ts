@@ -7,8 +7,6 @@ import { LobbyController } from "./controller/LobbyController.js";
 import { WebSocketHandler } from "./controller/WebSocketHandler.js";
 import { ClientNotifier } from "./model/ClientNotifier.js";
 import { Lobby } from "./model/Lobby.js";
-import { setDefaultResultOrder } from "dns";
-import { Http2SecureServer } from "node:http2";
 
 /**
  * Main class used to create and start the server
@@ -30,7 +28,7 @@ export class Server{
             });
             httpsServer.listen(port);
             server = new WebSocketServer({server : httpsServer});
-        }catch(e){
+        }catch{
             console.log("An error occurred while trying to create a secure websocket server");
             console.log("Check if the KEYPATHS file is present and if the key-certificate pair is valid");
             console.log("Starting a regular websocket server.");

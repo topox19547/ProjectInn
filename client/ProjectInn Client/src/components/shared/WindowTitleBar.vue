@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-    const props = defineProps<{
+    defineProps<{
         title : string,
         icon : string,
     }>();
@@ -16,7 +16,7 @@
                 <img :src="icon" class="windowIcon">
             </div>
             <div class="title">
-                {{ title }} 
+                {{ title }}
             </div>
         </div>
     </div>

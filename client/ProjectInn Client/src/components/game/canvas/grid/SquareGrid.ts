@@ -7,7 +7,7 @@ export class SquareGrid implements Grid{
     private tileOffset:Vector2;
     private color:string;
     private readonly lineWidth:number;
-    
+
 
     constructor(tileSize:number, tileOffset:Vector2, lineWidth:number){
         //prevent offsets bigger than the tilesize itself to avoid issues with token placement
@@ -26,7 +26,7 @@ export class SquareGrid implements Grid{
     }
 
     public drawGrid(canvas: HTMLCanvasElement, viewOffset: Vector2, viewScale:number): void {
-        let ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
+        const ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
         if(ctx === null){
             return;
         }
@@ -54,9 +54,9 @@ export class SquareGrid implements Grid{
     }
 
     public tileToCanvas(viewOffset: Vector2, tile: Vector2, viewScale:number):Vector2{
-        const canvasPositionX:number = 
+        const canvasPositionX:number =
             (tile.getX() * this.tileSize - viewOffset.getX() - this.tileOffset.getX()) * viewScale;
-        const canvasPositionY:number = 
+        const canvasPositionY:number =
             (tile.getY() * this.tileSize - viewOffset.getY() - this.tileOffset.getY()) * viewScale;
         return new Vector2(canvasPositionX, canvasPositionY);
     }
@@ -68,7 +68,7 @@ export class SquareGrid implements Grid{
         );
     }
 
-    public getTokenOffset(viewScale: number): Vector2 {
+    public getTokenOffset(): Vector2 {
         return new Vector2(this.lineWidth,this.lineWidth);
     }
 

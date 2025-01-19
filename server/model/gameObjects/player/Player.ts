@@ -1,4 +1,3 @@
-import { ClientNotifier } from "../../ClientNotifier.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
 import { ensureObject, ensureString, ensureMapObject, ensureBoolean } from "../../messages/Validators.js";

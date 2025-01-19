@@ -5,16 +5,16 @@
     import PlayersIcon from '../../../assets/icons/players.svg';
     import ChatIcon from '../../../assets/icons/chat.svg';
     import TabButton from './TabButton.vue';
-    import Chat from './panels/chat/Chat.vue';
+    import ChatView from './panels/chat/ChatView.vue';
     import type { Player } from '../../../model/Player.js';
     import type { ChatMessage } from '../../../model/ChatMessage.js';
-    import Players from './panels/players/Players.vue';
-    import Assets from './panels/assets/Assets.vue';
-    import Tokens from './panels/tokens/Tokens.vue';
+    import PlayerView from './panels/players/PlayerView.vue';
+    import AssetView from './panels/assets/AssetView.vue';
+    import TokenView from './panels/tokens/TokenView.vue';
     import type { Asset } from '../../../model/Asset.js';
     import type { ViewData } from '../../../model/Game.js';
 
-    const props = defineProps<{
+    defineProps<{
         currentTab : SideBarTab,
         previousTab : SideBarTab,
         localPlayer : Player,
@@ -24,7 +24,7 @@
         viewData : ViewData
     }>();
 
-    const emits = defineEmits<{
+    defineEmits<{
         (e : 'tabChanged', tab : SideBarTab) : void
     }>();
 
@@ -33,35 +33,35 @@
 <template>
     <div class="tabsContainer">
         <div class="tabs">
-            <TabButton 
-            :is-active="currentTab == 0" 
-            :id="0" :icon="ChatIcon" 
+            <TabButton
+            :is-active="currentTab == 0"
+            :id="0" :icon="ChatIcon"
             @click="$emit('tabChanged', 0)"></TabButton>
-            <TabButton 
-            :is-active="currentTab == 1" 
-            :id="1" :icon="PlayersIcon" 
+            <TabButton
+            :is-active="currentTab == 1"
+            :id="1" :icon="PlayersIcon"
             @click="$emit('tabChanged', 1)"></TabButton>
-            <TabButton 
+            <TabButton
             v-if="localPlayer.permissions.MANAGE_TOKENS == true"
-            :is-active="currentTab == 2" 
-            :id="2" :icon="AssetIcon" 
+            :is-active="currentTab == 2"
+            :id="2" :icon="AssetIcon"
             @click="$emit('tabChanged', 2)"></TabButton>
-            <TabButton 
-            :is-active="currentTab == 3" 
-            :id="3" 
-            :icon="TokenIcon" 
+            <TabButton
+            :is-active="currentTab == 3"
+            :id="3"
+            :icon="TokenIcon"
             @click="$emit('tabChanged', 3)"></TabButton>
         </div>
     </div>
     <div class = "content">
-        <Chat :chat="chat" :players="players" :local-player="localPlayer"
-        v-if="currentTab == 0"></Chat>
-        <Players :local-player="localPlayer" :players="players" 
-        v-if="currentTab == 1"></Players>
-        <Assets :assets="assets" :local-player="localPlayer" :view-position="viewData.viewCenterPosition"
-        v-if="currentTab == 2"></Assets>
-        <Tokens :selected-token="viewData.selectedToken" :players="players" :local-player="localPlayer"
-        v-if="currentTab == 3"></Tokens>
+        <ChatView :chat="chat" :players="players" :local-player="localPlayer"
+        v-if="currentTab == 0"></ChatView>
+        <PlayerView :local-player="localPlayer" :players="players"
+        v-if="currentTab == 1"></PlayerView>
+        <AssetView :assets="assets" :local-player="localPlayer" :view-position="viewData.viewCenterPosition"
+        v-if="currentTab == 2"></AssetView>
+        <TokenView :selected-token="viewData.selectedToken" :players="players" :local-player="localPlayer"
+        v-if="currentTab == 3"></TokenView>
     </div>
 </template>
 
@@ -80,7 +80,7 @@
         display: flex;
         justify-content: center;
     }
-    
+
     .tabs{
         width: fit-content;
         display: flex;

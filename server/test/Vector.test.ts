@@ -1,5 +1,5 @@
 import assert from "assert/strict";
-import { it, mock } from 'node:test';
+import { it } from 'node:test';
 import { Vector2 } from "../model/gameObjects/Vector2.js";
 
 it("vector library works",() => {

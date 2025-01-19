@@ -1,4 +1,3 @@
-import { ClientNotifier } from "../../ClientNotifier.js";
 import { Game } from "../../Game.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
@@ -45,7 +44,7 @@ export class Token implements Identifiable, NotificationSource{
         this.asset = asset;
         this.id = id;
         this.name = asset.getName();
-        this.owners = new Array<string>;
+        this.owners = []
         this.notes = new Map<string,string>;
         this.stats = new Map<string,Stat>;
         this.position = new Vector2(0,0);

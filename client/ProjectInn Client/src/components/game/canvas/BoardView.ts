@@ -1,9 +1,6 @@
 import type { Grid } from "./grid/Grid.js";
 import { Vector2 } from "../../../types/Vector2.js";
 import type { Token } from "../../../model/Token.js";
-import type { Ref } from "vue";
-import type { Asset } from "../../../model/Asset.js";
-import type { Scene } from "../../../model/Scene.js";
 import { SquareGrid } from "./grid/SquareGrid.js";
 import type { ServerPublisher } from "../../../network/ServerPublisher.js";
 import { Status } from "../../../network/message/Status.js";
@@ -37,7 +34,7 @@ export class BoardView{
     private backgroundSource : string | undefined;
     private noSprite : ImageBitmap | undefined;
     private spriteCache:Map<number,{
-        url : string | undefined, 
+        url : string | undefined,
         sprite : ImageBitmap | undefined,
         unused : boolean}>;
     private tokens:Array<Token>;
@@ -135,7 +132,7 @@ export class BoardView{
 
 
     public startFullCacheUpdate():void{
-        this.spriteCache.forEach((v, k) => v.unused = true);
+        this.spriteCache.forEach((v) => v.unused = true);
     }
 
     public updateSpriteCache(id:number, url:string):void{
@@ -162,7 +159,7 @@ export class BoardView{
             image.addEventListener("load", () =>{
                 createImageBitmap(image).then(s => {
                     spriteEntry.sprite = s;
-                }).catch( 
+                }).catch(
                     () => {
                         if(this.noSprite == undefined){
                             return;
@@ -273,7 +270,7 @@ export class BoardView{
             if(token.inDrag){
                 this.ctx.globalAlpha = 0.5;
                 this.drawToken(spriteData.sprite, tokenPosition, tokenSize);
-                const isOverlappingToken : boolean = this.tokens.find(t => t != token && 
+                const isOverlappingToken : boolean = this.tokens.find(t => t != token &&
                     t.position.x == token.position.x && t.position.y == token.position.y) !== undefined;
                 if(isOverlappingToken && this.draggedToken == token){
                     this.ctx.globalAlpha = 0.5;
@@ -289,7 +286,7 @@ export class BoardView{
                     this.drawPlayerTag(tokenPosition, tokenSize, player);
                 }
             }
-            
+
         }
     }
 
@@ -429,7 +426,7 @@ export class BoardView{
                 tokenSize.getX() - padding);
             drawPosition.translateY(- barHeight - padding / 4);
         }
-        
+
     }
 
     private bindEvents() : void{
@@ -444,7 +441,7 @@ export class BoardView{
         this.canvas.ondrop = e => this.onDrop(e);
         this.canvas.ondblclick = e => this.onDoubleClick(e);
         this.canvas.onkeydown = e => this.onKeyDown(e);
-        this.canvas.onselectstart  = e => false;
+        this.canvas.onselectstart  = () => false;
     }
 
     private unbindEvents() : void{
@@ -460,7 +457,7 @@ export class BoardView{
         this.canvas.ondblclick = null;
         this.canvas.onkeydown = null;
         this.canvas.onselectstart = null;
-        
+
     }
 
     private onKeyDown(e : KeyboardEvent){
@@ -572,7 +569,7 @@ export class BoardView{
             return;
         }
         const overlappedTile:Vector2 = this.grid.canvasToTile(this.viewOffset, position, this.viewScale);
-        const overlappedToken:Token | undefined = 
+        const overlappedToken:Token | undefined =
             this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
         this.viewData.selectedToken = overlappedToken != this.viewData.selectedToken ? overlappedToken : undefined;
     }
@@ -647,7 +644,7 @@ export class BoardView{
             this.draggedToken.virtualPosition = overlappedTile;
             return;
         }
-        const overlappedToken:Token | undefined = 
+        const overlappedToken:Token | undefined =
             this.tokens.find(t => t.position.x == overlappedTile.getX() && t.position.y == overlappedTile.getY());
         if(overlappedToken !== undefined && !this.draggingView){
             const isTokenOwner : boolean = overlappedToken.owners.find(o => o == this.localPlayer.name) !== undefined;
@@ -697,24 +694,24 @@ export class BoardView{
             this.grid.getTokenSize(this.viewScale).getY() / this.viewScale,
             Math.abs(this.grid.getTileOffset().getY()));
         if(newX < 0 - extraPaddingX){
-            let limitedX:number = - extraPaddingX - this.viewOffset.getX();
+            const limitedX:number = - extraPaddingX - this.viewOffset.getX();
             vector.setX(limitedX);
         }
         else if(newX + scaledCanvasW > this.background.width + extraPaddingX){
-            let limitedX:number = 
+            const limitedX:number =
                 this.background.width + extraPaddingX - this.viewOffset.getX() - scaledCanvasW ;
             vector.setX(limitedX)
         }
         if(newY < 0 - extraPaddingY){
-            let limitedY:number = - extraPaddingY - this.viewOffset.getY();
+            const limitedY:number = - extraPaddingY - this.viewOffset.getY();
             vector.setY(limitedY);
         }
         else if(newY + scaledCanvasH > this.background.height + extraPaddingY){
-            let limitedY:number =  
+            const limitedY:number =
                 this.background.height - this.viewOffset.getY() + extraPaddingY - scaledCanvasH;
             vector.setY(limitedY);
         }
-        //if the background can be fully seen, block scrolling on that axis       
+        //if the background can be fully seen, block scrolling on that axis
         this.viewOffset.translateBy(vector);
     }
 
@@ -727,9 +724,9 @@ export class BoardView{
         const dynamicMinScale = Math.max(
             this.canvas.width / this.background.width,
             this.canvas.height / this.background.height);
-        this.viewScale = Math.max(dynamicMinScale, Math.min(this.maxScale, tempViewScale))   
+        this.viewScale = Math.max(dynamicMinScale, Math.min(this.maxScale, tempViewScale))
         //translate to "zoom" towards where the mouse position was
-        let zoomOffset:Vector2 = new Vector2(0,0);
+        const zoomOffset:Vector2 = new Vector2(0,0);
         const cursorPosFracX = cursorPos.getX() / this.canvas.width;
         const cursorPosFracY = cursorPos.getY() / this.canvas.height;
         zoomOffset.setX(((this.canvas.width / oldScale) -

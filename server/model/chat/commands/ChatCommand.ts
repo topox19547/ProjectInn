@@ -1,4 +1,3 @@
-import { ChatMessage } from "../ChatMessage.js"
 import { CommandResponse } from "./CommandResponse.js"
 
 /**

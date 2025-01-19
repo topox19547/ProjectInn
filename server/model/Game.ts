@@ -53,10 +53,10 @@ export class Game{
     constructor(name : string, ownerName : string, startingScene : Scene){
         this.name = name;
         this.ownerName = ownerName;
-        this.players = new Array();
-        this.tokenAssets = new Array<Asset>;
-        this.scenes = new Array<Scene>;
-        this.tokens = new Array<Token>;
+        this.players = [];
+        this.tokenAssets = [];
+        this.scenes = [];
+        this.tokens = [];
         this.password = undefined;
         this.currentScene = startingScene;
         this.maxPasswordLength = 24;
@@ -104,7 +104,7 @@ export class Game{
                     dest.push(restored)
                 }
                 dest.sort(sortById);
-                if(dest.some(e1 => dest.some(e2 => e1.getID() == e2.getID() && e1 != e2))){
+                if(new Set(dest.map(o => o.getID())).size != dest.length){
                     return false;
                 }
                 return true;

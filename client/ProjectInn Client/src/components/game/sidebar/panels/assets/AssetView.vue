@@ -27,7 +27,6 @@
 
     const newAsset = ref<Asset>(createEmptyAsset());
     const deletingAsset = ref<Asset>(createEmptyAsset());
-    let editingAsset : Asset = createEmptyAsset();
     const editableAsset = ref<Asset>(createEmptyAsset());
     const canDelete = computed(() => props.assets.length >= 0);
 
@@ -37,7 +36,7 @@
         name : "",
         assetURL : "",
         assetType : AssetType.TOKEN,
-        assetSize : {x : 256, y : 256} 
+        assetSize : {x : 256, y : 256}
         };
     }
 
@@ -51,7 +50,6 @@
     }
 
     function editAsset(asset : Asset){
-        editingAsset = asset;
         editableAsset.value = Object.assign({},asset); //Create an editable copy
         showEditAssetWindow.value = true
     }
@@ -102,7 +100,7 @@
         <div class="container">
             <div class="assetList">
                 <div class="assets">
-                    <AssetCard :asset="asset" v-for="asset in assets"
+                    <AssetCard :asset="asset" v-for="asset in assets" :key="asset.assetID"
                     :show-delete="canDelete"
                     @edit-asset="editAsset"
                     @asset-clicked="() => createToken(asset.assetID, asset.name)"
@@ -112,10 +110,10 @@
             <div class="buttonBar">
                 <ButtonBase
                 @click="showCreateAssetWindow = true"
-                text="Add a new asset" 
-                :icon="addIcon" 
+                text="Add a new asset"
+                :icon="addIcon"
                 :disable-shadow="true"
-                width="100%" 
+                width="100%"
                 height="42px"></ButtonBase>
             </div>
         </div>
@@ -233,5 +231,5 @@
         overflow: hidden;
         height: 100%;
     }
-    
+
 </style>

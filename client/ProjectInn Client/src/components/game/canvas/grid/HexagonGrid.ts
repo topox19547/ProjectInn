@@ -9,7 +9,7 @@ export class HexagonGrid implements Grid{
     private color:string;
     private hexagonPoints:Array<Vector2>;
     private readonly lineWidth:number;
-    
+
     constructor(tileWidth:number, tileOffset:Vector2, lineWidth:number){
         //prevent offsets bigger than the tilesize itself to avoid issues with token placement
         this.tileWidth = tileWidth;
@@ -19,13 +19,13 @@ export class HexagonGrid implements Grid{
             tileOffset.getY() % (this.tileHeight));
         this.lineWidth = lineWidth;
         this.color = "#111111";
-        this.hexagonPoints = new Array();
+        this.hexagonPoints = [];
         for(let offset = 0; offset < 2 * Math.PI; offset += Math.PI / 3){//1/6 of 2PI
             const nextPoint : Vector2 = new Vector2(Math.sin(Math.PI / 6 + offset),Math.cos(Math.PI / 6 + offset));
             this.hexagonPoints.push(nextPoint);
         }
     }
-    
+
     public setLineColor(color: string): void {
         this.color = color;
     }
@@ -35,7 +35,7 @@ export class HexagonGrid implements Grid{
     }
 
     public drawGrid(canvas: HTMLCanvasElement, viewOffset: Vector2, viewScale: number): void {
-        let ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
+        const ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
         if(ctx === null){
             return;
         }
@@ -43,15 +43,15 @@ export class HexagonGrid implements Grid{
         ctx.lineWidth = this.lineWidth;
         const xDistBetweenCenters = this.tileWidth * 3 / 4;
         const xDistBeforeReTile = this.tileWidth + this.tileWidth / 2;
-        let gridOffsetX:number = 
+        let gridOffsetX:number =
             (-this.tileOffset.getX() - viewOffset.getX() % (xDistBeforeReTile) - this.tileWidth / 2);
-        let gridOffsetY:number = 
+        let gridOffsetY:number =
             (-this.tileOffset.getY() - viewOffset.getY() % (this.tileHeight) - this.tileHeight / 2);
         gridOffsetX = gridOffsetX * viewScale;
         gridOffsetY = gridOffsetY * viewScale;
         const endX:number = canvas.width + this.tileWidth * 2;
         const endY:number = canvas.height + this.tileHeight * 2;
-        const scaledPoints : Array<Vector2> = new Array();
+        const scaledPoints : Array<Vector2> = [];
         this.hexagonPoints.forEach(p => {
             const newPoint : Vector2 = p.clone();
             newPoint.multiplyByScalar((this.tileWidth / 2) * viewScale);
@@ -61,20 +61,20 @@ export class HexagonGrid implements Grid{
         for(let c:number = -3; c * (xDistBetweenCenters * viewScale) < endX; c++){
             for(let y:number = gridOffsetY; y < endY; y += this.tileHeight * viewScale){
                 const x = gridOffsetX + (this.tileWidth / 2 + ((xDistBetweenCenters) * c * 2) ) * viewScale;
-                let center : Vector2 = new Vector2(x, y);   
+                let center : Vector2 = new Vector2(x, y);
                 this.drawShape(center, ctx, scaledPoints);
                 center = new Vector2(
-                    x + xDistBetweenCenters * viewScale, 
+                    x + xDistBetweenCenters * viewScale,
                     y + this.tileHeight / 2 * viewScale);
-                this.drawShape(center, ctx, scaledPoints);             
-            } 
+                this.drawShape(center, ctx, scaledPoints);
+            }
         }
         ctx.stroke();
     }
 
     public canvasToTile(viewOffset: Vector2, position: Vector2, viewScale: number): Vector2 {
         //First, check which "square" the position is in
-        //If it is in more than one rect, compare the distances between the centers of each heaxagon and choose the closest 
+        //If it is in more than one rect, compare the distances between the centers of each heaxagon and choose the closest
         const overlaps : Array<Vector2> = [
             this.getOverlappedSquareTiles(0, position, viewScale, viewOffset),
             this.getOverlappedSquareTiles(- 1 / 4 * this.tileWidth, position, viewScale, viewOffset)];
@@ -99,7 +99,7 @@ export class HexagonGrid implements Grid{
 
     public tileToCanvas(viewOffset: Vector2, tile: Vector2, viewScale: number): Vector2 {
         let x : number = (tile.getX() * this.tileWidth * 3 / 4);
-        let y : number = (tile.getY() * this.tileHeight); 
+        let y : number = (tile.getY() * this.tileHeight);
         y = tile.getX() % 2 == 0 ? y : y + this.tileHeight / 2;
         x -= viewOffset.getX() + this.tileOffset.getX();
         y -= viewOffset.getY() + this.tileOffset.getY();
@@ -112,7 +112,7 @@ export class HexagonGrid implements Grid{
 
     public getTokenSize(viewScale : number): Vector2{
         return new Vector2(
-            this.tileWidth * 3 / 4 * viewScale - this.lineWidth, 
+            this.tileWidth * 3 / 4 * viewScale - this.lineWidth,
             this.tileWidth * 3 / 4 * viewScale - this.lineWidth,
         );// 3/4 instead of full width to help square tokens fit the grid better
     }
@@ -122,7 +122,7 @@ export class HexagonGrid implements Grid{
             this.lineWidth + this.tileWidth / 8 * viewScale,
             this.lineWidth + this.tileWidth / 16 * viewScale
         );//1/8 and 1/16 of the width are the coordinates where the top left of the token should be
-        //if we need it to be centered 
+        //if we need it to be centered
     }
 
     public getLineWidth(): number {
@@ -153,10 +153,10 @@ export class HexagonGrid implements Grid{
             (this.tileOffset.getX() + viewOffset.getX() + gridOffsetX + scaledXPosition) / virtualTileWidth);
         let tilesUntilPositionY;
         if(tilesUntilPositionX % 2 == 0 ){
-            tilesUntilPositionY = 
+            tilesUntilPositionY =
                 Math.floor((this.tileOffset.getY() + viewOffset.getY() + scaledYPosition) / this.tileHeight);
         } else {
-            tilesUntilPositionY = 
+            tilesUntilPositionY =
                 Math.round((this.tileOffset.getY() + viewOffset.getY() + scaledYPosition) / this.tileHeight) - 1;
         }
         return new Vector2(tilesUntilPositionX, tilesUntilPositionY);

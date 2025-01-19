@@ -90,7 +90,7 @@
         <WindowBackground  v-if="show && localPlayer.permissions[Permission.MASTER]" ></WindowBackground>
     </Transition>
     <Transition name="window">
-        <WindowBase window-height="500px" window-width="700px" 
+        <WindowBase window-height="500px" window-width="700px"
          v-if="show && localPlayer.permissions[Permission.MASTER]">
             <template v-slot:content>
                 <WindowTitleBar title="Edit Permissions" :icon="editPermsIcon">
@@ -109,19 +109,21 @@
                                 <tbody>
                                     <tr>
                                         <th class="inputTitle">Player</th>
-                                        <th 
-                                        class="permsPermission" 
-                                        v-for="key in Object.keys(Permission)">{{ permissionNames.get(key) }}</th>
+                                        <th
+                                        class="permsPermission"
+                                        v-for="key in Object.keys(Permission)" :key="key"
+                                        >{{ permissionNames.get(key) }}</th>
                                     </tr>
-                                    <tr class="playerPermissions" v-for="entry of Object.entries(permissionsCopy)">
+                                    <tr class="playerPermissions" v-for="entry of Object.entries(permissionsCopy)"
+                                    :key = entry[0]>
                                         <td class="permsEntry">{{ entry[0] }}</td>
-                                        <td class="permsEntry" v-for="key in Object.keys(Permission)">
-                                            <input type="checkbox" 
+                                        <td class="permsEntry" v-for="key in Object.keys(Permission)" :key="key">
+                                            <input type="checkbox"
                                             :disabled="
-                                                !props.editablePlayers.includes(entry[0]) || 
-                                                (key != Permission.MASTER && 
-                                                permissionsCopy[entry[0]][Permission.MASTER] == true) " 
-                                            v-model="entry[1][key]" 
+                                                !props.editablePlayers.includes(entry[0]) ||
+                                                (key != Permission.MASTER &&
+                                                permissionsCopy[entry[0]][Permission.MASTER] == true) "
+                                            v-model="entry[1][key]"
                                             @click="() => addToEdits(entry,key)"
                                             class="checkbox">
                                         </td>
@@ -132,7 +134,7 @@
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Save" height="42px" 
+                    <ButtonBase text="Save" height="42px"
                     @click="sendEditedPerms">
                     </ButtonBase>
                 </div>
@@ -163,7 +165,7 @@
     .buttonContainer{
         display: flex;
         justify-content: center;
-        padding-bottom: 16px; 
+        padding-bottom: 16px;
     }
 
     .contentContainer{
@@ -232,7 +234,7 @@
         padding: 16px;
         width: 100%;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

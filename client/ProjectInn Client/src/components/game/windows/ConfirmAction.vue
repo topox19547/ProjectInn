@@ -5,11 +5,11 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
 
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
 
-    const props = defineProps<{
+    defineProps<{
         show : boolean
         title : string
         icon : string
@@ -39,7 +39,7 @@
 
                     </slot>
                     <div class="buttonContainer">
-                        <ButtonBase :text="action" :color="destructive ? { active : '#9D2C2C', hover : '#CD3A3A'} : undefined" 
+                        <ButtonBase :text="action" :color="destructive ? { active : '#9D2C2C', hover : '#CD3A3A'} : undefined"
                         @click="() => {
                             onConfirm();
                             $emit('close');

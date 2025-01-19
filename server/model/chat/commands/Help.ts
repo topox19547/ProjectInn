@@ -1,5 +1,4 @@
 import { Chat } from "../Chat.js";
-import { ChatMessage } from "../ChatMessage.js";
 import { ChatCommand } from "./ChatCommand.js";
 import { CommandResponse } from "./CommandResponse.js";
 

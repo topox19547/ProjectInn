@@ -11,10 +11,10 @@
     import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
     import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
-    const props = defineProps<{
+    defineProps<{
         showWizard : boolean
     }>();
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
     const sameNameError = ref(false);
@@ -63,12 +63,12 @@
 
 <template>
      <SceneEditWindow
-    title="Starting Scene" 
+    title="Starting Scene"
     :scene="newGameData.currentScene"
     :on-confirm="() => {
         goToPlayerEditor();
         $emit('close');
-    }" 
+    }"
     :show="showWizard"
     @close = "$emit('close')"
     ></SceneEditWindow>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    const props = defineProps<{ 
+    const props = defineProps<{
         text : string
         icon : string
     }>();
@@ -8,7 +8,7 @@
 <template>
     <button class="fab">
         <div class="buttonText">{{ props.text }}</div>
-        <img class="buttonIcon" :src=props.icon></img>
+        <img class="buttonIcon" :src=props.icon>
     </button>
 </template>
 

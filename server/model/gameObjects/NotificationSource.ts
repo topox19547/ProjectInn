@@ -1,4 +1,3 @@
-import { ClientNotifier } from "../ClientNotifier.js";
 import { Player } from "./player/Player.js";
 import { Notifier } from "../Notifier.js";
 

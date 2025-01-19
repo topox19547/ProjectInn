@@ -7,11 +7,11 @@
     import ButtonBase from '../shared/ButtonBase.vue';
     import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import BoardCanvas from './canvas/BoardCanvas.vue';
-    import Sidebar from './sidebar/Sidebar.vue';
+    import SideBar from './sidebar/SideBar.vue';
     import { SideBarTab } from './sidebar/sidebarTab.js';
-    import Topbar from './topbar/Topbar.vue';
+    import TopBar from './topbar/TopBar.vue';
     import BoardSettings from './windows/BoardSettings.vue';
-    
+
     const loadError = ref(false);
     const currentTab = ref(SideBarTab.CHAT);
     const savedTab = ref(SideBarTab.CHAT);
@@ -28,6 +28,10 @@
 
     const props = defineProps<{
         game : Game
+    }>();
+
+    const emits = defineEmits<{
+      (e : "resetSelectedToken") : void
     }>();
 
     setCanvasSize();
@@ -51,7 +55,7 @@
     function manualTabChange(tab : SideBarTab){
         if(props.game.viewData.selectedToken !== undefined){
             savedTab.value = tab;
-            props.game.viewData.selectedToken = undefined;
+            emits("resetSelectedToken");
         } else {
             changeTab(tab);
         }
@@ -77,12 +81,12 @@
     <div class="background">
         <div class="mainContent">
             <div class="topbar" :style="{ height : headerHeight + 'px' }">
-                <Topbar 
-                :game="props.game"></Topbar>
+                <TopBar
+                :game="props.game"></TopBar>
             </div>
             <BoardCanvas @mousedown="showBoardSettings = false"
-            :tokens="game.tokens" 
-            :token-assets="game.tokenAssets" 
+            :tokens="game.tokens"
+            :token-assets="game.tokenAssets"
             :current-scene="game.currentScene"
             :local-player="game.localPlayer"
             :players="game.players"
@@ -100,12 +104,12 @@
              :show="showBoardSettings"
              @change-show-names="setShowNames"
              @change-show-stats="setShowStats"></BoardSettings>
-            <div class="boardSettingsButton" @click="showBoardSettings = !showBoardSettings"> 
-                <img :src="BoardSettingsIcon"> 
+            <div class="boardSettingsButton" @click="showBoardSettings = !showBoardSettings">
+                <img :src="BoardSettingsIcon">
             </div>
         </div>
         <div class="sidebar" :style="{ width : sidebarWidth + 'px'}">
-            <Sidebar
+            <SideBar
             :local-player="game.localPlayer"
             :current-tab="currentTab"
             :previous-tab="savedTab"
@@ -113,9 +117,9 @@
             :players="game.players"
             :chat="game.chat"
             :assets="game.tokenAssets"
-            :view-data="game.viewData"></Sidebar>
+            :view-data="game.viewData"></SideBar>
         </div>
-        <ErrorWindow title="Load error" 
+        <ErrorWindow title="Load error"
         message="unable to load the current scene. please try joining again" v-if="loadError">
             <template v-slot:button>
                 <ButtonBase text="Ok" @click="loadError = false"></ButtonBase>

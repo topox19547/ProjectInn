@@ -1,4 +1,4 @@
-import { Vector2, type WeakVector2 } from "../types/Vector2.js"
+import { type WeakVector2 } from "../types/Vector2.js"
 import { AssetType } from "./AssetType.js"
 
 export interface Asset{

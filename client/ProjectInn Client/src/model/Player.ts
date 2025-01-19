@@ -1,4 +1,3 @@
-import type { Permission } from "./Permission.js"
 
 export interface Player{
     name : string

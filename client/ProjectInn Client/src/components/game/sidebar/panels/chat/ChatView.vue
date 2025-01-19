@@ -40,8 +40,10 @@
         chatMessage.value = "";
     }
 
-    function updateScrollToBottom(target : any){
-        scrolledToBottom.value = target.scrollTop + target.clientHeight >= target.scrollHeight;
+    function updateScrollToBottom(target : unknown){
+        if(target instanceof HTMLBaseElement){
+          scrolledToBottom.value = target.scrollTop + target.clientHeight >= target.scrollHeight;
+        }
     }
 
     function scrollToBottom(){
@@ -68,16 +70,16 @@
     <div class="margin">
         <div class="container">
             <div class="messageViewer" @scrollend="e => updateScrollToBottom(e.target)">
-                <MessageView v-for="message in chat"
-                :message="message"
+                <MessageView v-for="(message,index) in chat"
+                :message="message" :key="index"
                 :player-color="message.isSystem ? undefined : getPlayerColor(message.sender)" ></MessageView>
                 <div ref="bottom" class="bottom"></div>
             </div>
             <div class="chatBar">
                 <input type="text" v-model="chatMessage" maxlength="512" @keyup.enter="sendMessage()" class="textBox">
-                <ButtonBase height="40px" 
-                :disable-shadow="true" 
-                :disabled="chatMessage.length == 0" 
+                <ButtonBase height="40px"
+                :disable-shadow="true"
+                :disabled="chatMessage.length == 0"
                 @click="sendMessage()"
                 text="Send">
                 </ButtonBase>
@@ -137,7 +139,7 @@
         overflow: hidden;
         height: 100%;
     }
-    
+
     .bottom{
         height: 24px;
         padding: 0px;

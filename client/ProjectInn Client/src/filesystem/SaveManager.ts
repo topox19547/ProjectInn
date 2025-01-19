@@ -62,9 +62,9 @@ export class SaveManager{
     }
 
     public getGameList() : Array<GamePreview>{
-        const gamesPreview : Array<GamePreview> = new Array();
+        const gamesPreview : Array<GamePreview> = [];
         const games : string | null = localStorage.getItem(this.gamesKey);
-        try{    
+        try{
             const parsedGames : Array<SavedGame> = JSON.parse(games!);
             let currentId : number = 0;
             for(const entry of parsedGames){
@@ -79,7 +79,7 @@ export class SaveManager{
         }
         return gamesPreview;
     }
-    
+
     public clearGameSaves() : void{
         localStorage.setItem(this.gamesKey, JSON.stringify([]));
     }

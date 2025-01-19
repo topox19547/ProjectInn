@@ -11,7 +11,7 @@
     import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import GameEditWindow from '../../shared/windows/GameEditWindow.vue';
     import ConfirmAction from '../windows/ConfirmAction.vue';
-    import Scenes from '../windows/Scenes.vue';
+    import SceneView from '../windows/SceneView.vue';
 
     const showSceneMenu = ref(false);
     const showGameSettings = ref(false);
@@ -34,7 +34,7 @@
             serverPublisher.send({
                 status : Status.PASSWORD_CHANGE,
                 command : Command.MODIFY,
-                content : { password : gameDataCopy.value.password } 
+                content : { password : gameDataCopy.value.password }
              });
         }
         showGameSettings.value = false;
@@ -115,18 +115,18 @@
             <img :src="SettingsIcon">
             <div>Game Settings</div>
         </div>
-        <div class="topbarButton" @click="showSceneMenu = true" 
+        <div class="topbarButton" @click="showSceneMenu = true"
         v-if="game.localPlayer.permissions[Permission.MANAGE_SCENES]">
             <img :src="SceneIcon">
             <div>Scenes</div>
         </div>
     </div>
-    <Scenes 
-    :scenes="game.scenes" 
-    :current-scene="game.currentScene" 
-    :show="showSceneMenu" 
+    <SceneView
+    :scenes="game.scenes"
+    :current-scene="game.currentScene"
+    :show="showSceneMenu"
     @close="showSceneMenu = false"
-    @show="showSceneMenu = true"></Scenes>
+    @show="showSceneMenu = true"></SceneView>
     <GameEditWindow
     :is-new-game="false"
     :enable-save-management="game.localPlayer.isOwner"

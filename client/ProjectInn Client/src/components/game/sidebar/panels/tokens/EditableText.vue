@@ -46,27 +46,27 @@
             emits("lockEdits",false);
         }
     })
-    
+
 </script>
 
 
 
 <template>
     <div class="card" @mouseenter="hoveredOn = true" @mouseleave="hoveredOn = false">
-        <div class="staticBox"v-if="editing == false">
+        <div class="staticBox" v-if="editing == false">
             <div class="text">
                 {{ text }}
             </div>
             <div class="hoverButton" v-if="canEdit && editing == false" @click="edit">
-                <img class="editButton" 
-                :src="EditIcon" 
-                :style="{opacity : hoveredOn ? 1 : 0}" 
+                <img class="editButton"
+                :src="EditIcon"
+                :style="{opacity : hoveredOn ? 1 : 0}"
                 >
-            </div>  
+            </div>
         </div>
         <Transition name="edit">
             <div class="editBox" v-if="editing == true">
-                <input class="textBox" :maxlength="maxLength" ref="textBox" v-model="editableText"> 
+                <input class="textBox" :maxlength="maxLength" ref="textBox" v-model="editableText">
                 <ButtonBase :disable-shadow="true" :icon="OkIcon" @click="submit" height="32px"></ButtonBase>
                 <ButtonBase :disable-shadow="true" :icon="CloseIcon" @click="cancel" height="32px"></ButtonBase>
             </div>
@@ -87,7 +87,7 @@
         color: #d9d9d9;
         font-size: 24px;
         font-weight: bold;
-        text-align: center;  
+        text-align: center;
     }
 
     .editButton{
@@ -154,5 +154,5 @@
         opacity: 0;
     }
 
-    
+
 </style>

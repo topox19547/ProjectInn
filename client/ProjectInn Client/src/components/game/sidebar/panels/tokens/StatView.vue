@@ -86,7 +86,7 @@
     }
 
     function confirm(){
-        if(!isStatOk){
+        if(!isStatOk.value){
             return;
         }
         emits('editedStat', editableName.value , editableStat.value);

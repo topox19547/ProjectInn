@@ -13,7 +13,7 @@
         showDelete? : boolean
     }>();
 
-    const emits = defineEmits<{
+    defineEmits<{
         (e : 'editAsset', asset : Asset) : void
         (e : 'deleteAsset', asset : Asset) : void
         (e : 'assetClicked', asset : Asset) : void
@@ -31,24 +31,24 @@
 </script>
 
 <template>
-    <div class="card" draggable @click="$emit('assetClicked', asset)" 
+    <div class="card" draggable @click="$emit('assetClicked', asset)"
     @dragstart="onDragStart"
-    @mouseenter="hoveredOn = true" 
+    @mouseenter="hoveredOn = true"
     @mouseleave="hoveredOn = false">
         <div @dragstart="(e) => e.preventDefault()" class="hoverButton">
-            <img class="miniButton editButton" 
-            :src="editIcon" 
-            :style="{opacity : hoveredOn ? 1 : 0}" 
+            <img class="miniButton editButton"
+            :src="editIcon"
+            :style="{opacity : hoveredOn ? 1 : 0}"
             @click.stop="$emit('editAsset', asset)">
         </div>
-        <div @dragstart="(e) => e.preventDefault()" class="hoverButton" 
+        <div @dragstart="(e) => e.preventDefault()" class="hoverButton"
         v-if="showDelete === undefined || showDelete == true">
-            <img class="miniButton deleteButton" 
-            :src="deleteIcon" 
-            :style="{opacity : hoveredOn ? 1 : 0}" 
+            <img class="miniButton deleteButton"
+            :src="deleteIcon"
+            :style="{opacity : hoveredOn ? 1 : 0}"
             @click.stop="$emit('deleteAsset',asset)">
         </div>
-        <img loading="lazy" :src="thumbnail !== undefined ? thumbnail : asset.assetURL" 
+        <img loading="lazy" :src="thumbnail !== undefined ? thumbnail : asset.assetURL"
         @error="(e : any) => e.target.src = ErrorImage" class="sprite">
         <div class="centered">
             <div class="name">{{ asset.name }}</div>
@@ -72,7 +72,7 @@
         background-color: #555555;
         border-radius: 16px;
         height: 150px;
-        width: 100px;   
+        width: 100px;
         margin: 8px;
         justify-content: space-between;
         align-items: center;

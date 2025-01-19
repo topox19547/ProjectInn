@@ -7,7 +7,7 @@
     import ownerIcon from '../../../../../assets/icons/owner.svg';
     import masterIcon from '../../../../../assets/icons/master.svg';
     import playerIcon from '../../../../../assets/icons/player.svg';
-    import Kickplayer from '../../../windows/Kickplayer.vue';
+    import KickPlayer from '../../../windows/KickPlayer.vue';
     import { Permission } from '../../../../../model/Permission.js';
     import EditPermissions from '../../../windows/EditPermissions.vue';
 
@@ -44,7 +44,7 @@
                 <div class="title" v-if="onlinePlayers.length > 0">
                     Active players
                 </div>
-                <div v-for="player in onlinePlayers" class="player"
+                <div v-for="player in onlinePlayers" class="player" :key="player.name"
                 :style="{ 'color' : player.color}">
                     <div>
                         {{ player.name }}
@@ -62,17 +62,17 @@
                 <div class="title" v-if="offlinePlayers.length > 0">
                     Offline players
                 </div>
-                <div v-for="player in offlinePlayers" class="player"
+                <div v-for="player in offlinePlayers" class="player" :key="player.name"
                 :style="{ 'color' : player.color}">
                     <div>
                         {{ player.name }}
                     </div>
                     <div class="playerTags" v-if="true">
-                        <img :src="playerIcon" title="You" 
+                        <img :src="playerIcon" title="You"
                         v-if="player.name == localPlayer.name" width="24px">
                         <img :src="ownerIcon" title="Owner"
                          v-if="player.isOwner" width="24px">
-                        <img :src="masterIcon" title="Dungeon Master" 
+                        <img :src="masterIcon" title="Dungeon Master"
                         v-else-if="player.permissions[Permission.MASTER]" width="24px">
                     </div>
                 </div>
@@ -80,30 +80,30 @@
             <div class="buttonBar">
                 <ButtonBase
                 @click="showPermissionsWindow = true"
-                text="Edit permissions" 
-                :icon="editPermsIcon" 
+                text="Edit permissions"
+                :icon="editPermsIcon"
                 :disable-shadow="true"
-                width="100%" 
+                width="100%"
                 height="42px"
                 v-if="localPlayer.permissions[Permission.MASTER] == true || localPlayer.isOwner"></ButtonBase>
                 <ButtonBase
                 @click="showKickWindow = true"
-                text="Kick player" 
-                :icon="kickIcon" 
+                text="Kick player"
+                :icon="kickIcon"
                 :disable-shadow="true"
-                width="100%" 
+                width="100%"
                 height="42px"
                 :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
                 v-if="canKickPlayers"></ButtonBase>
             </div>
         </div>
     </div>
-    <Kickplayer 
+    <KickPlayer
     :kickable-players="lowerPlayers" :show="showKickWindow" @close="showKickWindow = false">
-    </Kickplayer>
-    <EditPermissions 
-    :editable-players="lowerPlayers" 
-    :show="showPermissionsWindow" 
+    </KickPlayer>
+    <EditPermissions
+    :editable-players="lowerPlayers"
+    :show="showPermissionsWindow"
     :players="players"
     :local-player="localPlayer"
     @close="showPermissionsWindow = false">
@@ -187,5 +187,5 @@
         overflow: hidden;
         height: 100%;
     }
-    
+
 </style>

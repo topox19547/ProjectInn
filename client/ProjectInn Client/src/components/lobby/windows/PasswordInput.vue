@@ -3,11 +3,8 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
+    import { ref, watch} from 'vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
-    import BoardCanvas from '../../game/canvas/BoardCanvas.vue';
-    import { AssetType } from '../../../model/AssetType.js';
-    import { GridType } from '../../../model/GridType.js';
     import ButtonBase from '../../shared/ButtonBase.vue';
     import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
@@ -79,7 +76,7 @@
     .buttonContainer{
         display: flex;
         justify-content: center;
-        padding-bottom: 16px; 
+        padding-bottom: 16px;
     }
 
     .contentContainer{
@@ -119,7 +116,7 @@
         padding-left: 4px;
         padding-bottom: 4px;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

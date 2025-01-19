@@ -10,7 +10,7 @@ export class MockHandler extends ClientHandler{
 
     constructor(){
         super();
-        this.receivedMessages = new Array();
+        this.receivedMessages = [];
         this.closed = false;
     }
 

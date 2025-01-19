@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    const props = defineProps<{
+    defineProps<{
         isActive : boolean,
         id : number,
         icon : string

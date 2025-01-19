@@ -3,13 +3,11 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-    import { ref, watch, type Ref } from 'vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
-    const confirmDisabled = ref(true);
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
-    const props = defineProps<{
+    defineProps<{
         gameId : number
         show : boolean
     }>();

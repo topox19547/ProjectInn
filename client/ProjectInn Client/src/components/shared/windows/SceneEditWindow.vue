@@ -17,7 +17,7 @@
     const tileSizeValue = ref(100);
     const offsetValue = ref({x : 0, y : 0})
     const confirmDisabled = ref(true);
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
     const props = defineProps<{
@@ -95,7 +95,7 @@
                             <div class = "subCategory">
                                 <div class="subOption">Hexagonal</div>
                                 <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" name="test">
-                            </div>      
+                            </div>
                         </div>
                         <div class="inputTitle">Tile width (pixels)</div>
                         <input class="textBox" type="number" v-model="tileSizeValue">
@@ -103,23 +103,23 @@
                         <div class="subCategory">
                             <div class="subCategory">
                                 <div class="coordinateName">X</div>
-                                <input class="textBox" v-model="offsetValue.x" 
+                                <input class="textBox" v-model="offsetValue.x"
                                 type="number">
                             </div>
                             <div class="subCategory">
                                 <div class="coordinateName">Y</div>
-                                <input class="textBox" v-model="offsetValue.y" 
+                                <input class="textBox" v-model="offsetValue.y"
                                 type="number">
                             </div>
                         </div>
                     </div>
                     <div class="preview">
                         <div>
-                            <BoardCanvas 
+                            <BoardCanvas
                             :onLoadSuccess="(img : ImageBitmap) => enableConfirm(img)"
-                            rounded="16px" 
-                            :tokens="[]" 
-                            :token-assets="[]" 
+                            rounded="16px"
+                            :tokens="[]"
+                            :token-assets="[]"
                             :current-scene="scene"
                             :local-player="getStartingPlayerData()"
                             :players="[]"
@@ -131,7 +131,7 @@
                                 Interactive preview
                             </div>
                         </div>
-                        <ButtonBase 
+                        <ButtonBase
                         text="Next" width="256px" height="42px" :disabled="confirmDisabled" @click="onConfirm">
                         </ButtonBase>
                     </div>
@@ -217,7 +217,7 @@
         background-color: #353535;
         accent-color:#303F9F;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

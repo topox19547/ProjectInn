@@ -8,8 +8,10 @@
 
     const timeString = computed(() => {
         if(props.message.receivedAt !== undefined){
-            return props.message.receivedAt.toLocaleTimeString(
-                navigator.language,{hour : '2-digit', minute: '2-digit'});
+          return props.message.receivedAt.toLocaleTimeString(
+              navigator.language,{hour : '2-digit', minute: '2-digit'});
+        } else {
+          return undefined
         }
     })
 </script>
@@ -19,7 +21,7 @@
         <div class="sender" :style="{ color : playerColor }">{{ message.sender + ":" }}</div>
         <div class="text" v-if="!message.isSystem">{{ message.text }}</div>
         <div class="systemText" v-if="message.isSystem" v-html="message.text"></div>
-        <div  class="time" :class="message.isSystem ? 'systemText' : 'text'"> 
+        <div  class="time" :class="message.isSystem ? 'systemText' : 'text'">
             {{ timeString }}
         </div>
     </div>

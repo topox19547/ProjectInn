@@ -4,7 +4,6 @@ import { Game } from "./Game.js";
 import { Command } from "./messages/Command.js";
 import { Message } from "./messages/Message.js";
 import { Status } from "./messages/Status.js";
-import { NotificationSource } from "./gameObjects/NotificationSource.js";
 
 
 /**
@@ -48,7 +47,7 @@ export class Lobby{
     }
 
     public removeGame(game : Game) : void{
-        for(let [id, g] of this.games){
+        for(const [id, g] of this.games){
             if(g == game){
                 this.games.delete(id);
             }

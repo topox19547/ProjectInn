@@ -1,6 +1,6 @@
 <script setup lang="ts">
     defineEmits(['newGame']);
-    const props = defineProps<{
+    defineProps<{
         title : string,
     }>();
 </script>

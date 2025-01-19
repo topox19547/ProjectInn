@@ -11,8 +11,8 @@
     import type { ServerPublisher } from '../../../../../network/ServerPublisher.js';
     import { Status } from '../../../../../network/message/Status.js';
     import { Command } from '../../../../../network/message/Command.js';
-    import StatView from './Stat.vue';
-    import Note from './Note.vue';
+    import StatView from './StatView.vue';
+    import NoteView from './NoteView.vue';
     import ButtonBase from '../../../../shared/ButtonBase.vue';
     import type { Stat } from '../../../../../model/Stat.js';
 
@@ -168,18 +168,18 @@
             </div>
             <div v-if="selectedToken !== undefined" class="tokenInfo">
                <EditableText :max-length=24 :text="selectedToken.name" :current-token-id="selectedToken.id"
-               :canEdit="canEdit" @lock-edits="(v) => editLock = v" 
+               :canEdit="canEdit" @lock-edits="(v) => editLock = v"
                @text-edited="(name) => sendNewTokenName(name)"></EditableText>
                 <div class="section">
                     <div class="title"> Stats </div>
                     <div class="hoverButton" v-if="canEdit" @click="() => changeNewStatStatus(true)">
-                        <img class="miniButton" 
+                        <img class="miniButton"
                         :src="AddIcon">
                     </div>
                     <TransitionGroup name="subElement">
-                        <StatView v-for="stat in Object.entries(selectedToken.stats)" 
-                        :name="stat[0]" 
-                        :stat="stat[1]" 
+                        <StatView v-for="stat in Object.entries(selectedToken.stats)"
+                        :name="stat[0]"
+                        :stat="stat[1]"
                         :create="false"
                         :can-edit="canEdit"
                         :key="stat[0]"
@@ -189,8 +189,8 @@
                         @deleted-stat="() => sendDeletedStat(stat[0])"
                         :current-token-id="selectedToken.id"></StatView>
                         <StatView
-                        name="" 
-                        :stat="{value : 0, max : undefined, min : 0}" 
+                        name=""
+                        :stat="{value : 0, max : undefined, min : 0}"
                         :create="true"
                         :can-edit="canEdit"
                         key=""
@@ -207,11 +207,11 @@
                 <div class="section">
                     <div class="title"> Notes </div>
                     <div class="hoverButton" v-if="canEdit" @click="() => changeNewNoteStatus(true)">
-                        <img class="miniButton" 
+                        <img class="miniButton"
                         :src="AddIcon">
                     </div>
                     <TransitionGroup name="subElement">
-                        <Note v-for="note in Object.entries(selectedToken.notes)" 
+                        <NoteView v-for="note in Object.entries(selectedToken.notes)"
                         :create="false"
                         :title="note[0]"
                         :text="note[1]"
@@ -221,8 +221,8 @@
                         @edited-note="sendEditedNote"
                         @deleted-note="() => sendDeletedNote(note[0])"
                         @set-edit-lock="(v : boolean) => editLock = v"
-                        :key="note[0]"></Note>
-                        <Note
+                        :key="note[0]"></NoteView>
+                        <NoteView
                         v-if="showNewNoteCard"
                         :create="true"
                         title=""
@@ -233,10 +233,10 @@
                         @cancel="() => changeNewNoteStatus(false)"
                         @edited-note="sendEditedNote"
                         @set-edit-lock="(v : boolean) => editLock = v"
-                        key=""></Note>
+                        key=""></NoteView>
                         <div class="spacer" ref="newNoteScroll"
                         key="" v-if="Object.entries(selectedToken.notes).length > 0 || showNewNoteCard"></div>
-                    </TransitionGroup>  
+                    </TransitionGroup>
                 </div>
                 <div class="section">
                     <div class="title"> Assigned to </div>
@@ -245,7 +245,7 @@
                             <div class="playerText">
                                 {{ owner }}
                             </div>
-                            <div class="fixedButton" v-if="canEditStrict" 
+                            <div class="fixedButton" v-if="canEditStrict"
                             @click="() => updateOwnerStatus(true, owner)">
                                 <img class="miniButton" :src="RemoveIcon" width="20px" height="100%">
                             </div>
@@ -253,12 +253,12 @@
                     </TransitionGroup>
                     <div class="selectUser" v-if="canEditStrict">
                             <select class="dropDown" v-model="addingPlayer">
-                                <option :value="player.name" v-for="player in players">
+                                <option :value="player.name" v-for="player in players" :key="player.name">
                                     {{ player.name }}
                                 </option>
                             </select>
-                            <ButtonBase text="Add" 
-                            :disable-shadow="true" 
+                            <ButtonBase text="Add"
+                            :disable-shadow="true"
                             height="30px" width="128px"
                             :disabled="addingPlayer.length == 0"
                             @click="() => updateOwnerStatus(false, addingPlayer)"></ButtonBase>
@@ -270,20 +270,20 @@
                 <Transition name="fade">
                     <ButtonBase
                     @click="copyToken"
-                    text="Copy Token" 
-                    :icon="CopyIcon" 
+                    text="Copy Token"
+                    :icon="CopyIcon"
                     :disable-shadow="true"
-                    width="100%" 
+                    width="100%"
                     height="42px"
                     v-if="canEditStrict"></ButtonBase>
                 </Transition>
                 <Transition name="fade">
                     <ButtonBase
                     @click="deleteToken"
-                    text="Delete token" 
-                    :icon="DeleteIcon" 
+                    text="Delete token"
+                    :icon="DeleteIcon"
                     :disable-shadow="true"
-                    width="100%" 
+                    width="100%"
                     height="42px"
                     :color="{ active : '#9D2C2C', hover : '#CD3A3A'}"
                     v-if="canEditStrict"></ButtonBase>
@@ -315,7 +315,7 @@
         text-align: center;
         margin: auto;
     }
-    
+
     .title{
         color: #d9d9d9;
         font-size: 20px;

@@ -1,16 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Ref } from "vue";
 import { getDefaultLocalSettings, getInitializedViewData, type Game, type LocalSettings } from "../model/Game.js";
 import type { Message } from "./message/Message.js";
 import { Status } from "./message/Status.js";
 import { Command } from "./message/Command.js";
-import type { Token } from "../model/Token.js";
-import type { Stat } from "../model/Stat.js";
 import { AssetType } from "../model/AssetType.js";
 import type { Lobby } from "../model/Lobby.js";
 import type { Scene } from "../model/Scene.js";
 import type { Player } from "../model/Player.js";
 import { SaveManager } from "../filesystem/SaveManager.js";
-import { tokenToString } from "typescript";
 
 
 /**
@@ -81,7 +79,6 @@ export class MessageHandler{
         switch(message.status){
             case Status.TOKEN:{
                 if(message.command == Command.CREATE){
-                    const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
                     this.game.value.tokens.push(content);
                 } else if (message.command == Command.DELETE){
                     const index : number = this.game.value.tokens.findIndex(t => t.id == content.id);
@@ -234,12 +231,12 @@ export class MessageHandler{
                 break;
             }
             case Status.SCENE_PING:{
-                const olderPingIndex : number = 
+                const olderPingIndex : number =
                     this.game.value.viewData.pingBuffer.findIndex(p => p.player == content.player);
                 this.game.value.viewData.pingBuffer.splice(olderPingIndex, 1);
                 this.game.value.viewData.pingBuffer.push(content);
                 setTimeout(() => {
-                    const deletePingIndex : number | undefined = 
+                    const deletePingIndex : number | undefined =
                         this.game.value?.viewData.pingBuffer.indexOf(content);
                     if(deletePingIndex !== -1 && deletePingIndex !== undefined){
                         this.game.value?.viewData.pingBuffer.splice(deletePingIndex, 1);
@@ -254,7 +251,7 @@ export class MessageHandler{
                 });
                 break;
             }
-                
+
         }
     }
 }

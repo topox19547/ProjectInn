@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormatError } from "../../errors/FormatError.js";
 
 /**
@@ -41,7 +42,7 @@ export const ensureStringEnumLike = (permittedValues : Array<string>) => (object
 export const weakEnsureOf = <T>(ensureOtherType : ensureType<T>) => (object : unknown) => {
     try{
         return ensureOtherType(object);
-    } catch(e) {
+    } catch {
         if (typeof object !== "undefined"){
             throw new FormatError("not undefined or of the desired type");
         }

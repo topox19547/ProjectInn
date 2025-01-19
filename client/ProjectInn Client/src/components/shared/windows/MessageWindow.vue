@@ -2,7 +2,7 @@
     import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
 
-    const props = defineProps<
+    defineProps<
         {
             title : string,
             message : string

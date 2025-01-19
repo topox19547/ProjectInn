@@ -24,9 +24,8 @@
         rounded : string
         canvasSize : WeakVector2
         onLoadError? : () => void;
-        onLoadSuccess? : (img : ImageBitmap) => void;  
+        onLoadSuccess? : (img : ImageBitmap) => void;
     }>();
-
 
     const canvas = useTemplateRef("board");
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
@@ -52,7 +51,7 @@
                 viewData : props.viewData,
                 globalSettings : props.globalSettings
             }
-            renderer = 
+            renderer =
                 new BoardView(
                     canvas.value,
                     gameContext,
@@ -86,7 +85,7 @@
 </template>
 
 <style scoped>
-    .canvas:focus { 
-        outline: none; 
+    .canvas:focus {
+        outline: none;
     }
 </style>

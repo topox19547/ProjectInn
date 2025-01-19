@@ -1,4 +1,3 @@
-import { ClientNotifier } from "../ClientNotifier.js";
 import { Player } from "../gameObjects/player/Player.js";
 import { Command } from "../messages/Command.js";
 import { Status } from "../messages/Status.js";
@@ -27,7 +26,7 @@ export class Chat implements NotificationSource{
             isSystem : true
         }
         this.commandMap = new Map();
-        this.chatHistory = new Array(welcomeMessage);
+        this.chatHistory = [welcomeMessage];
         this.commandPrefix = "!";
         this.maxMessageLength = 512;
     }
@@ -73,7 +72,7 @@ export class Chat implements NotificationSource{
             return;
         }
         const commandResponse : CommandResponse = command.execute(argsString, message.sender);
-        const sendTo : Array<String> | undefined = commandResponse.sendTo;
+        const sendTo : Array<string> | undefined = commandResponse.sendTo;
         if(sendTo !== undefined){
             this.notifier?.notifyIf({
                 status : Status.CHAT,

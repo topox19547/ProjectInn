@@ -12,14 +12,14 @@
 
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const toKick = ref("");
-    const emits = defineEmits<{
+    defineEmits<{
         close : void
     }>();
-    const props = defineProps<{
+    defineProps<{
         kickablePlayers : Array<string>
         show : boolean
     }>();
-    
+
     function kickPlayer(){
         serverPublisher.send({
             status : Status.PLAYER,
@@ -50,14 +50,14 @@
                     <div class="subCategory">
                         <div class="inputTitle">Player</div>
                         <select class="dropDown" v-model="toKick">
-                            <option :value="player" v-for="player in kickablePlayers">
+                            <option :value="player" :key="player" v-for="player in kickablePlayers">
                                 {{ player }}
                             </option>
                         </select>
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Kick" height="42px" :disabled="toKick.length == 0" 
+                    <ButtonBase text="Kick" height="42px" :disabled="toKick.length == 0"
                     @click="() => {
                         $emit('close');
                         kickPlayer()
@@ -91,7 +91,7 @@
     .buttonContainer{
         display: flex;
         justify-content: center;
-        padding-bottom: 16px; 
+        padding-bottom: 16px;
     }
 
     .contentContainer{
@@ -132,7 +132,7 @@
         padding-bottom: 4px;
         max-width: 200px;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

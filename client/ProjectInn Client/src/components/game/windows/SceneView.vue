@@ -137,6 +137,7 @@
                     <div class="assetList">
                         <div class="assets">
                             <AssetCard :asset="scene.asset" v-for="scene in scenes"
+                            :key="scene.asset.assetID"
                             :thumbnail="scene.asset.assetID != currentScene.asset.assetID ?  SceneThumbnail : undefined"
                             :show-delete="scene.asset.assetID != currentScene.asset.assetID"
                             @edit-asset="a => editScene(a.assetID)"
@@ -165,7 +166,7 @@
     :on-confirm="sendCreatedScene"
     @close="showSceneCreateWindow = false"
     ></SceneEditWindow>
-    <ConfirmAction 
+    <ConfirmAction
     :show = showSceneDeleteWindow
     message="Are you sure you want to delete this scene?"
     :on-confirm="sendDeletedScene"
@@ -175,7 +176,7 @@
     :icon="deleteIcon"
     action="Delete">
     </ConfirmAction>
-    <ConfirmAction 
+    <ConfirmAction
     :show = showSceneChangeWindow
     message="Are you sure you want to change to this scene? All token positions will be reset."
     :on-confirm="sendSceneChange"

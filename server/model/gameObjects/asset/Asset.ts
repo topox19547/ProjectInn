@@ -1,7 +1,6 @@
-import { ClientNotifier } from "../../ClientNotifier.js";
 import { Command } from "../../messages/Command.js";
 import { Status } from "../../messages/Status.js";
-import { ensureObject, ensureNumber, weakEnsureOf, ensureString, ensureEnumLike } from "../../messages/Validators.js";
+import { ensureObject, ensureNumber, ensureString, ensureEnumLike } from "../../messages/Validators.js";
 import { NotificationSource } from "../NotificationSource.js";
 import { Identifiable } from "../Identifiable.js";
 import { Permission } from "../player/Permission.js";
