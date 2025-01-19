@@ -1,6 +1,6 @@
 import type { Token } from "./Token.js"
-import type { Player } from "./Player.js"
-import type { Scene } from "./Scene.js"
+import { getStartingPlayerData, type Player } from "./Player.js"
+import { getStartingSceneData, type Scene } from "./Scene.js"
 import type { Asset } from "./Asset.js"
 import type { ChatMessage } from "./ChatMessage.js"
 import { Vector2, type WeakVector2 } from "../types/Vector2.js"
@@ -14,7 +14,7 @@ export interface Game{
     scenes : Array<Scene>
     tokenAssets : Array<Asset>
     tokens : Array<Token>
-    currentScene : Scene 
+    currentScene : Scene
     password : string | undefined
     chat : Array<ChatMessage>
     localSettings : LocalSettings
@@ -31,8 +31,14 @@ export interface ViewData{
     pingBuffer : Array<{position : WeakVector2, player : string}>
 }
 
+export interface GameSettings{
+    name : string
+    password : string | undefined
+    localSettings? : LocalSettings
+}
 
-export function getInitializedViewData(): ViewData{ 
+
+export function getInitializedViewData(): ViewData{
     return{
         selectedToken : undefined,
         viewCenterPosition : new Vector2(0,0),
@@ -40,8 +46,17 @@ export function getInitializedViewData(): ViewData{
     }
 }
 
-export function getDefaultLocalSettings(game : Game){
+export function getDefaultLocalSettings(game : Game) : LocalSettings{
     return {
         autoSaveEnabled : game.localPlayer.isOwner
     }
+}
+
+export function getStartingGameData(){
+  return {
+      name : "",
+      localPlayer : getStartingPlayerData(),
+      currentScene : getStartingSceneData(),
+      password : undefined
+  }
 }

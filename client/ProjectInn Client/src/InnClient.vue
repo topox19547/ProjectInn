@@ -86,7 +86,8 @@
   @load-game-settings="loadGameSettings"></LobbyView>
   <Transition name="game">
     <GameView v-if="game !== undefined" :game=game
-    @reset-selected-token="game.viewData.selectedToken = undefined"></GameView>
+    @reset-selected-token="game.viewData.selectedToken = undefined"
+    @save-local-settings="(localSettings) => game!.localSettings = localSettings"></GameView>
   </Transition>
   <MessageWindow v-if="showNetworkError == true" title="Network error" message="Lost connection to the ProjectInn Server.">
     <template v-slot:button>

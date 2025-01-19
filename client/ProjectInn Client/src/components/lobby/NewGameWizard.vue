@@ -1,8 +1,6 @@
 <script setup lang="ts">
     import { inject, ref } from 'vue';
     import { SaveManager } from '../../filesystem/SaveManager.js';
-    import { getStartingPlayerData } from '../../model/Player.js';
-    import { getStartingSceneData } from '../../model/Scene.js';
     import type { ServerPublisher } from '../../network/ServerPublisher.js';
     import { Command } from '../../network/message/Command.js';
     import { Status } from '../../network/message/Status.js';
@@ -11,11 +9,14 @@
     import ErrorWindow from '../shared/windows/MessageWindow.vue';
     import PlayerEditWindow from '../shared/windows/PlayerEditWindow.vue';
     import SceneEditWindow from '../shared/windows/SceneEditWindow.vue';
+    import { getStartingGameData, type GameSettings } from '../../model/Game.js';
+    import type { Player } from '../../model/Player.js';
+    import type { Scene } from '../../model/Scene.js';
     defineProps<{
         showWizard : boolean
     }>();
-    defineEmits<{
-        close : void
+    const emits = defineEmits<{
+        (e : "close") : void
     }>();
     const sameNameError = ref(false);
     const newGameData = ref(getStartingGameData());
@@ -24,25 +25,19 @@
     const serverPublisher = inject("serverPublisher") as ServerPublisher;
     const saveManager = new SaveManager();
 
-    function getStartingGameData(){
-        return {
-            name : "",
-            localPlayer : getStartingPlayerData(),
-            currentScene : getStartingSceneData(),
-            password : undefined
-        }
-    }
-
-    function goToPlayerEditor(){
+    function goToPlayerEditor(scene : Scene){
+        newGameData.value.currentScene = scene;
         showPlayerMenu.value = true;
+        emits("close");
     }
 
-    function goToGameEditor(){
+    function goToGameEditor(player : Player){
+        newGameData.value.localPlayer = player;
         showPlayerMenu.value = false;
         showNewGameMenu.value = true;
     }
 
-    function sendNewGameInfo(){
+    function sendNewGameInfo(gameSettings : GameSettings){
         if(saveManager.getGameList().find(g => g.name == newGameData.value.name)){
             sameNameError.value = true;
             return;
@@ -53,8 +48,8 @@
             content : {
                 username : newGameData.value.localPlayer.name,
                 playerColor : newGameData.value.localPlayer.color,
-                gameName : newGameData.value.name,
-                password : newGameData.value.password,
+                gameName : gameSettings.name,
+                password : gameSettings.password,
                 scene : newGameData.value.currentScene
             }
         })
@@ -65,27 +60,24 @@
      <SceneEditWindow
     title="Starting Scene"
     :scene="newGameData.currentScene"
-    :on-confirm="() => {
-        goToPlayerEditor();
-        $emit('close');
-    }"
+    @confirm="goToPlayerEditor"
     :show="showWizard"
-    @close = "$emit('close')"
+    @close = "emits('close')"
     ></SceneEditWindow>
     <PlayerEditWindow
     :player="newGameData.localPlayer"
     :show="showPlayerMenu"
-    :on-confirm="goToGameEditor"
+    @confirm="goToGameEditor"
     :force-new-player="true"
     @close="showPlayerMenu = false"
     ></PlayerEditWindow>
     <GameEditWindow
-    :game="newGameData"
+    :gameSettings="newGameData"
     :is-new-game="true"
     :enable-save-management="false"
     :show="showNewGameMenu"
     confirm-text="Next"
-    :on-confirm="sendNewGameInfo"
+    @confirm="sendNewGameInfo"
     @close="showNewGameMenu = false"
     ></GameEditWindow>
     <ErrorWindow v-if="sameNameError"

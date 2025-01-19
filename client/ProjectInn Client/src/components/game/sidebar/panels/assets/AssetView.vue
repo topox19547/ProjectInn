@@ -27,7 +27,7 @@
 
     const newAsset = ref<Asset>(createEmptyAsset());
     const deletingAsset = ref<Asset>(createEmptyAsset());
-    const editableAsset = ref<Asset>(createEmptyAsset());
+    const editingAsset = ref<Asset>(createEmptyAsset());
     const canDelete = computed(() => props.assets.length >= 0);
 
     function createEmptyAsset(){
@@ -40,17 +40,17 @@
         };
     }
 
-    function sendNewAsset(){
+    function sendNewAsset(asset : Asset){
         serverPublisher.send({
             status : Status.TOKEN_ASSET,
             command : Command.CREATE,
-            content : newAsset.value
+            content : asset
         })
         newAsset.value = createEmptyAsset();
     }
 
     function editAsset(asset : Asset){
-        editableAsset.value = Object.assign({},asset); //Create an editable copy
+        editingAsset.value = asset
         showEditAssetWindow.value = true
     }
 
@@ -59,11 +59,11 @@
         showDeleteAssetWindow.value = true
     }
 
-    function sendEditedAsset(){
+    function sendEditedAsset(asset : Asset){
         serverPublisher.send({
             status: Status.TOKEN_ASSET,
             command : Command.MODIFY,
-            content : editableAsset.value
+            content : asset
         });
     }
 
@@ -124,15 +124,15 @@
     :asset="newAsset"
     :show="showCreateAssetWindow"
     @close="showCreateAssetWindow = false"
-    :on-confirm="sendNewAsset">
+    @confirm="sendNewAsset">
     </EditAsset>
     <EditAsset
     title="Edit Asset"
     action-text="Save"
-    :asset="editableAsset"
+    :asset="editingAsset"
     :show="showEditAssetWindow"
     @close="showEditAssetWindow= false"
-    :on-confirm="sendEditedAsset">
+    @confirm="sendEditedAsset">
     </EditAsset>
     <ConfirmAction
     message="Are you sure? This will also delete every token that uses this asset."

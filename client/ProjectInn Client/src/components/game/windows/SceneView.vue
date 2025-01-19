@@ -4,12 +4,10 @@
     import deleteIcon from '../../../assets/icons/delete_darker.svg';
     import SceneIcon from '../../../assets/icons/scene.svg';
     import SceneThumbnail from '../../../assets/placeholders/default_thumbnail.png';
-    import type { Asset } from '../../../model/Asset.js';
     import { getStartingSceneData, type Scene } from '../../../model/Scene.js';
     import type { ServerPublisher } from '../../../network/ServerPublisher.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
-    import type { WeakVector2 } from '../../../types/Vector2.js';
     import ButtonBase from '../../shared/ButtonBase.vue';
     import CloseButton from '../../shared/CloseButton.vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
@@ -45,7 +43,7 @@
         if(scene == undefined){
             return;
         }
-        editingScene.value = copyScene(scene);
+        editingScene.value = scene;
         showSceneEditWindow.value = true;
     }
 
@@ -67,17 +65,6 @@
         showSceneChangeWindow.value = true;
     }
 
-    function copyScene(scene : Scene){
-        const offsetCopy : WeakVector2 = Object.assign({}, scene.offset);
-        const assetCopy : Asset = Object.assign({}, scene.asset);
-        const assetSizeCopy : WeakVector2 = Object.assign({}, scene.asset.assetSize);
-        const sceneCopy : Scene = Object.assign({}, scene);
-        assetCopy.assetSize = assetSizeCopy;
-        sceneCopy.offset = offsetCopy;
-        sceneCopy.asset = assetCopy;
-        return sceneCopy;
-    }
-
     function sendDeletedScene(){
         serverPublisher.send({
             status : Status.SCENE,
@@ -88,20 +75,20 @@
         });
     }
 
-    function sendEditedScene(){
+    function sendEditedScene(scene : Scene){
         serverPublisher.send({
             status : Status.SCENE,
             command : Command.MODIFY,
-            content : editingScene.value
+            content : scene
         });
         showSceneEditWindow.value = false;
     }
 
-    function sendCreatedScene(){
+    function sendCreatedScene(scene : Scene){
         serverPublisher.send({
             status : Status.SCENE,
             command : Command.CREATE,
-            content : newScene.value
+            content : scene
         });
         showSceneCreateWindow.value = false;
         newScene.value = getStartingSceneData();
@@ -156,14 +143,14 @@
     :scene="editingScene"
     :show="showSceneEditWindow"
     title="Edit Scene"
-    :on-confirm="sendEditedScene"
+    @confirm="sendEditedScene"
     @close="showSceneEditWindow = false"
     ></SceneEditWindow>
     <SceneEditWindow
     :scene="newScene"
     :show="showSceneCreateWindow"
     title="Create Scene"
-    :on-confirm="sendCreatedScene"
+    @confirm="sendCreatedScene"
     @close="showSceneCreateWindow = false"
     ></SceneEditWindow>
     <ConfirmAction

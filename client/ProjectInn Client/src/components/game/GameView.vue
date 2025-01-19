@@ -2,7 +2,7 @@
     import { ref, watch } from 'vue';
     import BoardSettingsIcon from '../../assets/icons/boardSettings.svg';
     import { SaveManager } from '../../filesystem/SaveManager.js';
-    import type { Game } from '../../model/Game.js';
+    import type { Game, LocalSettings } from '../../model/Game.js';
     import { getDefaultGlobalSettings } from '../../model/GlobalSettings.js';
     import ButtonBase from '../shared/ButtonBase.vue';
     import ErrorWindow from '../shared/windows/MessageWindow.vue';
@@ -32,6 +32,7 @@
 
     const emits = defineEmits<{
       (e : "resetSelectedToken") : void
+      (e : "saveLocalSettings", localSettings : LocalSettings) : void
     }>();
 
     setCanvasSize();
@@ -82,7 +83,8 @@
         <div class="mainContent">
             <div class="topbar" :style="{ height : headerHeight + 'px' }">
                 <TopBar
-                :game="props.game"></TopBar>
+                :game="props.game"
+                @save-local-settings="(localSettings) => emits('saveLocalSettings', localSettings)"></TopBar>
             </div>
             <BoardCanvas @mousedown="showBoardSettings = false"
             :tokens="game.tokens"

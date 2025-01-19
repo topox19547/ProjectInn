@@ -3,21 +3,28 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-    import { ref, watch} from 'vue';
+    import { onUpdated, ref, watch} from 'vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
     import ButtonBase from '../../shared/ButtonBase.vue';
-    import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
-    defineEmits<{
-        close : void
+    const emits = defineEmits<{
+        (e : "close") : void
+        (e : "confirm", id : number) : void
     }>();
+
     const props = defineProps<{
-        joinData : { gameId : number, player : Player, password : string | undefined}
+        gameId : number
         show : boolean
-        onConfirm : () => void
     }>();
-    watch(props.joinData,(joinData) => {
-        confirmDisabled.value = joinData.gameId <= 0;
+
+    const joinId = ref(props.gameId);
+
+    watch(joinId, (id) => {
+        confirmDisabled.value = id <= 0;
+    });
+
+    onUpdated(() => {
+        joinId.value = props.gameId;
     })
 </script>
 
@@ -37,11 +44,12 @@
                 <div class="contentContainer">
                     <div class="subCategory">
                         <div class="inputTitle">Game id</div>
-                        <input class="textBox" v-model="joinData.gameId" maxlength="24" type="number">
+                        <input class="textBox" v-model="joinId" maxlength="24" type="number">
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="onConfirm"></ButtonBase>
+                    <ButtonBase text="Next" height="42px" :disabled="confirmDisabled"
+                    @click="emits('confirm', joinId)"></ButtonBase>
                 </div>
             </template>
         </WindowBase>
@@ -49,7 +57,6 @@
 </template>
 
 <style scoped>
-
     .subCategory{
         display: flex;
         width: 100%;

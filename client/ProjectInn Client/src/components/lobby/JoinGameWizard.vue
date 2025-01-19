@@ -9,8 +9,9 @@
   import ErrorWindow from '../shared/windows/MessageWindow.vue';
   import ButtonBase from '../shared/ButtonBase.vue';
   import PasswordInput from './windows/PasswordInput.vue';
-  defineEmits<{
-      close : boolean
+import type { Player } from '../../model/Player.js';
+  const emits = defineEmits<{
+      (e : "close") : boolean
   }>();
 
   const props = defineProps<{
@@ -24,8 +25,14 @@
   const showPasswordScreen = ref(false);
   const showPlayerMenu = ref(false);
   const joinData = ref(getJoinDataBaseValue());
+  type joinData = {
+    gameId : number,
+    player : Player,
+    password : string | undefined,
+    enterAsNewPlayer : boolean
+  }
 
-  function getJoinDataBaseValue(){
+  function getJoinDataBaseValue() : joinData{
       return {
           gameId : 0,
           player : {
@@ -40,18 +47,16 @@
       }
   }
 
-  function showPlayerEditor(){
-      showPlayerMenu.value = true;
-  }
-
-  function submitJoinData(){
+  function submitJoinData(player : Player){
       joinData.value.gameId = props.joinID !== undefined ? props.joinID : joinData.value.gameId;
+      joinData.value.player = player;
       showPlayerMenu.value = false;
       const game : GamePreview | undefined = props.activeGames.find(g => g.id == joinData.value.gameId);
       if(game === undefined){
           showJoinError.value = true;
           return;
       }
+      emits('close');
       if(game.private == true){
           showPasswordScreen.value = true;
           return;
@@ -70,7 +75,8 @@
       joinData.value = getJoinDataBaseValue();
   }
 
-  function submitJoinDataPassword(){
+  function submitJoinDataPassword(password : string | undefined){
+      joinData.value.password = password;
       if(joinData.value.password === undefined){
           return;
       }
@@ -86,6 +92,23 @@
           }
       });
       joinData.value = getJoinDataBaseValue();
+      emits('close');
+  }
+
+  function hideError(){
+      emits('close');
+      showJoinError.value = false;
+  }
+
+  function goToPlayerEditor(gameId : number){
+      joinData.value.gameId = gameId;
+      showPlayerMenu.value = true;
+      emits('close');
+  }
+
+  function hidePlayerEditor(){
+      showPlayerMenu.value = false;
+      emits('close');
   }
 
 </script>
@@ -98,39 +121,26 @@
             <ButtonBase
             text="Ok"
             width="100px"
-            @click="() => {
-                $emit('close');
-                showJoinError = false;
-            }
-            "></ButtonBase>
+            @click="hideError"></ButtonBase>
         </template>
     </ErrorWindow>
     <IdInput
-    :join-data="joinData"
-    :on-confirm="() => {
-        showPlayerEditor();
-        $emit('close');
-    }"
+    :game-id="joinData.gameId"
+    @confirm="goToPlayerEditor"
     :show="showWizard && joinID === undefined"
-    @close="$emit('close')">
+    @close="emits('close')">
     </IdInput>
     <PlayerEditWindow
     :player="joinData.player"
-    :on-confirm="() => {
-        submitJoinData();
-        $emit('close');
-    }"
     :show="showPlayerMenu || showWizard && joinID !== undefined"
     :force-new-player="false"
-    @close="() => {
-        showPlayerMenu = false;
-        $emit('close');
-    }"
-    @change-new-player-status="s => joinData.enterAsNewPlayer = s">
+    @close="hidePlayerEditor"
+    @change-new-player-status="s => joinData.enterAsNewPlayer = s"
+    @confirm="submitJoinData">
     </PlayerEditWindow>
     <PasswordInput
-    :join-data="joinData"
-    :on-confirm="submitJoinDataPassword"
+    :password="joinData.password"
+    @confirm="submitJoinDataPassword"
     :show="showPasswordScreen"
     @close="showPasswordScreen = false"
     ></PasswordInput>

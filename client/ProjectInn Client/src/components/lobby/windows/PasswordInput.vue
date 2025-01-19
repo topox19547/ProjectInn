@@ -3,27 +3,33 @@
     import WindowBase from '../../shared/WindowBase.vue';
     import WindowTitleBar from '../../shared/WindowTitleBar.vue';
     import CloseButton from '../../shared/CloseButton.vue';
-    import { ref, watch} from 'vue';
+    import { onUpdated, ref, watch} from 'vue';
     import WindowBackground from '../../shared/WindowBackground.vue';
     import ButtonBase from '../../shared/ButtonBase.vue';
-    import type { Player } from '../../../model/Player.js';
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         (e: "close") : void
+        (e: "confirm", password : string | undefined) : void
     }>();
     const props = defineProps<{
-        joinData : { gameId : number, player : Player, password : string | undefined}
+        password : string | undefined
         show : boolean
-        onConfirm : () => void
     }>();
-    watch(props.joinData,(joinData) => {
-        confirmDisabled.value = joinData.password == undefined || joinData.password?.length == 0;
+    const password = ref(props.password);
+
+
+    watch(password,(newPassword) => {
+        confirmDisabled.value = newPassword == undefined || newPassword?.length == 0;
     })
 
     function confirm(){
         emits("close");
-        props.onConfirm();
+        emits("confirm", password.value);
     }
+
+    onUpdated(() => {
+        password.value = props.password;
+    })
 </script>
 
 
@@ -42,7 +48,7 @@
                 <div class="contentContainer">
                     <div class="subCategory">
                         <div class="inputTitle">Enter password</div>
-                        <input class="textBox" v-model="joinData.password" maxlength="24" type="text">
+                        <input class="textBox" v-model="password" maxlength="24" type="text">
                     </div>
                 </div>
                 <div class="buttonContainer">

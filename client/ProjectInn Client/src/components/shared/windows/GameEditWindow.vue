@@ -6,31 +6,32 @@
     import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
+import type { GameSettings } from '../../../model/Game.js';
     const passwordEnabled = ref(false);
-    defineEmits<{
+
+    const emits = defineEmits<{
         (e : 'close') : void,
+        (e : 'confirm', gameSettings : GameSettings) : void
     }>();
+
     const props = defineProps<{
-        game : {
-            name : string,
-            password : undefined | string
-            localSettings? : {
-                autoSaveEnabled : boolean
-            }
-        }
+        gameSettings : GameSettings
         isNewGame : boolean
         enableSaveManagement : boolean
         show : boolean
         confirmText : string
-        onConfirm? : () => void
     }>();
+
+    const editableGameSettings = ref(JSON.parse(JSON.stringify(props.gameSettings)) as GameSettings);
+
     watch(passwordEnabled,(newValue) => {
         if(newValue == false){
-            props.game.password = undefined;
+            editableGameSettings.value.password = undefined;
         }
     });
     watch(() => props.show, () => {
-        passwordEnabled.value = props.game.password !== undefined
+        passwordEnabled.value = props.gameSettings.password !== undefined
+        editableGameSettings.value = JSON.parse(JSON.stringify(props.gameSettings)) as GameSettings;
     })
 </script>
 
@@ -51,7 +52,7 @@
                     <div class="editor">
                         <div class="subCategory" v-if=isNewGame>
                             <div class="inputTitle">Game name</div>
-                            <input class="textBox" v-model="game.name"
+                            <input class="textBox" v-model="editableGameSettings.name"
                             maxlength="24" type="text">
                         </div>
                         <div class="multiLineSubCategory">
@@ -62,22 +63,23 @@
                             <div class="section">
                                 <div class="inputTitle">Password</div>
                                 <input
-                                class="textBox" v-model="game.password" :disabled="!passwordEnabled"
+                                class="textBox" v-model="editableGameSettings.password" :disabled="!passwordEnabled"
                                  maxlength="24" type="text" title="sceneName" placeholder="Password">
                             </div>
                         </div>
-                        <div class="subCategory" v-if="enableSaveManagement && game.localSettings !== undefined">
+                        <div class="subCategory" v-if="enableSaveManagement &&
+                        editableGameSettings.localSettings !== undefined">
                             <div class="section">
                                 <div class="inputTitle">Enable autosave</div>
                                 <input class="toggle"
-                                v-model="game.localSettings.autoSaveEnabled" type="checkbox">
+                                v-model="editableGameSettings.localSettings.autoSaveEnabled" type="checkbox">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="buttonContainer">
-                    <ButtonBase :text="confirmText" @click="onConfirm" height="42px"
-                    :disabled="(game.name.length == 0 && isNewGame) || (passwordEnabled && !game.password)">
+                    <ButtonBase :text="confirmText" @click="emits('confirm', editableGameSettings)" height="42px"
+                    :disabled="(editableGameSettings.name.length == 0 && isNewGame) || (passwordEnabled && !editableGameSettings.password)">
                     </ButtonBase>
                 </div>
             </template>

@@ -4,7 +4,7 @@
     import SaveIcon from '../../../assets/icons/save.svg';
     import SceneIcon from "../../../assets/icons/scene.svg";
     import SettingsIcon from '../../../assets/icons/settings.svg';
-    import type { Game } from '../../../model/Game.js';
+    import type { Game, GameSettings, LocalSettings } from '../../../model/Game.js';
     import { Permission } from '../../../model/Permission.js';
     import { Command } from '../../../network/message/Command.js';
     import { Status } from '../../../network/message/Status.js';
@@ -26,21 +26,27 @@
         game : Game
     }>();
 
-    const gameDataCopy = ref(copyGameData());
+    const emits = defineEmits<{
+      (e : "saveLocalSettings", localSettings : LocalSettings) : void
+    }>();
 
-    function editGameSettings(){
-        props.game.localSettings = gameDataCopy.value.localSettings
-        if(gameDataCopy.value.password != props.game.password){
+    const gameDataCopy = ref(getGameData());
+
+    function editGameSettings(game : GameSettings){
+        if(game.localSettings !== undefined){
+          emits("saveLocalSettings",game.localSettings);
+        }
+        if(game.password != props.game.password){
             serverPublisher.send({
                 status : Status.PASSWORD_CHANGE,
                 command : Command.MODIFY,
-                content : { password : gameDataCopy.value.password }
+                content : { password : game.password }
              });
         }
         showGameSettings.value = false;
     }
 
-    function copyGameData(){
+    function getGameData() : GameSettings{
         return {
             name : props.game.name,
             password : props.game.password,
@@ -94,7 +100,7 @@
     }, {immediate : true})
 
     watch(showGameSettings, () => {
-        gameDataCopy.value = copyGameData()
+        gameDataCopy.value = getGameData()
     })
 
 </script>
@@ -130,10 +136,10 @@
     <GameEditWindow
     :is-new-game="false"
     :enable-save-management="game.localPlayer.isOwner"
-    :game="gameDataCopy"
+    :gameSettings="gameDataCopy"
     :show="showGameSettings"
     confirm-text="Save"
-    :on-confirm="editGameSettings"
+    @confirm="editGameSettings"
     @close="showGameSettings = false"
     ></GameEditWindow>
     <ConfirmAction

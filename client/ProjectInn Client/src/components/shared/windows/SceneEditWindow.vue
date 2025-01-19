@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { onUpdated, ref, watch } from 'vue';
+    import { ref, watch } from 'vue';
     import SceneIcon from '../../../assets/icons/scene.svg';
     import { getInitializedViewData } from '../../../model/Game.js';
     import { getDefaultGlobalSettings } from '../../../model/GlobalSettings.js';
@@ -17,47 +17,50 @@
     const tileSizeValue = ref(100);
     const offsetValue = ref({x : 0, y : 0})
     const confirmDisabled = ref(true);
-    defineEmits<{
-        close : void
+    const emits = defineEmits<{
+        (e : "close") : void
+        (e : "confirm", scene : Scene) : void
     }>();
     const props = defineProps<{
         title : string
         show : boolean
         scene : Scene
-        onConfirm : () => void
     }>();
+    const editableScene = ref(JSON.parse(JSON.stringify(props.scene)) as Scene); //deep clone
 
 
     watch(tileSizeValue,(newValue) => {
         if(newValue < minTileSize){
-            props.scene.tileSize = minTileSize;
+            editableScene.value.tileSize = minTileSize;
         } else if (newValue > maxTileSize){
-            props.scene.tileSize = maxTileSize;
+            editableScene.value.tileSize = maxTileSize;
         } else {
-            props.scene.tileSize = newValue;
+            editableScene.value.tileSize = newValue;
         }
     })
 
     watch(offsetValue, (newValue) => {
-        props.scene.offset.x = typeof newValue.x !== "number" ? 0 : newValue.x;
-        props.scene.offset.y = typeof newValue.y !== "number"? 0 : newValue.y;
+        editableScene.value.offset.x = typeof newValue.x !== "number" ? 0 : newValue.x;
+        editableScene.value.offset.y = typeof newValue.y !== "number"? 0 : newValue.y;
     }, {deep : true})
 
-    watch(props.scene.asset, (newValue, oldValue) => {
-        if(oldValue.assetURL != newValue.assetURL){
+    watch(() => editableScene.value.asset.assetURL, (newValue, oldValue) => {
+        console.log("changed url")
+        if(oldValue != newValue){
             confirmDisabled.value = true;
         }
     })
 
-    onUpdated(() => {
+    watch(() => props.show,() => {
         confirmDisabled.value = true;
-        tileSizeValue.value = props.scene.tileSize;
-        offsetValue.value.x = props.scene.offset.x;
-        offsetValue.value.y = props.scene.offset.y;
+        editableScene.value = JSON.parse(JSON.stringify(props.scene)) as Scene; //deep clone
+        tileSizeValue.value = editableScene.value.tileSize;
+        offsetValue.value.x = editableScene.value.offset.x;
+        offsetValue.value.y = editableScene.value.offset.y;
     })
 
     function enableConfirm(image : ImageBitmap){
-        props.scene.asset.assetSize = {x : image.width, y : image.height};
+        editableScene.value.asset.assetSize = {x : image.width, y : image.height};
         confirmDisabled.value = false;
     }
 </script>
@@ -78,23 +81,25 @@
                 <div class="contentContainer">
                     <div class="editor">
                         <div class="inputTitle">Scene name</div>
-                        <input class="textBox" v-model="scene.asset.name" maxlength="24" type="text">
+                        <input class="textBox" v-model="editableScene.asset.name" maxlength="24" type="text">
                         <div class="titleWithHelp">
                             <div class="inputTitle">
                                 Image URL
                             </div>
                             <UploadHelp></UploadHelp>
                         </div>
-                        <input class="textBox" v-model="scene.asset.assetURL" maxlength="2000" type="text">
+                        <input class="textBox" v-model="editableScene.asset.assetURL" maxlength="2000" type="text">
                         <div class="inputTitle">Grid Type</div>
                         <div class="gridTypeSelection">
                             <div class = "subCategory">
                                 <div class="subOption">Square</div>
-                                <input class="radioButton" :value="0" type="radio" v-model="scene.gridType" name="test">
+                                <input class="radioButton" :value="0" type="radio"
+                                v-model="editableScene.gridType" name="test">
                             </div>
                             <div class = "subCategory">
                                 <div class="subOption">Hexagonal</div>
-                                <input class="radioButton" :value="1"  type="radio" v-model="scene.gridType" name="test">
+                                <input class="radioButton" :value="1"  type="radio"
+                                v-model="editableScene.gridType" name="test">
                             </div>
                         </div>
                         <div class="inputTitle">Tile width (pixels)</div>
@@ -120,7 +125,7 @@
                             rounded="16px"
                             :tokens="[]"
                             :token-assets="[]"
-                            :current-scene="scene"
+                            :current-scene="editableScene"
                             :local-player="getStartingPlayerData()"
                             :players="[]"
                             :global-settings="getDefaultGlobalSettings()"
@@ -132,7 +137,8 @@
                             </div>
                         </div>
                         <ButtonBase
-                        text="Next" width="256px" height="42px" :disabled="confirmDisabled" @click="onConfirm">
+                        text="Next" width="256px" height="42px" :disabled="confirmDisabled"
+                        @click="emits('confirm', editableScene)">
                         </ButtonBase>
                     </div>
                 </div>

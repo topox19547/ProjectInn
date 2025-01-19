@@ -7,33 +7,35 @@
     import WindowBackground from '../WindowBackground.vue';
     import WindowBase from '../WindowBase.vue';
     import WindowTitleBar from '../WindowTitleBar.vue';
-    
+
     const confirmDisabled = ref(true);
     const emits = defineEmits<{
         (e : "close") : void
         (e : "changeNewPlayerStatus", status : boolean) : void
+        (e : "confirm", player : Player) : void
     }>();
     const props = defineProps<{
         player : Player
         show : boolean
-        onConfirm : () => void
         forceNewPlayer : boolean
     }>();
     const allowedCharacters : string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+    const editablePlayer = ref(JSON.parse(JSON.stringify(props.player)) as Player); //deep clone
     const isNewPlayer = ref(true);
 
     watch(() => props.show, () => {
         isNewPlayer.value = true;
+        editablePlayer.value = JSON.parse(JSON.stringify(props.player)) as Player;
     })
 
-    watch(props.player,(newPlayer) => {
-        confirmDisabled.value = newPlayer.name.length == 0 || [...newPlayer.name].some(
+    watch(() => editablePlayer.value.name, (newName) => {
+        confirmDisabled.value = newName.length == 0 || [...newName].some(
             c => !allowedCharacters.includes(c));
     })
 
     function submit(){
         emits("changeNewPlayerStatus", isNewPlayer.value);
-        props.onConfirm();
+        emits("confirm", editablePlayer.value);
     }
 </script>
 
@@ -59,18 +61,18 @@
                         <div class="subCategory" key="playerName">
                             <div class="inputTitle">
                                 {{ forceNewPlayer || isNewPlayer ? "Player name" : "Previous name"}}</div>
-                            <input class="textBox" v-model="player.name" maxlength="24" type="text">
+                            <input class="textBox" v-model="editablePlayer.name" maxlength="24" type="text">
                         </div>
-                        <div class="subCategory" key="color" 
+                        <div class="subCategory" key="color"
                         v-if="forceNewPlayer == true || isNewPlayer">
                             <div class="inputTitle">Player color</div>
-                            <input type="color" v-model="player.color" class="colorPicker">
+                            <input type="color" v-model="editablePlayer.color" class="colorPicker">
                         </div>
                     </TransitionGroup>
                 </div>
                 <div class="buttonContainer">
                     <ButtonBase text="Next" height="42px" :disabled="confirmDisabled" @click="submit"></ButtonBase>
-                </div> 
+                </div>
             </template>
         </WindowBase>
     </Transition>
@@ -103,7 +105,7 @@
     .buttonContainer{
         display: flex;
         justify-content: center;
-        padding-bottom: 16px; 
+        padding-bottom: 16px;
     }
 
     .contentContainer{
@@ -143,7 +145,7 @@
         padding-left: 4px;
         padding-bottom: 4px;
     }
-    
+
     .subOption{
         color: #d9d9d9;
     }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, watch } from 'vue';
+    import { onUpdated, ref, watch } from 'vue';
     import AssetIcon from '../../../assets/icons/assets.svg';
     import ErrorImage from '../../../assets/placeholders/token_placeholder.png';
     import type { Asset } from '../../../model/Asset.js';
@@ -12,19 +12,20 @@
     const confirmDisabled = ref(true);
     let imageValid = false;
     let errorOccurred = false;
-    defineEmits<{
-        close : void
+    const emits = defineEmits<{
+        (e : "close") : void
+        (e : "confirm", asset : Asset) : void
     }>();
     const props = defineProps<{
         title : string
         actionText : string
         show : boolean
         asset : Asset
-        onConfirm : () => void
     }>();
+    const editableAsset = ref(JSON.parse(JSON.stringify(props.asset))); //deep clone
 
     function enableConfirm() : void{
-        confirmDisabled.value = !(imageValid && props.asset.name.length > 0);
+        confirmDisabled.value = !(imageValid && editableAsset.value.name.length > 0);
     }
 
     function onLoadError(e : Event) : void{
@@ -46,12 +47,16 @@
 
     function confirm() : void{
         confirmDisabled.value = true;
-        props.onConfirm();
+        emits("confirm", editableAsset.value);
     }
 
     watch(() => props.asset.assetURL, () => {
         imageValid = false;
-    })
+    });
+
+    onUpdated(() => {
+        editableAsset.value = JSON.parse(JSON.stringify(props.asset));
+    });
 </script>
 
 
@@ -70,18 +75,18 @@
                 <div class="contentContainer">
                     <div class="editor">
                         <div class="inputTitle">Asset name</div>
-                        <input class="textBox" @input="enableConfirm" v-model="asset.name" maxlength="24" type="text">
+                        <input class="textBox" @input="enableConfirm" v-model="editableAsset.name" maxlength="24" type="text">
                         <div class="titleWithHelp">
                             <div class="inputTitle">
                                 Image URL
                             </div>
                             <UploadHelp></UploadHelp>
                         </div>
-                        <input class="textBox" v-model="asset.assetURL" maxlength="2000" type="text">
+                        <input class="textBox" v-model="editableAsset.assetURL" maxlength="2000" type="text">
                     </div>
                     <div class="preview">
                         <div>
-                            <img :src="asset.assetURL" @error="onLoadError"
+                            <img :src="editableAsset.assetURL" @error="onLoadError"
                             width="128px" height="128px"
                             @load="onLoadSuccess">
                             <div class="previewLabel">
