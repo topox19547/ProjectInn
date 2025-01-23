@@ -433,10 +433,6 @@ export class GameController implements ClientState{
         }
     }
 
-    private isNameValid(name : string, type : AssetType){
-
-    }
-
     private getTokenIfAuthorized(id : number, ignoreOwnership : boolean) : Token{
         const token : Token | undefined = this.currentGame.getToken(id);
         if(token === undefined){
