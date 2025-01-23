@@ -262,9 +262,10 @@ export class GameController implements ClientState{
                     if(message.command == Command.CREATE){
                         const content = Scene.validate(message.content);
                         const scene : Scene = Scene.fromObject(content);
-                        if(!this.currentGame.addScene(scene)){
+                        if(!this.currentGame.isNameUnique(content.asset.name, AssetType.SCENE)){
                             throw new ValueError("There already is a scene with the same name");
                         }
+                        this.currentGame.addScene(scene);
                     }
                     else if(message.command == Command.DELETE){
                         const content = ensureObject({
@@ -280,6 +281,10 @@ export class GameController implements ClientState{
                             this.currentGame.getCurrentScene() == scene ?
                             undefined : 
                             Permission.MANAGE_SCENES;
+                        if(!(content.asset.name == scene.getName()) &&
+                            !this.currentGame.isNameUnique(content.asset.name, AssetType.SCENE)){
+                            throw new ValueError("There already is a scene with the same name");
+                        }
                         scene.setGridType(content.gridType, minPermission);
                         scene.setOffset(new Vector2(content.offset.x,content.offset.y), minPermission);
                         scene.setTileSize(content.tileSize, minPermission);
@@ -322,9 +327,10 @@ export class GameController implements ClientState{
                         if(content.assetType != AssetType.TOKEN){
                             throw new ValueError("Wrong asset type passed");
                         }
-                        if(!this.currentGame.addTokenAsset(Asset.fromObject(content))){
-                            throw new ValueError("There already is a token asset with the same name");
+                        if(!this.currentGame.isNameUnique(content.name, AssetType.TOKEN)){
+                            throw new ValueError("There already is an asset with the same name");
                         }
+                        this.currentGame.addTokenAsset(Asset.fromObject(content));
                     } else if (message.command == Command.DELETE){
                         const content = ensureObject({id : ensureNumber})(message.content);
                         if(!this.currentGame.removeTokenAsset(content.id)){
@@ -337,6 +343,9 @@ export class GameController implements ClientState{
                             this.currentGame.isTokenAssetInUse(asset.getID()) ?
                             undefined : 
                             Permission.MANAGE_TOKENS;
+                        if(!(content.name == asset.getName()) && !this.currentGame.isNameUnique(content.name, AssetType.TOKEN)){
+                            throw new ValueError("There already is an asset with the same name");
+                        }
                         if(!asset.setName(content.name, minPermission)){
                             throw new ValueError("The supplied name is too long");
                         }
@@ -424,6 +433,9 @@ export class GameController implements ClientState{
         }
     }
 
+    private isNameValid(name : string, type : AssetType){
+
+    }
 
     private getTokenIfAuthorized(id : number, ignoreOwnership : boolean) : Token{
         const token : Token | undefined = this.currentGame.getToken(id);

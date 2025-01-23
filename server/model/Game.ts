@@ -15,6 +15,7 @@ import { Command } from "./messages/Command.js";
 import { Status } from "./messages/Status.js";
 import { ensureObject, ensureString, ensureArrayOf, weakEnsureOf, ensureGenericObject, ensureNumber } from "./messages/Validators.js";
 import { NotificationSource } from "./gameObjects/NotificationSource.js";
+import { AssetType } from "./gameObjects/asset/AssetType.js";
 
 
 /**
@@ -269,10 +270,7 @@ export class Game{
         return this.players.find(p => p.getName() == playerName);
     }
 
-    public addTokenAsset(asset : Asset) : boolean{
-        if(this.tokenAssets.findIndex(a => a.getName() == asset.getName()) != -1){
-            return false;
-        }
+    public addTokenAsset(asset : Asset) : void{
         this.addToEntityArray(this.tokenAssets,asset);
         if(this.notifier !== undefined){
             asset.setNotifier(this.notifier);
@@ -280,8 +278,7 @@ export class Game{
         this.notifier?.notifyIf({
             status : Status.TOKEN_ASSET,
             command : Command.CREATE,
-            content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS))
-        return true;
+            content : Asset.toObject(asset)}, (p) => p.hasPermission(Permission.MANAGE_TOKENS));
     }
 
     public removeTokenAsset(id : number) : boolean{
@@ -300,6 +297,11 @@ export class Game{
             command : Command.DELETE,
             content : {id : id}})
         return true;
+    }
+
+    public isNameUnique(name : string, type : AssetType){
+        const arrayToCheck = type == AssetType.SCENE ? this.scenes : this.tokenAssets;
+        return arrayToCheck.find(o => name == o.getName()) === undefined;
     }
 
     public getTokenAsset(id : number) : Asset | undefined{
@@ -368,10 +370,7 @@ export class Game{
         return this.tokens.find(t => t.getID() == tokenId);
     }
 
-    public addScene(scene : Scene) : boolean{
-        if(this.scenes.find(s => s.getName() == scene.getName())){
-            return false;
-        }
+    public addScene(scene : Scene) : void{
         this.addToEntityArray(this.scenes,scene);
         if(this.notifier !== undefined){
             scene.setNotifier(this.notifier);
@@ -381,7 +380,6 @@ export class Game{
             command : Command.CREATE,
             content : Scene.toObject(scene)
         }, p => p.hasPermission(Permission.MANAGE_SCENES));
-        return true;
     }
 
     public removeScene(id : number) : boolean{

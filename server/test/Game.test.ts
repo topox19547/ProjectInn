@@ -246,7 +246,7 @@ it("an entire game can be played fully using all the main commands", () => {
     assert(game.getPlayer("test2")?.hasPermission(Permission.MANAGE_SCENES));
     //Scenes
     const scene2 : Scene = Scene.fromObject(Scene.toObject(startingScene));
-    scene2.setName("test2")
+    scene2.setName("test2");
     handler.receive({
         status : Status.SCENE,
         command : Command.CREATE,
@@ -261,6 +261,7 @@ it("an entire game can be played fully using all the main commands", () => {
     })
     scene2.setGridType(GridType.HEXAGONAL);
     scene2.setID(0);
+    scene2.setName("test3");
     handler.receive({
         status : Status.SCENE,
         command : Command.MODIFY,
